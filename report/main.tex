@@ -1,0 +1,81 @@
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[11pt]{report}
+
+\usepackage[utf8]{inputenc} % Required for inputting international characters
+\usepackage[T1]{fontenc} % Output font encoding for international characters
+
+\usepackage{mathpazo} % Palatino font
+
+\begin{document}
+
+
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+
+\input{chapters/title_page}
+
+
+%----------------------------------------------------------------------------------------
+%	ABSTRACT
+%----------------------------------------------------------------------------------------
+
+\begin{abstract}
+Abstract goes here.
+\end{abstract}
+
+
+%----------------------------------------------------------------------------------------
+%	TABLE OF CONTENTS
+%----------------------------------------------------------------------------------------
+
+\tableofcontents
+
+
+%----------------------------------------------------------------------------------------
+%	CHAPTERS
+%----------------------------------------------------------------------------------------
+
+\chapter{Introduction}
+\input{chapters/introduction}
+
+
+\chapter{Literature Review}
+\input{chapters/literature_review}
+
+
+
+\chapter{Problem Analysis}
+\input{chapters/problem_analysis}
+
+
+\chapter{Design and Implementation}
+\input{chapters/design_and_implementation}
+
+
+\chapter{Results and Evaluation}
+\input{chapters/results_and_evaluation}
+
+
+\chapter{Conclusions}
+\input{chapters/conclusions}
+
+
+%----------------------------------------------------------------------------------------
+%	BIBLIOGRAPHY
+%----------------------------------------------------------------------------------------
+
+\chapter{Bibliography}
+
+
+%----------------------------------------------------------------------------------------
+%	APENDICES
+%----------------------------------------------------------------------------------------
+
+\appendix
+\chapter{}
+
+\end{document}
