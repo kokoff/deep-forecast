@@ -1,0 +1,96 @@
+\documentclass[10pt]{article}
+\usepackage{graphicx}
+
+\usepackage{longtable}
+\usepackage{array}
+
+
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{0.25\textwidth}|}
+
+
+%------------------------------------------------------------
+%	TITLE
+%------------------------------------------------------------
+\title{Forecasting Macroeconomic Parameters with Deep Learning Neural Networks \\ Project Reading List}
+\date{\today}
+\author{Stefan Kokov}
+
+\begin{document}
+
+
+%------------------------------------------------------------
+%	MAKE TITLE
+%------------------------------------------------------------
+\maketitle
+
+\section{Books}
+\begin{itemize}
+\item Deep Learning \cite{goodfellow_bengio_courville_2017} - reading chapters on convolutional neural networks and recurrent neural networks.
+\end{itemize}
+
+
+\section{Papers}
+
+%------------------------------------------------------------
+%	READING LIST TABLE
+%------------------------------------------------------------
+\begin{center}
+
+	\begin{longtable}{ | P | P | P | P |}
+  
+    \hline
+    Paper & Application & Results & Key Concepts \\ \hline
+    %------------------------------------------------------------
+    %	ROW 1
+    %------------------------------------------------------------
+    Introduction to financial forecasting \cite{Abu-Mostafa1996}
+	& 
+	Using neural networks for financial forecasting with a focus on commodity futures and foreign exchange. 
+	&
+	Using custom features derived using domain knowledge ("hints"), authors managed to achieve better accuracy of their algorithm. 
+	& 
+    Input feature selection. \linebreak Problems arraising from the noisy nature of financial data. 
+    \\  \hline
+    %------------------------------------------------------------
+    %	ROW 2
+    %------------------------------------------------------------ 
+	Equation Discovery for Macroeconomic Modelling  \cite{dimitar}  
+    &
+    Using LAGRAMGE equation discovery tool to find macroeconomic models, which both minimise error in predictions and provide a theoretical insight. 
+    &
+    Several models which achieve good predictions are found. They are not based on iterative re-estimation, which might mean they are theoritically sound.
+    &
+    Equation Discovery 
+    \linebreak
+    Macroeconomic parameters used: inflation, output, interest rate
+    \linebreak
+    Macroeconomic background - empirical modelling of the inflation process.
+   	\\  \hline
+   	
+   	%------------------------------------------------------------
+    %	ROW 2
+    %------------------------------------------------------------ 
+	Forecasting Stock Prices from the Limit Order
+Book using Convolutional Neural Networks  \cite{Tsantekidis}  
+    &
+    Convolutional Neural Network algorithm for predicting stock prices.
+    &
+    CNN outperforms MLP and SVM.
+    &
+    Convolutional neural network applied to financial time series data.
+    Further work suggestions.
+   	\\  \hline
+
+  	\end{longtable}
+\end{center}
+
+
+%------------------------------------------------------------
+%	REFERENCES
+%------------------------------------------------------------
+
+\bibliographystyle{ieeetr}
+\bibliography{reference} 
+
+
+\end{document}
