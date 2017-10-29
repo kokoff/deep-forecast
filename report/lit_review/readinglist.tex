@@ -15,6 +15,10 @@
 \date{\today}
 \author{Stefan Kokov}
 
+
+%------------------------------------------------------------
+%	BEGIN DOCUMENT
+%------------------------------------------------------------
 \begin{document}
 
 
@@ -23,17 +27,30 @@
 %------------------------------------------------------------
 \maketitle
 
+
+%------------------------------------------------------------
+%	BOOKS
+%------------------------------------------------------------
 \section{Books}
 \begin{itemize}
-\item Deep Learning \cite{goodfellow_bengio_courville_2017} - reading chapters on convolutional neural networks and recurrent neural networks.
+	\item Deep Learning \cite{goodfellow_bengio_courville_2017} - reading chapters on convolutional neural networks and recurrent neural networks.
 \end{itemize}
 
 
-\section{Papers}
+%------------------------------------------------------------
+%	PROJECTS
+%------------------------------------------------------------
+\section{Past Projects}
+\begin{itemize}
+	\item Forecasting Macroeconomic Data with Neural Networks \cite{bassi}.
+	\item Equation Discovery for Macroeconomic Modelling: an Ordinary Differential Equations appoach \cite{Georgiev}.
+\end{itemize}
+
 
 %------------------------------------------------------------
-%	READING LIST TABLE
+%	PAPERS
 %------------------------------------------------------------
+\section{Papers}
 \begin{center}
 
 	\begin{longtable}{ | P | P | P | P |}
@@ -45,9 +62,9 @@
     %------------------------------------------------------------
     Introduction to financial forecasting \cite{Abu-Mostafa1996}
 	& 
-	Using neural networks for financial forecasting with a focus on commodity futures and foreign exchange. 
+	Neural networks for financial forecasting with a focus on commodity futures and foreign exchange. 
 	&
-	Using custom features derived using domain knowledge ("hints"), authors managed to achieve better accuracy of their algorithm. 
+	Custom features derived using domain knowledge ("hints"), achieved good accuracy of their algorithm. 
 	& 
     Input feature selection. \linebreak Problems arraising from the noisy nature of financial data. 
     \\  \hline
@@ -68,7 +85,7 @@
    	\\  \hline
    	
    	%------------------------------------------------------------
-    %	ROW 2
+    %	ROW 3
     %------------------------------------------------------------ 
 	Forecasting Stock Prices from the Limit Order
 Book using Convolutional Neural Networks  \cite{Tsantekidis}  
@@ -80,6 +97,19 @@ Book using Convolutional Neural Networks  \cite{Tsantekidis}
     Convolutional neural network applied to financial time series data.
     Further work suggestions.
    	\\  \hline
+   	
+   	%------------------------------------------------------------
+    %	ROW 4
+    %------------------------------------------------------------ 
+	FForecasting with artificial neural networks:: The state of the art  \cite{ZHANG1998}  
+    &
+    Survey of research in forecasting using neural networks.
+    &
+    Summurises main aproaches for forecasting using neural networks at the time. Lists the main challenges and compares NN based aproaches to conventional methods.
+    &
+    Feedforward neural networks for forecasting. \linebreak
+    Main characteristics and challanges of using NN.
+   	\\  \hline
 
   	\end{longtable}
 \end{center}
@@ -88,7 +118,6 @@ Book using Convolutional Neural Networks  \cite{Tsantekidis}
 %------------------------------------------------------------
 %	REFERENCES
 %------------------------------------------------------------
-
 \bibliographystyle{ieeetr}
 \bibliography{reference} 
 
