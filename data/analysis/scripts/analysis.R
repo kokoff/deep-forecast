@@ -5,7 +5,7 @@ library(urca)
 WORK_DIR <- '/home/skokov/project/data/analysis'
 DATA_DIR <- '/home/skokov/project/data/'
 DATA_FILES <- list('ea.csv', 'us.csv')
-DATA_NAMES <- list('eu', 'us')
+DATA_NAMES <- list('ea', 'us')
 
 list.files(paste(WORK_DIR, '/', 'plots', '/', sep = ''), full.names = TRUE)
 file.remove(list.files(paste(WORK_DIR, '/', 'plots', '/', sep = ''), full.names = TRUE))
