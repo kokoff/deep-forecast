@@ -1,0 +1,2922 @@
+[1] "####################################################################################################"
+[1] "ea"
+[1] "CPI"
+[1] "####################################################################################################"
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression none 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 - 1 + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.50794 -0.21790  0.05383  0.27339  1.08791 
+
+Coefficients:
+           Estimate Std. Error t value Pr(>|t|)   
+z.lag.1    -0.03342    0.02444  -1.367  0.17565   
+z.diff.lag  0.32674    0.11004   2.969  0.00402 **
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.4173 on 74 degrees of freedom
+Multiple R-squared:  0.1173,	Adjusted R-squared:  0.09346 
+F-statistic: 4.918 on 2 and 74 DF,  p-value: 0.00988
+
+
+Value of test-statistic is: -1.3674 
+
+Critical values for test statistics: 
+     1pct  5pct 10pct
+tau1 -2.6 -1.95 -1.61
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression drift 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.33066 -0.26616  0.01426  0.24723  1.05275 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.24823    0.09730   2.551 0.012829 *  
+z.lag.1     -0.14498    0.04968  -2.918 0.004676 ** 
+z.diff.lag   0.37958    0.10816   3.509 0.000774 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.4026 on 73 degrees of freedom
+Multiple R-squared:  0.1896,	Adjusted R-squared:  0.1674 
+F-statistic: 8.538 on 2 and 73 DF,  p-value: 0.0004656
+
+
+Value of test-statistic is: -2.9183 4.2588 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau2 -3.51 -2.89 -2.58
+phi1  6.70  4.71  3.86
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression trend 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + tt + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.25653 -0.25715  0.00103  0.21148  1.05665 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.426855   0.158697   2.690 0.008881 ** 
+z.lag.1     -0.174711   0.053603  -3.259 0.001706 ** 
+tt          -0.003224   0.002272  -1.419 0.160226    
+z.diff.lag   0.390385   0.107690   3.625 0.000535 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.3998 on 72 degrees of freedom
+Multiple R-squared:  0.2116,	Adjusted R-squared:  0.1788 
+F-statistic: 6.442 on 3 and 72 DF,  p-value: 0.000632
+
+
+Value of test-statistic is: -3.2593 3.5498 5.324 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau3 -4.04 -3.45 -3.15
+phi2  6.50  4.88  4.16
+phi3  8.73  6.49  5.47
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept 
+
+
+Call:
+lm(formula = y ~ y.l1)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-1.3374 -0.2579  0.0291  0.3050  1.0400 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)   0.1878     0.1014   1.852    0.068 .  
+y.l1          0.8930     0.0516  17.308   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.43 on 75 degrees of freedom
+Multiple R-squared:  0.7998,	Adjusted R-squared:  0.7971 
+F-statistic: 299.6 on 1 and 75 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -2.6367 
+
+         aux. Z statistics
+Z-tau-mu            2.3372
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -3.516342 -2.899068 -2.586531
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept and trend 
+
+
+Call:
+lm(formula = y ~ y.l1 + trend)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.27464 -0.25907  0.00759  0.26084  1.04449 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.229683   0.107406   2.138   0.0358 *  
+y.l1         0.869463   0.055322  15.716   <2e-16 ***
+trend       -0.002748   0.002364  -1.162   0.2488    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.429 on 74 degrees of freedom
+Multiple R-squared:  0.8034,	Adjusted R-squared:  0.798 
+F-statistic: 151.2 on 2 and 74 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -2.9253 
+
+           aux. Z statistics
+Z-tau-mu              0.6653
+Z-tau-beta           -1.2752
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -4.080282 -3.468062 -3.160581
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: mu with 3 lags. 
+
+Value of test-statistic is: 0.4876 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.347 0.463  0.574 0.739
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: tau with 3 lags. 
+
+Value of test-statistic is: 0.1926 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.119 0.146  0.176 0.216
+
+[1] "####################################################################################################"
+[1] "ea"
+[1] "GDP"
+[1] "####################################################################################################"
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression none 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 - 1 + z.diff.lag)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-2.1101 -0.1385  0.1896  0.4291  1.7549 
+
+Coefficients:
+           Estimate Std. Error t value Pr(>|t|)    
+z.lag.1    -0.09840    0.03056  -3.219  0.00192 ** 
+z.diff.lag  0.64622    0.08683   7.442 1.56e-10 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.6226 on 73 degrees of freedom
+Multiple R-squared:  0.4522,	Adjusted R-squared:  0.4372 
+F-statistic: 30.13 on 2 and 73 DF,  p-value: 2.889e-10
+
+
+Value of test-statistic is: -3.2193 
+
+Critical values for test statistics: 
+     1pct  5pct 10pct
+tau1 -2.6 -1.95 -1.61
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression drift 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-2.37607 -0.31025  0.03892  0.32198  1.34241 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.21646    0.08637   2.506   0.0145 *  
+z.lag.1     -0.15306    0.03670  -4.171 8.36e-05 ***
+z.diff.lag   0.67587    0.08468   7.982 1.66e-11 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.6013 on 72 degrees of freedom
+Multiple R-squared:  0.496,	Adjusted R-squared:  0.482 
+F-statistic: 35.43 on 2 and 72 DF,  p-value: 1.94e-11
+
+
+Value of test-statistic is: -4.1706 8.6976 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau2 -3.51 -2.89 -2.58
+phi1  6.70  4.71  3.86
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression trend 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + tt + z.diff.lag)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-2.3806 -0.3669  0.1055  0.3675  1.2702 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.449666   0.175656   2.560   0.0126 *  
+z.lag.1     -0.174578   0.039027  -4.473 2.86e-05 ***
+tt          -0.005201   0.003421  -1.520   0.1329    
+z.diff.lag   0.696042   0.084961   8.193 7.35e-12 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.5959 on 71 degrees of freedom
+Multiple R-squared:  0.5119,	Adjusted R-squared:  0.4913 
+F-statistic: 24.82 on 3 and 71 DF,  p-value: 4.315e-11
+
+
+Value of test-statistic is: -4.4733 6.6745 10.0111 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau3 -4.04 -3.45 -3.15
+phi2  6.50  4.88  4.16
+phi3  8.73  6.49  5.47
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept 
+
+
+Call:
+lm(formula = y ~ y.l1)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.7039 -0.3558  0.0640  0.4038  3.0492 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.11928    0.11627   1.026    0.308    
+y.l1         0.89841    0.04846  18.539   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.8175 on 74 degrees of freedom
+Multiple R-squared:  0.8228,	Adjusted R-squared:  0.8204 
+F-statistic: 343.7 on 1 and 74 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -2.9108 
+
+         aux. Z statistics
+Z-tau-mu            1.5731
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -3.517498 -2.899574 -2.586797
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept and trend 
+
+
+Call:
+lm(formula = y ~ y.l1 + trend)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.7061 -0.3520  0.0646  0.3996  3.0477 
+
+Coefficients:
+              Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.1208091  0.1205542   1.002    0.320    
+y.l1         0.8974164  0.0522403  17.179   <2e-16 ***
+trend       -0.0002443  0.0046082  -0.053    0.958    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.8231 on 73 degrees of freedom
+Multiple R-squared:  0.8228,	Adjusted R-squared:  0.818 
+F-statistic: 169.5 on 2 and 73 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -2.9096 
+
+           aux. Z statistics
+Z-tau-mu             -0.2992
+Z-tau-beta           -0.5294
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -4.081921 -3.468832 -3.161028
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: mu with 3 lags. 
+
+Value of test-statistic is: 0.3968 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.347 0.463  0.574 0.739
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: tau with 3 lags. 
+
+Value of test-statistic is: 0.0954 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.119 0.146  0.176 0.216
+
+[1] "####################################################################################################"
+[1] "ea"
+[1] "UR"
+[1] "####################################################################################################"
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression none 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 - 1 + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.33891 -0.06950 -0.00118  0.07418  0.63010 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+z.lag.1    -0.001401   0.001643  -0.853    0.397    
+z.diff.lag  0.802657   0.069172  11.604   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.138 on 73 degrees of freedom
+Multiple R-squared:  0.6512,	Adjusted R-squared:  0.6416 
+F-statistic: 68.14 on 2 and 73 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic is: -0.8529 
+
+Critical values for test statistics: 
+     1pct  5pct 10pct
+tau1 -2.6 -1.95 -1.61
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression drift 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.31356 -0.07594 -0.00983  0.06231  0.57084 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.29731    0.11673   2.547   0.0130 *  
+z.lag.1     -0.03175    0.01202  -2.641   0.0101 *  
+z.diff.lag   0.81598    0.06691  12.194   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.1331 on 72 degrees of freedom
+Multiple R-squared:  0.6783,	Adjusted R-squared:  0.6693 
+F-statistic:  75.9 on 2 and 72 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic is: -2.6414 3.6347 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau2 -3.51 -2.89 -2.58
+phi1  6.70  4.71  3.86
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression trend 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + tt + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.23538 -0.07463  0.00586  0.07335  0.54317 
+
+Coefficients:
+              Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.3733600  0.1201920   3.106  0.00272 ** 
+z.lag.1     -0.0464253  0.0137940  -3.366  0.00124 ** 
+tt           0.0016675  0.0008182   2.038  0.04527 *  
+z.diff.lag   0.8070285  0.0656426  12.294  < 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.1303 on 71 degrees of freedom
+Multiple R-squared:  0.6961,	Adjusted R-squared:  0.6832 
+F-statistic:  54.2 on 3 and 71 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic is: -3.3656 3.9139 5.7181 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau3 -4.04 -3.45 -3.15
+phi2  6.50  4.88  4.16
+phi3  8.73  6.49  5.47
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept 
+
+
+Call:
+lm(formula = y ~ y.l1)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.32553 -0.18512 -0.02932  0.10771  0.94953 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.17148    0.20239   0.847      0.4    
+y.l1         0.98079    0.02083  47.091   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.2319 on 74 degrees of freedom
+Multiple R-squared:  0.9677,	Adjusted R-squared:  0.9673 
+F-statistic:  2218 on 1 and 74 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -1.45 
+
+         aux. Z statistics
+Z-tau-mu            1.3991
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -3.517498 -2.899574 -2.586797
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept and trend 
+
+
+Call:
+lm(formula = y ~ y.l1 + trend)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.35875 -0.16607 -0.03329  0.10197  0.91642 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 0.312821   0.231657    1.35    0.181    
+y.l1        0.966025   0.023927   40.38   <2e-16 ***
+trend       0.001727   0.001393    1.24    0.219    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.2311 on 73 degrees of freedom
+Multiple R-squared:  0.9684,	Adjusted R-squared:  0.9675 
+F-statistic:  1118 on 2 and 73 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -1.8652 
+
+           aux. Z statistics
+Z-tau-mu             -0.2631
+Z-tau-beta            1.4305
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -4.081921 -3.468832 -3.161028
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: mu with 3 lags. 
+
+Value of test-statistic is: 0.7619 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.347 0.463  0.574 0.739
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: tau with 3 lags. 
+
+Value of test-statistic is: 0.2626 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.119 0.146  0.176 0.216
+
+[1] "####################################################################################################"
+[1] "ea"
+[1] "IR Policy Rate"
+[1] "####################################################################################################"
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression none 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 - 1 + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.15177 -0.04502  0.02066  0.14120  0.66046 
+
+Coefficients:
+           Estimate Std. Error t value Pr(>|t|)    
+z.lag.1    -0.02066    0.01552  -1.331    0.187    
+z.diff.lag  0.43203    0.10379   4.163 8.82e-05 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.2477 on 70 degrees of freedom
+Multiple R-squared:  0.2189,	Adjusted R-squared:  0.1965 
+F-statistic: 9.807 on 2 and 70 DF,  p-value: 0.000176
+
+
+Value of test-statistic is: -1.3313 
+
+Critical values for test statistics: 
+     1pct  5pct 10pct
+tau1 -2.6 -1.95 -1.61
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression drift 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.13706 -0.06736 -0.00254  0.13622  0.68395 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.04022    0.04987   0.807    0.423    
+z.lag.1     -0.03768    0.02621  -1.437    0.155    
+z.diff.lag   0.44826    0.10598   4.230 7.06e-05 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.2484 on 69 degrees of freedom
+Multiple R-squared:  0.2133,	Adjusted R-squared:  0.1905 
+F-statistic: 9.354 on 2 and 69 DF,  p-value: 0.0002543
+
+
+Value of test-statistic is: -1.4373 1.207 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau2 -3.51 -2.89 -2.58
+phi1  6.70  4.71  3.86
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression trend 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + tt + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.00543 -0.09786  0.00254  0.13673  0.67527 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.333090   0.135261   2.463  0.01633 *  
+z.lag.1     -0.108144   0.039623  -2.729  0.00807 ** 
+tt          -0.004935   0.002129  -2.318  0.02344 *  
+z.diff.lag   0.482712   0.103839   4.649 1.59e-05 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.2408 on 68 degrees of freedom
+Multiple R-squared:  0.2709,	Adjusted R-squared:  0.2388 
+F-statistic: 8.423 on 3 and 68 DF,  p-value: 7.749e-05
+
+
+Value of test-statistic is: -2.7293 2.6475 3.786 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau3 -4.04 -3.45 -3.15
+phi2  6.50  4.88  4.16
+phi3  8.73  6.49  5.47
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept 
+
+
+Call:
+lm(formula = y ~ y.l1)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.13192 -0.08801  0.02542  0.08459  0.65638 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 0.004167   0.054800   0.076     0.94    
+y.l1        0.970413   0.028801  33.694   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.2784 on 71 degrees of freedom
+Multiple R-squared:  0.9411,	Adjusted R-squared:  0.9403 
+F-statistic:  1135 on 1 and 71 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -1.3802 
+
+         aux. Z statistics
+Z-tau-mu            0.5445
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -3.521167 -2.901176 -2.587639
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept and trend 
+
+
+Call:
+lm(formula = y ~ y.l1 + trend)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.04988 -0.07897  0.01826  0.12770  0.63175 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.071829   0.076637   0.937    0.352    
+y.l1         0.927172   0.044777  20.707   <2e-16 ***
+trend       -0.003023   0.002404  -1.258    0.213    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.2773 on 70 degrees of freedom
+Multiple R-squared:  0.9424,	Adjusted R-squared:  0.9408 
+F-statistic: 573.1 on 2 and 70 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -2.1765 
+
+           aux. Z statistics
+Z-tau-mu             -0.1766
+Z-tau-beta           -1.6476
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -4.087127 -3.471275 -3.162446
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: mu with 3 lags. 
+
+Value of test-statistic is: 1.1887 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.347 0.463  0.574 0.739
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: tau with 3 lags. 
+
+Value of test-statistic is: 0.1131 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.119 0.146  0.176 0.216
+
+[1] "####################################################################################################"
+[1] "ea"
+[1] "LR10"
+[1] "####################################################################################################"
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression none 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 - 1 + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.49333 -0.18761 -0.05231  0.17564  0.76632 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)   
+z.lag.1    -0.009006   0.008118  -1.109  0.27109   
+z.diff.lag  0.304127   0.112247   2.709  0.00847 **
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.2676 on 70 degrees of freedom
+Multiple R-squared:  0.1131,	Adjusted R-squared:  0.08777 
+F-statistic: 4.464 on 2 and 70 DF,  p-value: 0.01498
+
+
+Value of test-statistic is: -1.1093 
+
+Critical values for test statistics: 
+     1pct  5pct 10pct
+tau1 -2.6 -1.95 -1.61
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression drift 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + z.diff.lag)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-0.4900 -0.1962 -0.0523  0.1718  0.7655 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)  
+(Intercept)  0.01470    0.10126   0.145   0.8850  
+z.lag.1     -0.01256    0.02582  -0.487   0.6281  
+z.diff.lag   0.30857    0.11711   2.635   0.0104 *
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.2695 on 69 degrees of freedom
+Multiple R-squared:  0.09161,	Adjusted R-squared:  0.06528 
+F-statistic: 3.479 on 2 and 69 DF,  p-value: 0.03634
+
+
+Value of test-statistic is: -0.4865 0.6172 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau2 -3.51 -2.89 -2.58
+phi1  6.70  4.71  3.86
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression trend 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + tt + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.50500 -0.16521 -0.04249  0.16422  0.58216 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)   
+(Intercept)  0.626239   0.250787   2.497  0.01495 * 
+z.lag.1     -0.107732   0.043682  -2.466  0.01618 * 
+tt          -0.006968   0.002634  -2.645  0.01014 * 
+z.diff.lag   0.308904   0.112330   2.750  0.00763 **
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.2585 on 68 degrees of freedom
+Multiple R-squared:  0.1763,	Adjusted R-squared:   0.14 
+F-statistic: 4.853 on 3 and 68 DF,  p-value: 0.004055
+
+
+Value of test-statistic is: -2.4663 2.7791 3.6264 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau3 -4.04 -3.45 -3.15
+phi2  6.50  4.88  4.16
+phi3  8.73  6.49  5.47
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept 
+
+
+Call:
+lm(formula = y ~ y.l1)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.51796 -0.17805 -0.08696  0.23426  0.84065 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept) -0.05373    0.10184  -0.528    0.599    
+y.l1         1.00389    0.02616  38.370   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.2808 on 71 degrees of freedom
+Multiple R-squared:  0.954,	Adjusted R-squared:  0.9533 
+F-statistic:  1472 on 1 and 71 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -0.2151 
+
+         aux. Z statistics
+Z-tau-mu           -0.1198
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -3.521167 -2.901176 -2.587639
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept and trend 
+
+
+Call:
+lm(formula = y ~ y.l1 + trend)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.47794 -0.18594 -0.03129  0.15743  0.68698 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.311630   0.164826   1.891  0.06281 .  
+y.l1         0.905683   0.043630  20.758  < 2e-16 ***
+trend       -0.007149   0.002601  -2.748  0.00761 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.2687 on 70 degrees of freedom
+Multiple R-squared:  0.9585,	Adjusted R-squared:  0.9573 
+F-statistic: 807.8 on 2 and 70 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -2.4158 
+
+           aux. Z statistics
+Z-tau-mu              0.9076
+Z-tau-beta           -2.7467
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -4.087127 -3.471275 -3.162446
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: mu with 3 lags. 
+
+Value of test-statistic is: 1.3474 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.347 0.463  0.574 0.739
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: tau with 3 lags. 
+
+Value of test-statistic is: 0.2573 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.119 0.146  0.176 0.216
+
+[1] "####################################################################################################"
+[1] "ea"
+[1] "LR10-IR"
+[1] "####################################################################################################"
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression none 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 - 1 + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.68455 -0.16895 -0.06626  0.18969  1.17829 
+
+Coefficients:
+           Estimate Std. Error t value Pr(>|t|)  
+z.lag.1    -0.01673    0.01812  -0.923    0.359  
+z.diff.lag  0.19661    0.11400   1.725    0.089 .
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.3514 on 70 degrees of freedom
+Multiple R-squared:  0.04873,	Adjusted R-squared:  0.02155 
+F-statistic: 1.793 on 2 and 70 DF,  p-value: 0.174
+
+
+Value of test-statistic is: -0.9235 
+
+Critical values for test statistics: 
+     1pct  5pct 10pct
+tau1 -2.6 -1.95 -1.61
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression drift 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + z.diff.lag)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-0.6810 -0.2306 -0.0233  0.1800  1.0225 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)  
+(Intercept)  0.27889    0.12816   2.176   0.0330 *
+z.lag.1     -0.13257    0.05608  -2.364   0.0209 *
+z.diff.lag   0.25081    0.11383   2.203   0.0309 *
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.3423 on 69 degrees of freedom
+Multiple R-squared:  0.1094,	Adjusted R-squared:  0.08355 
+F-statistic: 4.236 on 2 and 69 DF,  p-value: 0.01839
+
+
+Value of test-statistic is: -2.3638 2.8168 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau2 -3.51 -2.89 -2.58
+phi1  6.70  4.71  3.86
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression trend 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + tt + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.76307 -0.20655 -0.02398  0.18353  0.99886 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)  
+(Intercept)  0.415242   0.165148   2.514   0.0143 *
+z.lag.1     -0.150271   0.057444  -2.616   0.0110 *
+tt          -0.002610   0.002009  -1.299   0.1982  
+z.diff.lag   0.237995   0.113699   2.093   0.0401 *
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.3407 on 68 degrees of freedom
+Multiple R-squared:  0.1309,	Adjusted R-squared:  0.0926 
+F-statistic: 3.415 on 3 and 68 DF,  p-value: 0.02216
+
+
+Value of test-statistic is: -2.6159 2.4595 3.6659 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau3 -4.04 -3.45 -3.15
+phi2  6.50  4.88  4.16
+phi3  8.73  6.49  5.47
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept 
+
+
+Call:
+lm(formula = y ~ y.l1)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.71516 -0.24931 -0.03278  0.21461  0.90468 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.26170    0.12695   2.061   0.0429 *  
+y.l1         0.87930    0.05567  15.794   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.3557 on 71 degrees of freedom
+Multiple R-squared:  0.7784,	Adjusted R-squared:  0.7753 
+F-statistic: 249.4 on 1 and 71 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -2.4226 
+
+         aux. Z statistics
+Z-tau-mu            2.3006
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -3.521167 -2.901176 -2.587639
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept and trend 
+
+
+Call:
+lm(formula = y ~ y.l1 + trend)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-0.8253 -0.2306 -0.0212  0.2176  0.9057 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.310366   0.127818   2.428   0.0177 *  
+y.l1         0.857543   0.056102  15.285   <2e-16 ***
+trend       -0.003605   0.001991  -1.811   0.0745 .  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.3501 on 70 degrees of freedom
+Multiple R-squared:  0.7883,	Adjusted R-squared:  0.7823 
+F-statistic: 130.4 on 2 and 70 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -2.7417 
+
+           aux. Z statistics
+Z-tau-mu              1.6978
+Z-tau-beta           -1.7148
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -4.087127 -3.471275 -3.162446
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: mu with 3 lags. 
+
+Value of test-statistic is: 0.2594 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.347 0.463  0.574 0.739
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: tau with 3 lags. 
+
+Value of test-statistic is: 0.1613 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.119 0.146  0.176 0.216
+
+[1] "####################################################################################################"
+[1] "ea"
+[1] "Exrate Euro for 1 USD"
+[1] "####################################################################################################"
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression none 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 - 1 + z.diff.lag)
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.077901 -0.020992 -0.000945  0.021256  0.086919 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)  
+z.lag.1    -0.001973   0.004632  -0.426   0.6715  
+z.diff.lag  0.296742   0.112584   2.636   0.0103 *
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.03357 on 70 degrees of freedom
+Multiple R-squared:  0.09149,	Adjusted R-squared:  0.06553 
+F-statistic: 3.524 on 2 and 70 DF,  p-value: 0.0348
+
+
+Value of test-statistic is: -0.4259 
+
+Critical values for test statistics: 
+     1pct  5pct 10pct
+tau1 -2.6 -1.95 -1.61
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression drift 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + z.diff.lag)
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.065705 -0.024901 -0.004465  0.020660  0.094028 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)   
+(Intercept)  0.04014    0.02535   1.583  0.11795   
+z.lag.1     -0.04839    0.02968  -1.631  0.10752   
+z.diff.lag   0.32118    0.11246   2.856  0.00566 **
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.03321 on 69 degrees of freedom
+Multiple R-squared:  0.1231,	Adjusted R-squared:  0.09772 
+F-statistic: 4.845 on 2 and 69 DF,  p-value: 0.01074
+
+
+Value of test-statistic is: -1.6307 1.3459 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau2 -3.51 -2.89 -2.58
+phi1  6.70  4.71  3.86
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression trend 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + tt + z.diff.lag)
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.065933 -0.025146 -0.003935  0.021573  0.093992 
+
+Coefficients:
+              Estimate Std. Error t value Pr(>|t|)   
+(Intercept)  4.320e-02  3.550e-02   1.217  0.22783   
+z.lag.1     -5.078e-02  3.551e-02  -1.430  0.15733   
+tt          -2.817e-05  2.264e-04  -0.124  0.90137   
+z.diff.lag   3.241e-01  1.156e-01   2.803  0.00659 **
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.03345 on 68 degrees of freedom
+Multiple R-squared:  0.1233,	Adjusted R-squared:  0.08466 
+F-statistic: 3.189 on 3 and 68 DF,  p-value: 0.02908
+
+
+Value of test-statistic is: -1.4299 0.8896 1.3183 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau3 -4.04 -3.45 -3.15
+phi2  6.50  4.88  4.16
+phi3  8.73  6.49  5.47
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept 
+
+
+Call:
+lm(formula = y ~ y.l1)
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.063059 -0.026085 -0.004793  0.019552  0.086852 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.02925    0.02667   1.097    0.277    
+y.l1         0.96569    0.03118  30.972   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.03528 on 71 degrees of freedom
+Multiple R-squared:  0.9311,	Adjusted R-squared:  0.9301 
+F-statistic: 959.2 on 1 and 71 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -1.3749 
+
+         aux. Z statistics
+Z-tau-mu            1.3659
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -3.521167 -2.901176 -2.587639
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept and trend 
+
+
+Call:
+lm(formula = y ~ y.l1 + trend)
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.063006 -0.026816 -0.005063  0.019754  0.087065 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 2.808e-02  3.130e-02   0.897    0.373    
+y.l1        9.671e-01  3.664e-02  26.391   <2e-16 ***
+trend       1.676e-05  2.303e-04   0.073    0.942    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.03553 on 70 degrees of freedom
+Multiple R-squared:  0.9311,	Adjusted R-squared:  0.9291 
+F-statistic: 472.9 on 2 and 70 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -1.2832 
+
+           aux. Z statistics
+Z-tau-mu              0.1712
+Z-tau-beta           -0.1332
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -4.087127 -3.471275 -3.162446
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: mu with 3 lags. 
+
+Value of test-statistic is: 0.7946 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.347 0.463  0.574 0.739
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: tau with 3 lags. 
+
+Value of test-statistic is: 0.3674 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.119 0.146  0.176 0.216
+
+[1] "####################################################################################################"
+[1] "us"
+[1] "CPI"
+[1] "####################################################################################################"
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression none 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 - 1 + z.diff.lag)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.5743 -0.2244  0.1759  0.4197  3.0748 
+
+Coefficients:
+           Estimate Std. Error t value Pr(>|t|)  
+z.lag.1    -0.06632    0.03697  -1.794   0.0770 .
+z.diff.lag  0.24352    0.11356   2.144   0.0353 *
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.7889 on 74 degrees of freedom
+Multiple R-squared:  0.0826,	Adjusted R-squared:  0.05781 
+F-statistic: 3.331 on 2 and 74 DF,  p-value: 0.04118
+
+
+Value of test-statistic is: -1.7936 
+
+Critical values for test statistics: 
+     1pct  5pct 10pct
+tau1 -2.6 -1.95 -1.61
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression drift 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-3.09808 -0.36252  0.01298  0.35309  2.11649 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.63822    0.17679   3.610 0.000558 ***
+z.lag.1     -0.29579    0.07222  -4.095 0.000108 ***
+z.diff.lag   0.35438    0.10971   3.230 0.001856 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.7316 on 73 degrees of freedom
+Multiple R-squared:  0.2216,	Adjusted R-squared:  0.2002 
+F-statistic: 10.39 on 2 and 73 DF,  p-value: 0.0001071
+
+
+Value of test-statistic is: -4.0954 8.3864 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau2 -3.51 -2.89 -2.58
+phi1  6.70  4.71  3.86
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression trend 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + tt + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-2.93304 -0.39723 -0.01316  0.26437  1.99064 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  1.042724   0.279818   3.726 0.000383 ***
+z.lag.1     -0.346854   0.076259  -4.548 2.14e-05 ***
+tt          -0.007455   0.004040  -1.845 0.069077 .  
+z.diff.lag   0.377997   0.108701   3.477 0.000863 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.7199 on 72 degrees of freedom
+Multiple R-squared:  0.2567,	Adjusted R-squared:  0.2257 
+F-statistic: 8.289 on 3 and 72 DF,  p-value: 8.27e-05
+
+
+Value of test-statistic is: -4.5483 6.9105 10.3656 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau3 -4.04 -3.45 -3.15
+phi2  6.50  4.88  4.16
+phi3  8.73  6.49  5.47
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept 
+
+
+Call:
+lm(formula = y ~ y.l1)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-3.01560 -0.29729 -0.01722  0.43390  2.23320 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.47792    0.17788   2.687  0.00888 ** 
+y.l1         0.78060    0.07184  10.866  < 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.7717 on 75 degrees of freedom
+Multiple R-squared:  0.6115,	Adjusted R-squared:  0.6064 
+F-statistic: 118.1 on 1 and 75 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -3.4298 
+
+         aux. Z statistics
+Z-tau-mu            3.0099
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -3.516342 -2.899068 -2.586531
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept and trend 
+
+
+Call:
+lm(formula = y ~ y.l1 + trend)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-2.89178 -0.33765 -0.02187  0.36442  2.15483 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.550286   0.185389   2.968  0.00403 ** 
+y.l1         0.748246   0.075614   9.896 3.45e-15 ***
+trend       -0.005472   0.004165  -1.314  0.19291    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.768 on 74 degrees of freedom
+Multiple R-squared:  0.6204,	Adjusted R-squared:  0.6101 
+F-statistic: 60.47 on 2 and 74 DF,  p-value: 2.725e-16
+
+
+Value of test-statistic, type: Z-tau  is: -3.6978 
+
+           aux. Z statistics
+Z-tau-mu              1.8808
+Z-tau-beta           -1.3869
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -4.080282 -3.468062 -3.160581
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: mu with 3 lags. 
+
+Value of test-statistic is: 0.4212 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.347 0.463  0.574 0.739
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: tau with 3 lags. 
+
+Value of test-statistic is: 0.1077 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.119 0.146  0.176 0.216
+
+[1] "####################################################################################################"
+[1] "us"
+[1] "GDP"
+[1] "####################################################################################################"
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression none 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 - 1 + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-2.04278 -0.36319  0.08001  0.59928  2.55294 
+
+Coefficients:
+           Estimate Std. Error t value Pr(>|t|)    
+z.lag.1    -0.06134    0.03076  -1.994 0.049910 *  
+z.diff.lag  0.37197    0.10680   3.483 0.000842 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.7508 on 73 degrees of freedom
+Multiple R-squared:  0.1699,	Adjusted R-squared:  0.1471 
+F-statistic:  7.47 on 2 and 73 DF,  p-value: 0.001118
+
+
+Value of test-statistic is: -1.9938 
+
+Critical values for test statistics: 
+     1pct  5pct 10pct
+tau1 -2.6 -1.95 -1.61
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression drift 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-2.32429 -0.42430 -0.01826  0.44018  1.93711 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.30543    0.13417   2.276  0.02580 *  
+z.lag.1     -0.14552    0.04757  -3.059  0.00312 ** 
+z.diff.lag   0.41558    0.10561   3.935  0.00019 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.7302 on 72 degrees of freedom
+Multiple R-squared:  0.2248,	Adjusted R-squared:  0.2033 
+F-statistic: 10.44 on 2 and 72 DF,  p-value: 0.0001044
+
+
+Value of test-statistic is: -3.0592 4.6924 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau2 -3.51 -2.89 -2.58
+phi1  6.70  4.71  3.86
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression trend 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + tt + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-2.33794 -0.40289  0.01848  0.42747  1.85608 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.501202   0.247588   2.024  0.04670 *  
+z.lag.1     -0.163993   0.051493  -3.185  0.00215 ** 
+tt          -0.003975   0.004224  -0.941  0.34981    
+z.diff.lag   0.430294   0.106848   4.027  0.00014 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.7307 on 71 degrees of freedom
+Multiple R-squared:  0.2344,	Adjusted R-squared:  0.202 
+F-statistic: 7.245 on 3 and 71 DF,  p-value: 0.0002618
+
+
+Value of test-statistic is: -3.1847 3.4185 5.1147 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau3 -4.04 -3.45 -3.15
+phi2  6.50  4.88  4.16
+phi3  8.73  6.49  5.47
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept 
+
+
+Call:
+lm(formula = y ~ y.l1)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-2.69948 -0.40646 -0.03333  0.40163  2.46772 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.21178    0.14342   1.477    0.144    
+y.l1         0.88914    0.05013  17.738   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.7945 on 74 degrees of freedom
+Multiple R-squared:  0.8096,	Adjusted R-squared:  0.807 
+F-statistic: 314.6 on 1 and 74 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -2.7259 
+
+         aux. Z statistics
+Z-tau-mu            1.9273
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -3.517498 -2.899574 -2.586797
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept and trend 
+
+
+Call:
+lm(formula = y ~ y.l1 + trend)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-2.7081 -0.4332 -0.0475  0.3998  2.4472 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.224828   0.152087   1.478    0.144    
+y.l1         0.883513   0.054521  16.205   <2e-16 ***
+trend       -0.001229   0.004518  -0.272    0.786    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.7995 on 73 degrees of freedom
+Multiple R-squared:  0.8098,	Adjusted R-squared:  0.8046 
+F-statistic: 155.4 on 2 and 73 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -2.7448 
+
+           aux. Z statistics
+Z-tau-mu              0.2444
+Z-tau-beta           -0.5717
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -4.081921 -3.468832 -3.161028
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: mu with 3 lags. 
+
+Value of test-statistic is: 0.4587 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.347 0.463  0.574 0.739
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: tau with 3 lags. 
+
+Value of test-statistic is: 0.1527 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.119 0.146  0.176 0.216
+
+[1] "####################################################################################################"
+[1] "us"
+[1] "UR"
+[1] "####################################################################################################"
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression none 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 - 1 + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.47320 -0.12449 -0.00154  0.12958  0.78228 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+z.lag.1    -0.001865   0.004029  -0.463    0.645    
+z.diff.lag  0.727535   0.079734   9.124 1.09e-13 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.2193 on 73 degrees of freedom
+Multiple R-squared:  0.533,	Adjusted R-squared:  0.5202 
+F-statistic: 41.65 on 2 and 73 DF,  p-value: 8.543e-13
+
+
+Value of test-statistic is: -0.4629 
+
+Critical values for test statistics: 
+     1pct  5pct 10pct
+tau1 -2.6 -1.95 -1.61
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression drift 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.39082 -0.13769 -0.01608  0.10962  0.77956 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.18340    0.08916   2.057   0.0433 *  
+z.lag.1     -0.02989    0.01418  -2.107   0.0386 *  
+z.diff.lag   0.74108    0.07830   9.464 2.87e-14 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.2146 on 72 degrees of freedom
+Multiple R-squared:  0.5588,	Adjusted R-squared:  0.5466 
+F-statistic:  45.6 on 2 and 72 DF,  p-value: 1.607e-13
+
+
+Value of test-statistic is: -2.1075 2.2276 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau2 -3.51 -2.89 -2.58
+phi1  6.70  4.71  3.86
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression trend 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + tt + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.38975 -0.13574 -0.01516  0.10868  0.77756 
+
+Coefficients:
+              Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.1831077  0.0898236   2.039   0.0452 *  
+z.lag.1     -0.0307481  0.0165299  -1.860   0.0670 .  
+tt           0.0001405  0.0013617   0.103   0.9181    
+z.diff.lag   0.7434114  0.0820122   9.065 1.78e-13 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.2161 on 71 degrees of freedom
+Multiple R-squared:  0.5589,	Adjusted R-squared:  0.5403 
+F-statistic: 29.99 on 3 and 71 DF,  p-value: 1.236e-12
+
+
+Value of test-statistic is: -1.8601 1.4682 2.1955 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau3 -4.04 -3.45 -3.15
+phi2  6.50  4.88  4.16
+phi3  8.73  6.49  5.47
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept 
+
+
+Call:
+lm(formula = y ~ y.l1)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.45647 -0.17228 -0.07493  0.09378  1.41349 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.09956    0.13092    0.76    0.449    
+y.l1         0.98354    0.02088   47.10   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.3186 on 74 degrees of freedom
+Multiple R-squared:  0.9677,	Adjusted R-squared:  0.9673 
+F-statistic:  2219 on 1 and 74 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -1.3427 
+
+         aux. Z statistics
+Z-tau-mu            1.2913
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -3.517498 -2.899574 -2.586797
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept and trend 
+
+
+Call:
+lm(formula = y ~ y.l1 + trend)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.43134 -0.17934 -0.05088  0.07286  1.41465 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept) -0.003582   0.146187  -0.025    0.981    
+y.l1         1.000907   0.023599  42.413   <2e-16 ***
+trend       -0.002883   0.001883  -1.531    0.130    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.3157 on 73 degrees of freedom
+Multiple R-squared:  0.9687,	Adjusted R-squared:  0.9679 
+F-statistic:  1131 on 2 and 73 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -0.9261 
+
+           aux. Z statistics
+Z-tau-mu             -0.9327
+Z-tau-beta           -0.4080
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -4.081921 -3.468832 -3.161028
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: mu with 3 lags. 
+
+Value of test-statistic is: 0.6768 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.347 0.463  0.574 0.739
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: tau with 3 lags. 
+
+Value of test-statistic is: 0.2199 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.119 0.146  0.176 0.216
+
+[1] "####################################################################################################"
+[1] "us"
+[1] "IR FEDFUNDS"
+[1] "####################################################################################################"
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression none 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 - 1 + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.28264 -0.01844  0.02795  0.16761  0.68431 
+
+Coefficients:
+           Estimate Std. Error t value Pr(>|t|)    
+z.lag.1    -0.02520    0.01269  -1.986    0.051 .  
+z.diff.lag  0.69410    0.08331   8.331 4.48e-12 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.307 on 70 degrees of freedom
+Multiple R-squared:  0.5174,	Adjusted R-squared:  0.5036 
+F-statistic: 37.52 on 2 and 70 DF,  p-value: 8.421e-12
+
+
+Value of test-statistic is: -1.9857 
+
+Critical values for test statistics: 
+     1pct  5pct 10pct
+tau1 -2.6 -1.95 -1.61
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression drift 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.31573 -0.07840 -0.02461  0.15526  0.64815 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.06469    0.04919   1.315   0.1928    
+z.lag.1     -0.04039    0.01711  -2.360   0.0211 *  
+z.diff.lag   0.70864    0.08361   8.475  2.7e-12 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.3054 on 69 degrees of freedom
+Multiple R-squared:  0.5222,	Adjusted R-squared:  0.5084 
+F-statistic: 37.71 on 2 and 69 DF,  p-value: 8.584e-12
+
+
+Value of test-statistic is: -2.3604 2.8568 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau2 -3.51 -2.89 -2.58
+phi1  6.70  4.71  3.86
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression trend 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + tt + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.30697 -0.08645 -0.00523  0.14544  0.67738 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.274480   0.135971   2.019  0.04747 *  
+z.lag.1     -0.069226   0.024297  -2.849  0.00579 ** 
+tt          -0.004077   0.002468  -1.652  0.10315    
+z.diff.lag   0.733150   0.083908   8.738 1.01e-12 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.3017 on 68 degrees of freedom
+Multiple R-squared:  0.5406,	Adjusted R-squared:  0.5204 
+F-statistic: 26.68 on 3 and 68 DF,  p-value: 1.613e-11
+
+
+Value of test-statistic is: -2.8492 2.8619 4.2201 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau3 -4.04 -3.45 -3.15
+phi2  6.50  4.88  4.16
+phi3  8.73  6.49  5.47
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept 
+
+
+Call:
+lm(formula = y ~ y.l1)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.38228 -0.03132  0.00806  0.15422  0.76357 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept) 0.009101   0.068725   0.132    0.895    
+y.l1        0.968995   0.023798  40.718   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.4306 on 71 degrees of freedom
+Multiple R-squared:  0.9589,	Adjusted R-squared:  0.9584 
+F-statistic:  1658 on 1 and 71 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -1.6997 
+
+         aux. Z statistics
+Z-tau-mu            0.6961
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -3.521167 -2.901176 -2.587639
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept and trend 
+
+
+Call:
+lm(formula = y ~ y.l1 + trend)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.38151 -0.03014  0.01413  0.16099  0.76125 
+
+Coefficients:
+              Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.0152712  0.0855536   0.178    0.859    
+y.l1         0.9659607  0.0344390  28.048   <2e-16 ***
+trend       -0.0004245  0.0034609  -0.123    0.903    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.4336 on 70 degrees of freedom
+Multiple R-squared:  0.9589,	Adjusted R-squared:  0.9578 
+F-statistic: 817.5 on 2 and 70 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -1.8865 
+
+           aux. Z statistics
+Z-tau-mu             -0.9119
+Z-tau-beta           -0.9564
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -4.087127 -3.471275 -3.162446
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: mu with 3 lags. 
+
+Value of test-statistic is: 1.0576 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.347 0.463  0.574 0.739
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: tau with 3 lags. 
+
+Value of test-statistic is: 0.0904 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.119 0.146  0.176 0.216
+
+[1] "####################################################################################################"
+[1] "us"
+[1] "LR10 - IR"
+[1] "####################################################################################################"
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression none 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 - 1 + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.76758 -0.20248 -0.02271  0.23699  0.73664 
+
+Coefficients:
+           Estimate Std. Error t value Pr(>|t|)
+z.lag.1    -0.01482    0.01015  -1.460    0.149
+z.diff.lag  0.13438    0.11475   1.171    0.246
+
+Residual standard error: 0.3355 on 70 degrees of freedom
+Multiple R-squared:  0.05014,	Adjusted R-squared:  0.023 
+F-statistic: 1.848 on 2 and 70 DF,  p-value: 0.1652
+
+
+Value of test-statistic is: -1.46 
+
+Critical values for test statistics: 
+     1pct  5pct 10pct
+tau1 -2.6 -1.95 -1.61
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression drift 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.73862 -0.21153 -0.05214  0.19800  0.69678 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)
+(Intercept)  0.12819    0.12055   1.063    0.291
+z.lag.1     -0.04572    0.03078  -1.485    0.142
+z.diff.lag   0.15381    0.11609   1.325    0.190
+
+Residual standard error: 0.3352 on 69 degrees of freedom
+Multiple R-squared:  0.04835,	Adjusted R-squared:  0.02076 
+F-statistic: 1.753 on 2 and 69 DF,  p-value: 0.1809
+
+
+Value of test-statistic is: -1.4854 1.6333 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau2 -3.51 -2.89 -2.58
+phi1  6.70  4.71  3.86
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression trend 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + tt + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.77650 -0.18135 -0.02787  0.22624  0.62324 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)   
+(Intercept)  1.422530   0.451024   3.154  0.00240 **
+z.lag.1     -0.254282   0.076117  -3.341  0.00136 **
+tt          -0.013945   0.004701  -2.967  0.00415 **
+z.diff.lag   0.258928   0.115601   2.240  0.02837 * 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.3177 on 68 degrees of freedom
+Multiple R-squared:  0.1574,	Adjusted R-squared:  0.1202 
+F-statistic: 4.234 on 3 and 68 DF,  p-value: 0.00837
+
+
+Value of test-statistic is: -3.3407 4.1454 5.6282 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau3 -4.04 -3.45 -3.15
+phi2  6.50  4.88  4.16
+phi3  8.73  6.49  5.47
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept 
+
+
+Call:
+lm(formula = y ~ y.l1)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.76244 -0.20972 -0.03909  0.22769  0.69360 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.08659    0.12160   0.712    0.479    
+y.l1         0.96651    0.03103  31.146   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.3433 on 71 degrees of freedom
+Multiple R-squared:  0.9318,	Adjusted R-squared:  0.9308 
+F-statistic: 970.1 on 1 and 71 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -1.1036 
+
+         aux. Z statistics
+Z-tau-mu            0.7416
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -3.521167 -2.901176 -2.587639
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept and trend 
+
+
+Call:
+lm(formula = y ~ y.l1 + trend)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.78209 -0.21450 -0.01098  0.21877  0.64092 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.764028   0.275823    2.77  0.00717 ** 
+y.l1         0.785005   0.073288   10.71  < 2e-16 ***
+trend       -0.012202   0.004503   -2.71  0.00846 ** 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.3289 on 70 degrees of freedom
+Multiple R-squared:  0.9383,	Adjusted R-squared:  0.9365 
+F-statistic: 532.1 on 2 and 70 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -3.2267 
+
+           aux. Z statistics
+Z-tau-mu              1.8528
+Z-tau-beta           -2.9336
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -4.087127 -3.471275 -3.162446
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: mu with 3 lags. 
+
+Value of test-statistic is: 1.6872 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.347 0.463  0.574 0.739
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: tau with 3 lags. 
+
+Value of test-statistic is: 0.0824 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.119 0.146  0.176 0.216
+
+[1] "####################################################################################################"
+[1] "us"
+[1] "IR10 premium"
+[1] "####################################################################################################"
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression none 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 - 1 + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.86092 -0.18825 -0.00765  0.22510  1.33278 
+
+Coefficients:
+           Estimate Std. Error t value Pr(>|t|)   
+z.lag.1    -0.03477    0.02504  -1.388  0.16942   
+z.diff.lag  0.37154    0.11097   3.348  0.00131 **
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.4511 on 70 degrees of freedom
+Multiple R-squared:  0.1475,	Adjusted R-squared:  0.1232 
+F-statistic: 6.058 on 2 and 70 DF,  p-value: 0.003745
+
+
+Value of test-statistic is: -1.3884 
+
+Critical values for test statistics: 
+     1pct  5pct 10pct
+tau1 -2.6 -1.95 -1.61
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression drift 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.98904 -0.24733 -0.09725  0.18036  1.09705 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.18700    0.09137   2.047 0.044502 *  
+z.lag.1     -0.10710    0.04300  -2.491 0.015154 *  
+z.diff.lag   0.39751    0.10927   3.638 0.000526 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.4412 on 69 degrees of freedom
+Multiple R-squared:  0.1962,	Adjusted R-squared:  0.1729 
+F-statistic: 8.419 on 2 and 69 DF,  p-value: 0.0005351
+
+
+Value of test-statistic is: -2.4908 3.1021 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau2 -3.51 -2.89 -2.58
+phi1  6.70  4.71  3.86
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression trend 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + tt + z.diff.lag)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.96887 -0.25042 -0.08699  0.19710  1.10847 
+
+Coefficients:
+              Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.1660313  0.1201575   1.382 0.171562    
+z.lag.1     -0.1103969  0.0449656  -2.455 0.016646 *  
+tt           0.0007115  0.0026236   0.271 0.787057    
+z.diff.lag   0.4012212  0.1108585   3.619 0.000564 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.4442 on 68 degrees of freedom
+Multiple R-squared:  0.197,	Adjusted R-squared:  0.1616 
+F-statistic: 5.562 on 3 and 68 DF,  p-value: 0.001793
+
+
+Value of test-statistic is: -2.4551 2.0648 3.0973 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau3 -4.04 -3.45 -3.15
+phi2  6.50  4.88  4.16
+phi3  8.73  6.49  5.47
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept 
+
+
+Call:
+lm(formula = y ~ y.l1)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.99468 -0.29963 -0.06637  0.18256  1.27619 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.16376    0.09652   1.697   0.0941 .  
+y.l1         0.91401    0.04537  20.147   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.4773 on 71 degrees of freedom
+Multiple R-squared:  0.8511,	Adjusted R-squared:  0.849 
+F-statistic: 405.9 on 1 and 71 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -2.4093 
+
+         aux. Z statistics
+Z-tau-mu            2.0814
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -3.521167 -2.901176 -2.587639
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept and trend 
+
+
+Call:
+lm(formula = y ~ y.l1 + trend)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.01817 -0.27845 -0.06242  0.16497  1.26147 
+
+Coefficients:
+              Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.1572622  0.0994223   1.582    0.118    
+y.l1         0.9179984  0.0474769  19.336   <2e-16 ***
+trend       -0.0008501  0.0027742  -0.306    0.760    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.4803 on 70 degrees of freedom
+Multiple R-squared:  0.8513,	Adjusted R-squared:  0.8471 
+F-statistic: 200.4 on 2 and 70 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -2.3102 
+
+           aux. Z statistics
+Z-tau-mu              0.3209
+Z-tau-beta            0.0540
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -4.087127 -3.471275 -3.162446
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: mu with 3 lags. 
+
+Value of test-statistic is: 0.2231 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.347 0.463  0.574 0.739
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: tau with 3 lags. 
+
+Value of test-statistic is: 0.083 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.119 0.146  0.176 0.216
+
+[1] "####################################################################################################"
+[1] "us"
+[1] "Exrate USD to 1 Euro"
+[1] "####################################################################################################"
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression none 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 - 1 + z.diff.lag)
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.161946 -0.022081  0.004247  0.037524  0.069206 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)   
+z.lag.1    -0.0005495  0.0046431  -0.118  0.90613   
+z.diff.lag  0.3593515  0.1104675   3.253  0.00176 **
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.04822 on 70 degrees of freedom
+Multiple R-squared:  0.1314,	Adjusted R-squared:  0.1066 
+F-statistic: 5.295 on 2 and 70 DF,  p-value: 0.007218
+
+
+Value of test-statistic is: -0.1183 
+
+Critical values for test statistics: 
+     1pct  5pct 10pct
+tau1 -2.6 -1.95 -1.61
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression drift 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + z.diff.lag)
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.143159 -0.032311  0.005596  0.033453  0.077197 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.07791    0.03954   1.970 0.052798 .  
+z.lag.1     -0.06356    0.03230  -1.968 0.053108 .  
+z.diff.lag   0.39353    0.10964   3.589 0.000616 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.04726 on 69 degrees of freedom
+Multiple R-squared:  0.1776,	Adjusted R-squared:  0.1537 
+F-statistic: 7.449 on 2 and 69 DF,  p-value: 0.001177
+
+
+Value of test-statistic is: -1.9678 1.9487 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau2 -3.51 -2.89 -2.58
+phi1  6.70  4.71  3.86
+
+
+############################################### 
+# Augmented Dickey-Fuller Test Unit Root Test # 
+############################################### 
+
+Test regression trend 
+
+
+Call:
+lm(formula = z.diff ~ z.lag.1 + 1 + tt + z.diff.lag)
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.141655 -0.034747  0.003056  0.033773  0.076995 
+
+Coefficients:
+              Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  8.052e-02  4.138e-02   1.946 0.055781 .  
+z.lag.1     -6.796e-02  3.768e-02  -1.804 0.075665 .  
+tt           7.287e-05  3.145e-04   0.232 0.817473    
+z.diff.lag   3.991e-01  1.130e-01   3.532 0.000747 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.04759 on 68 degrees of freedom
+Multiple R-squared:  0.1782,	Adjusted R-squared:  0.142 
+F-statistic: 4.916 on 3 and 68 DF,  p-value: 0.003769
+
+
+Value of test-statistic is: -1.804 1.2992 1.9365 
+
+Critical values for test statistics: 
+      1pct  5pct 10pct
+tau3 -4.04 -3.45 -3.15
+phi2  6.50  4.88  4.16
+phi3  8.73  6.49  5.47
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept 
+
+
+Call:
+lm(formula = y ~ y.l1)
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.171801 -0.031092  0.003839  0.039263  0.081092 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  0.05111    0.04236   1.207    0.232    
+y.l1         0.95751    0.03464  27.639   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.05142 on 71 degrees of freedom
+Multiple R-squared:  0.915,	Adjusted R-squared:  0.9138 
+F-statistic: 763.9 on 1 and 71 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -1.4559 
+
+         aux. Z statistics
+Z-tau-mu            1.4349
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -3.521167 -2.901176 -2.587639
+
+
+################################## 
+# Phillips-Perron Unit Root Test # 
+################################## 
+
+Test regression with intercept and trend 
+
+
+Call:
+lm(formula = y ~ y.l1 + trend)
+
+Residuals:
+      Min        1Q    Median        3Q       Max 
+-0.172864 -0.031565  0.005985  0.038614  0.080268 
+
+Coefficients:
+              Estimate Std. Error t value Pr(>|t|)    
+(Intercept)  4.614e-02  4.841e-02   0.953    0.344    
+y.l1         9.616e-01  3.974e-02  24.196   <2e-16 ***
+trend       -7.109e-05  3.277e-04  -0.217    0.829    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.05177 on 70 degrees of freedom
+Multiple R-squared:  0.915,	Adjusted R-squared:  0.9126 
+F-statistic: 376.9 on 2 and 70 DF,  p-value: < 2.2e-16
+
+
+Value of test-statistic, type: Z-tau  is: -1.2739 
+
+           aux. Z statistics
+Z-tau-mu              0.3621
+Z-tau-beta            0.0948
+
+Critical values for Z statistics: 
+                     1pct      5pct     10pct
+critical values -4.087127 -3.471275 -3.162446
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: mu with 3 lags. 
+
+Value of test-statistic is: 0.7599 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.347 0.463  0.574 0.739
+
+
+####################### 
+# KPSS Unit Root Test # 
+####################### 
+
+Test is of type: tau with 3 lags. 
+
+Value of test-statistic is: 0.3861 
+
+Critical value for a significance level of: 
+                10pct  5pct 2.5pct  1pct
+critical values 0.119 0.146  0.176 0.216
+

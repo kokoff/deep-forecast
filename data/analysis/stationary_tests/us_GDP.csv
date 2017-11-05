@@ -1,0 +1,8 @@
+Test Name,T-stat,1%,5%,10%,>95% Confidence
+ADF,-1.994,-2.6,-1.95,-1.61,Stationary
+ADF with drift,-3.059,-3.51,-2.89,-2.58,Stationary
+ADF with drift and trend,-3.185,-4.04,-3.45,-3.15,Not Stationary
+PP with drift,-2.726,-3.517,-2.9,-2.587,Not Stationary
+PP with drift and trend,-2.745,-4.082,-3.469,-3.161,Not Stationary
+KPSS with drift,0.459,0.739,0.463,0.347,Not Stationary
+KPSS with drift and trend,0.153,0.216,0.146,0.119,Stationary
