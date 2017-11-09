@@ -7,7 +7,11 @@ from keras.layers import Dense
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 from keras import metrics
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import *
+from keras.callbacks import TensorBoard
+from keras.wrappers.scikit_learn import KerasRegressor
+from sklearn.model_selection import GridSearchCV
+from keras.utils import plot_model, print_summary
 
 
 def plotMetrics(hist, model):
@@ -72,6 +76,8 @@ def getData(data_frame, name, lag=0):
     na_mask = np.isnan(XY).any(axis=1)
     XY = XY[~na_mask]
 
+    print XY
+
     # Create X and Y
     X = XY[:, :m]
     Y = XY[:, m:]
@@ -79,41 +85,79 @@ def getData(data_frame, name, lag=0):
     return X, Y
 
 
-def main():
-    # read data and drop missing values
-    data_file = os.path.join('..', 'data', 'ea.csv')
-    data = pd.read_csv(data_file)
-
-    X, Y = getData(data, 'CPI', 0)
-    input_dim = X.shape[1]
-
-    # split data into training and test sets
-    x_train, x_test, y_train, y_test = train_test_split(X, Y, shuffle=False, test_size=0.2)
-
-    # scaler = StandardScaler().fit(x_train)
-    # x_train = scaler.transform(x_train)
-    # x_test = scaler.transform(x_test)
-
+def getModel(input_dim=1, neurons=1):
+    # Create Model
     model = Sequential()
-
-    model.add(Dense(8, activation='relu', input_dim=input_dim))
+    model.add(Dense(10, activation='relu', input_dim=input_dim))
     model.add(Dense(1, activation='linear'))
 
     model.compile(loss='MSE',
                   optimizer='adam',
                   metrics=[])
 
-    history = model.fit(x_train, y_train, epochs=500, batch_size=2, validation_split=0.2)
-    score = model.evaluate(x_test, y_test)
-    prediction = model.predict(X)
+    return model
 
-    plotMetrics(history, model)
-    plotPredictions(y_test, model.predict(x_test))
-    #
-    plt.show()
 
-    forecast(model, X)
+def main():
 
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--lags", help="display a square of a given number",
+                        type=int)
+    parser.add_argument("--VAR", help="display a square of a given number",
+                        type=str)
+    args = parser.parse_args()
+    print args.VAR, args.lags
+
+    # read data and drop missing values
+    data_file = os.path.join('..', 'data', 'ea.csv')
+    data = pd.read_csv(data_file)
+
+    VAR = args.VAR
+    INPUT_DIM = args.lags
+
+    X, Y = getData(data, VAR, INPUT_DIM - 1)
+
+    model = KerasRegressor(getModel)
+    param_grid = dict(input_dim=[INPUT_DIM],
+                      neurons=[5, 10, 15, 20],
+                      epochs=[10, 15, 20],
+                      shuffle=[False],
+                      batch_size=[1, 2, 4],
+                      verbose = [False])
+
+    grid = GridSearchCV(estimator=model, param_grid=param_grid, n_jobs=4, scoring='neg_mean_squared_error')
+    grid_result = grid.fit(X, Y)
+    dfresults = DataFrame.from_dict(grid_result.cv_results_)
+    # summarize results
+    print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))
+    means = grid_result.cv_results_['mean_test_score']
+    stds = grid_result.cv_results_['std_test_score']
+    params = grid_result.cv_results_['params']
+    for mean, stdev, param in zip(means, stds, params):
+        print("%f (%f) with: %r" % (mean, stdev, param))
+
+
+    # Record the results
+    output_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                               'experiments')
+
+    # Output table of results
+    columns = ['rank_test_score', 'mean_test_score', 'mean_train_score', 'std_test_score', 'std_train_score']
+    columns += [col for col in dfresults.columns if col.startswith('param_')]
+    file_path = os.path.join(output_path, VAR + '.csv')
+    dfresults.to_csv(file_path, float_format='%.3f', columns=columns, mode='a')
+
+    # Save model config
+    best_model = grid_result.best_estimator_.model
+    file_path = os.path.join(output_path, VAR + str(INPUT_DIM) + '.json')
+    with open(file_path, 'w') as f:
+        f.write(best_model.to_json())
+
+    # Output plot
+    file_path = os.path.join(output_path, VAR + str(INPUT_DIM) + '.png')
+    plotPredictions(Y, best_model.predict(X))
+    plt.savefig(file_path, bbox_inches='tight')
 
 
 if __name__ == '__main__':
