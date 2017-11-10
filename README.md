@@ -1,4 +1,4 @@
-## Forecasting Macroeconomic Parameters with Deep Learning Neural Networks
+# Forecasting Macroeconomic Parameters with Deep Learning Neural Networks
 
 The project will make use of convolutional deep learning neural networks (as implemented through the Keras software library) to model macroeconomic data and forecast future developments.
 
