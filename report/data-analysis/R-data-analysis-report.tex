@@ -17,6 +17,15 @@
 \title{Analysis of Project Time Series Data Performed in R}
 \author{Stefan Kokov}
 
+%----------------------------------------------------------------
+% Path Variables
+%----------------------------------------------------------------
+\def \kokDataAnalysisPath {../../data/analysis/}
+\def \kokPlotsPath {\kokDataAnalysisPath plots/}
+\def \kokAcfPath {\kokDataAnalysisPath acf/}
+\def \kokPacfPath  {\kokDataAnalysisPath pacf/}
+\def \kokTestPath {\kokDataAnalysisPath stationary_tests/}
+
 \begin{document}
 \maketitle
 
@@ -26,7 +35,7 @@
 The analysis of the data set was performed using R tseries and urca packages.
 ADF tests were performed using the ur.df function. Optimal number of lags were found using AIC information criteria. The PP tests were performed using the ur.pp function with $Z\tau$ statistic. The Stationary/Not stationary values in the tables below were derived by comparing the test statistic and the 5$\%$ confidence interval threshhold and they are not conclusive because rejection of the null hyphotesis is stronger than acceptance. Therefore the ADF and PP tests that result in Not Stationary conclusion show weaker results than the ones that result in a Stationary conclusion.
 
-The structure of this report is as follows: \autoref{sec:ea} describes the variables of the EA data set, with discussion on the plot ACF, PACF and unit root test results for each variable. \autoref{sec:us} describes the variables of the US data set, with discussion on the plot ACF, PACF and unit root test results for each variable. \autoref{sec:conclusions} draws conclusions and suggests further work.
+The structure of this report is as follows: \autoref{sec:ea} describes the variables of the EA data set, with discussion on the plot ACF, PACF and unit root test results for each variable. \autoref{sec:us} describes the variables of the US data set, with discussion on the plot ACF, PACF and unit root test results for each variable. \autoref{sec:conclusions} draws conclusions and suggests further working.
 
 
 
@@ -43,7 +52,7 @@ The CPI plot (\autoref{fig:ea_cpi}) shows large fluctuiations after around 2007 
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.7\textwidth]{../plots/ea_CPI}
+\includegraphics[width = 0.7\textwidth]{\kokPlotsPath ea_CPI}
 \caption{plot EA CPI}
 \label{fig:ea_cpi}
 \end{figure}
@@ -52,7 +61,7 @@ Looking at the ACF (\autoref{fig:ea_cpi_acf}) of EA CPI, we see that it resemble
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.5\textwidth]{../acf/ea_CPI}\includegraphics[width = 0.5\textwidth]{../pacf/ea_CPI}
+\includegraphics[width = 0.5\textwidth]{\kokAcfPath ea_CPI}\includegraphics[width = 0.5\textwidth]{\kokPacfPath ea_CPI}
 \caption{ACF and PACF EA CPI}
 \label{fig:ea_cpi_acf}
 \end{figure}
@@ -61,7 +70,7 @@ Looking at the ACF (\autoref{fig:ea_cpi_acf}) of EA CPI, we see that it resemble
 
 \begin{table}[h!]
 \centering
-\csvautotabular[respect all]{../stationary_tests/ea_CPI.csv}
+\csvautotabular[respect all]{\kokTestPath ea_CPI.csv}
 \caption{CPI EA Unit Root Tests}
 \label{table:ea_cpi}
 \end{table}
@@ -74,7 +83,7 @@ The plot of GDP (\autoref{fig:ea_gdp}) maybe suggests a downward trend. A fluctu
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.7\textwidth]{../plots/ea_GDP}
+\includegraphics[width = 0.7\textwidth]{\kokPlotsPath ea_GDP}
 \caption{plot EA GDP}
 \label{fig:ea_gdp}
 \end{figure}
@@ -83,7 +92,7 @@ ACF and PCF (\autoref{fig:ea_gdp_acf}) again suggest an autoregressive model as 
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.5\textwidth]{../acf/ea_GDP}\includegraphics[width = 0.5\textwidth]{../pacf/ea_GDP}
+\includegraphics[width = 0.5\textwidth]{\kokAcfPath ea_GDP}\includegraphics[width = 0.5\textwidth]{\kokPacfPath ea_GDP}
 \caption{ACF and PACF EA GDP}
 \label{fig:ea_gdp_acf}
 \end{figure}
@@ -92,7 +101,7 @@ The unit root test results (\autoref{table:ea_gdp}) suggest the series is statio
 
 \begin{table}[h!]
 \centering
-\csvautotabular[respect all]{../stationary_tests/ea_GDP.csv}
+\csvautotabular[respect all]{\kokTestPath ea_GDP.csv}
 \caption{GDP EA Unit Root Tests}
 \label{table:ea_gdp}
 \end{table}
@@ -105,7 +114,7 @@ The EA unemployment rate curve (\autoref{fig:ea_ur}) looks very quite smooth, th
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.7\textwidth]{../plots/ea_UR}
+\includegraphics[width = 0.7\textwidth]{\kokPlotsPath ea_UR}
 \caption{plot EA UR}
 \label{fig:ea_ur}
 \end{figure}
@@ -114,7 +123,7 @@ UR ACF and PACF (\autoref{fig:ea_ur_acf}) show that there is a significant time 
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.5\textwidth]{../acf/ea_UR}\includegraphics[width = 0.5\textwidth]{../pacf/ea_UR}
+\includegraphics[width = 0.5\textwidth]{\kokAcfPath ea_UR}\includegraphics[width = 0.5\textwidth]{\kokPacfPath ea_UR}
 \caption{ACF and PACF EA UR}
 \label{fig:ea_ur_acf}
 \end{figure}
@@ -123,7 +132,7 @@ Only the KPSS tests suggest the variable is stationary (\autoref{table:ea_ur}), 
 
 \begin{table}[h!]
 \centering
-\csvautotabular[respect all]{../stationary_tests/ea_UR.csv}
+\csvautotabular[respect all]{\kokTestPath ea_UR.csv}
 \caption{UR EA Unit Root Tests}
 \label{table:ea_ur}
 \end{table}
@@ -136,7 +145,7 @@ There deffinetly seems to be a downward trend in the EA IR Policy Rate variable 
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.7\textwidth]{"../plots/ea_IR Policy Rate"}
+\includegraphics[width = 0.7\textwidth]{"\kokPlotsPath ea_IR Policy Rate"}
 \caption{plot EA IR Policy Rate}
 \label{fig:ea_irpolicyrate}
 \end{figure}
@@ -145,7 +154,7 @@ ACF and PACF (\autoref{fig:ea_irpolicyrate_acf}) exhibit the behaviour of an aut
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.5\textwidth]{"../acf/ea_IR Policy Rate"}\includegraphics[width = 0.5\textwidth]{"../pacf/ea_IR Policy Rate"}
+\includegraphics[width = 0.5\textwidth]{"\kokAcfPath ea_IR Policy Rate"}\includegraphics[width = 0.5\textwidth]{"\kokPacfPath ea_IR Policy Rate"}
 \caption{ACF and PACF EA IR Policy Rate}
 \label{fig:ea_irpolicyrate_acf}
 \end{figure}
@@ -154,7 +163,7 @@ The unit root tests (\autoref{fig:ea_irpolicyrate}) again show weak evidence of 
 
 \begin{table}[h!]
 \centering
-\csvautotabular[respect all]{"../stationary_tests/ea_IR Policy Rate.csv"}
+\csvautotabular[respect all]{"\kokTestPath ea_IR Policy Rate.csv"}
 \caption{IR Policy Rate EA Unit Root Tests}
 \label{table:ea_irpolicyrate}
 \end{table}
@@ -167,7 +176,7 @@ The EA LR10 variable has a distinct trend (\autoref{fig:ea_lr10-ir}). The mean i
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.7\textwidth]{../plots/ea_LR10}
+\includegraphics[width = 0.7\textwidth]{\kokPlotsPath ea_LR10}
 \caption{plot EA LR10}
 \label{fig:ea_lr10}
 \end{figure}
@@ -176,7 +185,7 @@ ACF and PACF (\autoref{fig:ea_lr10_acf}) exhibit the typical behaviour of an aut
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.5\textwidth]{../acf/ea_LR10}\includegraphics[width = 0.5\textwidth]{../pacf/ea_LR10}
+\includegraphics[width = 0.5\textwidth]{\kokAcfPath ea_LR10}\includegraphics[width = 0.5\textwidth]{\kokPacfPath ea_LR10}
 \caption{ACF and PACF EA LR10}
 \label{fig:ea_lr10_acf}
 \end{figure}
@@ -185,7 +194,7 @@ Again only the KPSS tests show the variable might be stationary (\autoref{table:
 
 \begin{table}[h!]
 \centering
-\csvautotabular[respect all]{"../stationary_tests/ea_LR10.csv"}
+\csvautotabular[respect all]{"\kokTestPath ea_LR10.csv"}
 \caption{LR10 EA Unit Root Tests}
 \label{table:ea_lr10}
 \end{table}
@@ -198,7 +207,7 @@ The LR10-IR (\autoref{fig:ea_lr10-ir}) derived variable seems to have some perio
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.7\textwidth]{../plots/ea_LR10-IR}
+\includegraphics[width = 0.7\textwidth]{\kokPlotsPath ea_LR10-IR}
 \caption{plot EA LR10-IR}
 \label{fig:ea_lr10-ir}
 \end{figure}
@@ -207,7 +216,7 @@ The ACF (\autoref{fig:ea_lr10-ir_acf}) shows a strong autocorelation even for la
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.5\textwidth]{../acf/ea_LR10-IR}\includegraphics[width = 0.5\textwidth]{../pacf/ea_LR10-IR}
+\includegraphics[width = 0.5\textwidth]{\kokAcfPath ea_LR10-IR}\includegraphics[width = 0.5\textwidth]{\kokPacfPath ea_LR10-IR}
 \caption{ACF and PACF EA LR10-IR}
 \label{fig:ea_lr10-ir_acf}
 \end{figure}
@@ -216,7 +225,7 @@ Again weak evidence of stationarity from the tests (\autoref{table:ea_lr10-ir}).
 
 \begin{table}[h!]
 \centering
-\csvautotabular[respect all]{"../stationary_tests/ea_LR10-IR.csv"}
+\csvautotabular[respect all]{"\kokTestPath ea_LR10-IR.csv"}
 \caption{LR10-IR EA Unit Root Tests}
 \label{table:ea_lr10-ir}
 \end{table}
@@ -230,7 +239,7 @@ The exchange rate between euro and dollar (\autoref{fig:ea_exrateEURtoUSD}) has 
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.7\textwidth]{"../plots/ea_Exrate Euro for 1 USD"}
+\includegraphics[width = 0.7\textwidth]{"\kokPlotsPath ea_Exrate Euro for 1 USD"}
 \caption{plot EA Exchange Rate EUR to USD}
 \label{fig:ea_exrateEURtoUSD}
 \end{figure}
@@ -239,7 +248,7 @@ ACF and PACF (\autoref{fig:ea_exrateEURtoUSD_acf}) are typical for an autoregres
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.5\textwidth]{"../acf/ea_Exrate Euro for 1 USD"}\includegraphics[width = 0.5\textwidth]{"../pacf/ea_Exrate Euro for 1 USD"}
+\includegraphics[width = 0.5\textwidth]{"\kokAcfPath ea_Exrate Euro for 1 USD"}\includegraphics[width = 0.5\textwidth]{"\kokPacfPath ea_Exrate Euro for 1 USD"}
 \caption{ACF and PACF EA Exchange Rate EUR to USD}
 \label{fig:ea_exrateEURtoUSD_acf}
 \end{figure}
@@ -248,7 +257,7 @@ Weak evidence of stationarity from unit root tests (\autoref{table:ea_exrate})
 
 \begin{table}[h!]
 \centering
-\csvautotabular[respect all]{"../stationary_tests/ea_Exrate Euro for 1 USD.csv"}
+\csvautotabular[respect all]{"\kokTestPath ea_Exrate Euro for 1 USD.csv"}
 \caption{Exchange Rate EA Unit Root Tests}
 \label{table:ea_exrate}
 \end{table}
@@ -268,7 +277,7 @@ The US CPI plot (\autoref{fig:us_cpi}) shows evidence of a drift term but no tre
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.7\textwidth]{../plots/us_CPI}
+\includegraphics[width = 0.7\textwidth]{\kokPlotsPath us_CPI}
 \caption{plot US CPI}
 \label{fig:us_cpi}
 \end{figure}
@@ -277,7 +286,7 @@ ACF and PACF plots (\autoref{fig:us_cpi_acf}) show behaviour of autoregressive m
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.5\textwidth]{../acf/us_CPI}\includegraphics[width = 0.5\textwidth]{../pacf/us_CPI}
+\includegraphics[width = 0.5\textwidth]{\kokAcfPath us_CPI}\includegraphics[width = 0.5\textwidth]{\kokPacfPath us_CPI}
 \caption{ACF and PACF US CPI}
 \label{fig:us_cpi_acf}
 \end{figure}
@@ -286,7 +295,7 @@ Unit root tests (\autoref{table:us_cpi}) good show evidence of stationarity from
 
 \begin{table}[h!]
 \centering
-\csvautotabular[respect all]{../stationary_tests/us_CPI.csv}
+\csvautotabular[respect all]{\kokTestPath us_CPI.csv}
 \caption{CPI US Unit Root Tests}
 \label{table:us_cpi}
 \end{table}
@@ -298,7 +307,7 @@ The plot of US GDP (\autoref{fig:us_gdp}) shows a mean close to zero. A clear tr
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.7\textwidth]{../plots/us_GDP}
+\includegraphics[width = 0.7\textwidth]{\kokPlotsPath us_GDP}
 \caption{plot US GDP}
 \label{fig:us_gdp}
 \end{figure}
@@ -307,7 +316,7 @@ An autoregressive model with a dependance on relativly few lags is suggested by 
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.5\textwidth]{../acf/us_GDP}\includegraphics[width = 0.5\textwidth]{../pacf/us_GDP}
+\includegraphics[width = 0.5\textwidth]{\kokAcfPath us_GDP}\includegraphics[width = 0.5\textwidth]{\kokPacfPath us_GDP}
 \caption{ACF and PACF US GDP}
 \label{fig:us_gdp_acf}
 \end{figure}
@@ -316,7 +325,7 @@ Strong evidence of stationarity by both ADF and KPSS tests (\autoref{table:us_gd
 
 \begin{table}[h!]
 \centering
-\csvautotabular[respect all]{../stationary_tests/us_GDP.csv}
+\csvautotabular[respect all]{\kokTestPath us_GDP.csv}
 \caption{ US Unit Root Tests}
 \label{table:us_gdp}
 \end{table}
@@ -327,7 +336,7 @@ Unemployment rate cureve (\autoref{fig:us_ur}) is again very smooth as the EA on
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.7\textwidth]{../plots/us_UR}
+\includegraphics[width = 0.7\textwidth]{\kokPlotsPath us_UR}
 \caption{plot US UR}
 \label{fig:us_ur}
 \end{figure}
@@ -336,7 +345,7 @@ Strong autocorrelation in ACF (\autoref{fig:us_ur_acf}).
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.5\textwidth]{../acf/us_UR}\includegraphics[width = 0.5\textwidth]{../pacf/us_UR}
+\includegraphics[width = 0.5\textwidth]{\kokAcfPath us_UR}\includegraphics[width = 0.5\textwidth]{\kokPacfPath us_UR}
 \caption{ACF and PACF US UR}
 \label{fig:us_ur_acf}
 \end{figure}
@@ -345,7 +354,7 @@ Stationarity test results (\autoref{table:us_ur}) not very convincing. Only KPSS
 
 \begin{table}[h!]
 \centering
-\csvautotabular[respect all]{../stationary_tests/us_UR.csv}
+\csvautotabular[respect all]{\kokTestPath us_UR.csv}
 \caption{UR US Unit Root Tests}
 \label{table:us_ur}
 \end{table}
@@ -357,7 +366,7 @@ US IR variable (\autoref{fig:us_ir10fedfunds}) shows high variance followed by a
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.7\textwidth]{"../plots/us_IR FEDFUNDS"}
+\includegraphics[width = 0.7\textwidth]{"\kokPlotsPath us_IR FEDFUNDS"}
 \caption{plot US IR10 fedfunds}
 \label{fig:us_ir10fedfunds}
 \end{figure}
@@ -366,7 +375,7 @@ Again typical autoregressive model ACF and PACF (\autoref{fig:us_ir10fedfunds-ir
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.5\textwidth]{"../acf/us_IR FEDFUNDS"}\includegraphics[width = 0.5\textwidth]{"../pacf/us_IR FEDFUNDS"}
+\includegraphics[width = 0.5\textwidth]{"\kokAcfPath us_IR FEDFUNDS"}\includegraphics[width = 0.5\textwidth]{"\kokPacfPath us_IR FEDFUNDS"}
 \caption{ACF and PACF US IR10 fedfunds}
 \label{fig:us_ir10fedfunds-ir_acf}
 \end{figure}
@@ -375,7 +384,7 @@ Evidence of stationarity from both ADF and KPSS tests (\autoref{table:us_ir}). A
 
 \begin{table}[h!]
 \centering
-\csvautotabular[respect all]{"../stationary_tests/us_IR FEDFUNDS.csv"}
+\csvautotabular[respect all]{"\kokTestPath us_IR FEDFUNDS.csv"}
 \caption{IR Fedfunds US Unit Root Tests}
 \label{table:us_ir}
 \end{table}
@@ -386,7 +395,7 @@ IR10 premium variable plot (\autoref{fig:us_ir10prem}) show decaying variance. T
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.7\textwidth]{"../plots/us_IR10 premium"}
+\includegraphics[width = 0.7\textwidth]{"\kokPlotsPath us_IR10 premium"}
 \caption{plot US IR10 premium}
 \label{fig:us_ir10prem}
 \end{figure}
@@ -395,7 +404,7 @@ Autocorrelations of lags much after initial decline in ACF (\autoref{fig:us_ir10
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.5\textwidth]{"../acf/us_IR10 premium"}\includegraphics[width = 0.5\textwidth]{"../pacf/us_IR10 premium"}
+\includegraphics[width = 0.5\textwidth]{"\kokAcfPath us_IR10 premium"}\includegraphics[width = 0.5\textwidth]{"\kokPacfPath us_IR10 premium"}
 \caption{ACF and PACF US IR10 premium}
 \label{fig:us_ir10prem-ir_acf}
 \end{figure}
@@ -404,7 +413,7 @@ No evidence of stationarity from any of the tests (\autoref{table:us_ir10})
 
 \begin{table}[h!]
 \centering
-\csvautotabular[respect all]{"../stationary_tests/us_IR10 premium.csv"}
+\csvautotabular[respect all]{"\kokTestPath us_IR10 premium.csv"}
 \caption{IR 10 premium US Unit Root Tests}
 \label{table:us_ir10}
 \end{table}
@@ -415,7 +424,7 @@ The plot of the LR10 - IR (\autoref{fig:us_lr10-ir}) suggests a very clear downw
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.7\textwidth]{"../plots/us_LR10 - IR"}
+\includegraphics[width = 0.7\textwidth]{"\kokPlotsPath us_LR10 - IR"}
 \caption{plot US LR10 - IR}
 \label{fig:us_lr10-ir}
 \end{figure}
@@ -424,7 +433,7 @@ Strong autocorrelation in ACF on many lags (\autoref{fig:us_lr10-ir_acf}).
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.5\textwidth]{"../acf/us_LR10 - IR"}\includegraphics[width = 0.5\textwidth]{"../pacf/us_LR10 - IR"}
+\includegraphics[width = 0.5\textwidth]{"\kokAcfPath us_LR10 - IR"}\includegraphics[width = 0.5\textwidth]{"\kokPacfPath us_LR10 - IR"}
 \caption{ACF and PACF US LR10 - IR}
 \label{fig:us_lr10-ir_acf}
 \end{figure}
@@ -433,7 +442,7 @@ Weak evidence of stationarity from only KPSS unit root test (\autoref{table:us_l
 
 \begin{table}[h!]
 \centering
-\csvautotabular[respect all]{"../stationary_tests/us_LR10 - IR.csv"}
+\csvautotabular[respect all]{"\kokTestPath us_LR10 - IR.csv"}
 \caption{LR10-IR US Unit Root Tests}
 \label{table:us_lr10-ir}
 \end{table}
@@ -445,21 +454,21 @@ Exchange rate USD to EUR is the naturally the opposite of EUR to USD (\autoref{s
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.7\textwidth]{"../plots/us_Exrate USD to 1 Euro"}
+\includegraphics[width = 0.7\textwidth]{"\kokPlotsPath us_Exrate USD to 1 Euro"}
 \caption{plot US Exchange Rate USD to EUR}
 \label{fig:us_exrateUSDtoEUR}
 \end{figure}
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width = 0.5\textwidth]{"../acf/us_Exrate USD to 1 Euro"}\includegraphics[width = 0.5\textwidth]{"../pacf/us_Exrate USD to 1 Euro"}
+\includegraphics[width = 0.5\textwidth]{"\kokAcfPath us_Exrate USD to 1 Euro"}\includegraphics[width = 0.5\textwidth]{"\kokPacfPath us_Exrate USD to 1 Euro"}
 \caption{ACF and PACF US Exchange Rate USD to EUR}
 \label{fig:us_exrateUSDtoEUR_acf}
 \end{figure}
 
 \begin{table}[h!]
 \centering
-\csvautotabular[respect all]{"../stationary_tests/us_Exrate USD to 1 Euro.csv"}
+\csvautotabular[respect all]{"\kokTestPath us_Exrate USD to 1 Euro.csv"}
 \caption{Exchange Rate US Unit Root Tests}
 \label{table:us_exrate}
 \end{table}
