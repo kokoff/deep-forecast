@@ -6,6 +6,8 @@ The essence of the project is to apply a machine learning based approach to acqu
 
 An MEng student will be expected to produce models from data that represents more than one economy, using at least 2 macro-parameters in each case. The benefits of including key commodities, such as oil and gold, should also be at least discussed in the design section (if adequate data cannot be gathered). A certain level of automation of the experimental setup is expected to be developed, and discussed in the report.
 
+----------
+
 Reading:
 
 Dimitar Kazakov and Tsvetomira Tsenova. January 2009. [Equation Discovery for Macroeconomic Modelling.](http://www-users.cs.york.ac.uk/~kazakov/papers/crc-Kazakov-Tsenova.pdf) International Conference on Agents and Artificial Intelligence, Porto, Portugal. 
