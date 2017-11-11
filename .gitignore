@@ -2,3 +2,4 @@
 experiments/*
 .idea
 out/*
+data/.~lock*
