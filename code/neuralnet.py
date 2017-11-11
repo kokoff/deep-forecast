@@ -110,7 +110,7 @@ def main():
     print args.VAR, args.lags
 
     # read data and drop missing values
-    data_file = os.path.join('..', 'data', 'ea.csv')
+    data_file = os.path.join('..', 'data', 'EA.csv')
     data = pd.read_csv(data_file)
 
     VAR = args.VAR
