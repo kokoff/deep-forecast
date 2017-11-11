@@ -1,2 +1,4 @@
 .sync/*
 experiments/*
+.idea
+out/*
