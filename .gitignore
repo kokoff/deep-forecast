@@ -1,5 +1,14 @@
+# Local Folders
 .sync/*
 experiments/*
+
+
+# Pycharm
 .idea
 out/*
+
+# Excel
 data/.~lock*
+
+# Python
+*.pyc
