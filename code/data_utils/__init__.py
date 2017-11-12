@@ -21,11 +21,15 @@ def xls_to_csv():
 
 
 def get_ea_data():
-    return pd.read_csv(DATA_PATH_CSV_EA, index_col=0)
+    data = pd.read_csv(DATA_PATH_CSV_EA, index_col=0)
+    data.index = pd.PeriodIndex(data.index, freq='Q')
+    return data
 
 
 def get_us_data():
-    return pd.read_csv(DATA_PATH_CSV_US, index_col=0)
+    data = pd.read_csv(DATA_PATH_CSV_US, index_col=0)
+    data.index = pd.PeriodIndex(data.index, freq='Q')
+    return data
 
 
 def main():
