@@ -32,10 +32,7 @@ def get_us_data():
     return data
 
 
-def main():
-    print get_ea_data()
-    print get_us_data()
-
-
-if __name__ == '__main__':
-    main()
+def get_data():
+    data_ea = get_ea_data()
+    data_us = get_us_data()
+    return dict(EA=data_ea, US=data_us)
