@@ -1,18 +1,22 @@
 import os
-import numpy as np
+
 import pandas as pd
-from pandas.plotting import table
-from matplotlib import pyplot as plt
-from pandas import DataFrame
-from statsmodels.tsa.stattools import adfuller, kpss
-from statsmodels.tsa.seasonal import seasonal_decompose
 from arch.unitroot import ADF, PhillipsPerron, KPSS
+from matplotlib import pyplot as plt
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+
 from code.utils import data_utils
 from code.utils.experiments_utils import expr_sub_dir, expr_file_name
 
-_EXPERIMENTS_DIR_NAME = 'python-analysis'
-ROLLING_STATISTICS_DIR = expr_sub_dir(_EXPERIMENTS_DIR_NAME, 'rolling-statistics')
-STATIONARY_TESTS_DIR = expr_sub_dir(_EXPERIMENTS_DIR_NAME, 'stationary-tests')
+
+
+from statsmodels.tsa.seasonal import seasonal_decompose
+
+
+EXPERIMENTS_DIR_NAME = 'python-analysis'
+ROLLING_STATISTICS_DIR = expr_sub_dir(EXPERIMENTS_DIR_NAME, 'rolling-statistics')
+STATIONARY_TESTS_DIR = expr_sub_dir(EXPERIMENTS_DIR_NAME, 'stationary-tests')
+ACF_PACF_DIR = expr_sub_dir(EXPERIMENTS_DIR_NAME, 'acf-pacf')
 
 
 def plot_rolling_stats(data, window=12, country=None):
@@ -56,14 +60,36 @@ def stationary_tests(data, country=None):
             results.to_csv(file_path, float_format='%.3f')
 
 
+def acf_and_pacf(data, country=None):
+    for variable in data.columns:
+        series = data[variable].dropna()
+
+        plt.figure()
+
+        ax = plt.subplot(1,2,1)
+        plot_acf(series,ax=ax)
+
+        ax = plt.subplot(1, 2, 2)
+        plot_pacf(series, ax=ax)
+
+        if country:
+            file_path = os.path.join(ACF_PACF_DIR, expr_file_name(country, variable, 'png'))
+            plt.savefig(file_path, bbox_inches='tight')
+
+
+
+
 def main():
     ea_data = data_utils.get_ea_data()
     us_data = data_utils.get_us_data()
+    data = data_utils.get_data()
 
-    stationary_tests(ea_data, country='EA')
-    plot_rolling_stats(ea_data, country='EA')
+    for country, df in data.items():
+        stationary_tests(ea_data, country=country)
+        plot_rolling_stats(ea_data, country=country)
+        acf_and_pacf(ea_data, country=country)
 
-    plt.show()
+    #plt.show()
 
 
 if __name__ == '__main__':
