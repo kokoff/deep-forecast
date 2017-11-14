@@ -1,6 +1,7 @@
-from code.analysis import stationary_tests, plot_rolling_stats, plot_series
-from code.utils import data_utils as du
-from code.utils.experiments_utils import expr_sub_dir, expr_file_name
+from src.analysis import stationary_tests, plot_rolling_stats, plot_series, plot_auto_correlation
+from src.preprocessing import difference, trend_smoothing, trend_regression, seasonal_regression
+from src.utils import data_utils as du
+from src.utils.experiments_utils import expr_sub_dir, expr_file_name
 from matplotlib import pyplot as plt
 import os
 
@@ -11,25 +12,27 @@ def main():
     data = du.get_data()
     output = True
 
-    # for country, data_frame in data.items():
-    #     for variable in data_frame.columns:
-    country = 'US'
-    variable = 'LR10-IR'
-    series = data[country][variable]
+    for country, data_frame in data.items():
+        for variable in data_frame.columns:
+            series = data[country][variable]
+            original_series = series
+            original_series.name = original_series.name + ' original'
 
-    file_path = os.path.join(ANALYSIS_RESULTS_DIR, country + '_' + variable)
+            for series in [original_series, difference(series), trend_regression(series)[0],
+                           seasonal_regression(series)[0], trend_smoothing(series)[0]]:
+                file_path = os.path.join(ANALYSIS_RESULTS_DIR, country + '_' + series.name.replace(' ', '_'))
 
-    plot_series(series)
-    plt.savefig(file_path + '_plot.png')
+                plot_series(series)
+                plt.savefig(file_path + '_plot.png')
 
-    plot_rolling_stats(series)
-    plt.savefig(file_path + '_roll.png')
+                plot_rolling_stats(series)
+                plt.savefig(file_path + '_roll.png')
 
-    res = stationary_tests(series)
-    print '%.3f' % res['t-stat']['ADF']
-    res['t-stat'].to_csv(file_path + '_test.csv', float_format='%.6f')
+                res = stationary_tests(series)
+                res.to_csv(file_path + '_test.csv', float_format='%.3f')
 
-    # plt.show()
+                plot_auto_correlation(series)
+                plt.savefig(file_path + '_ACF.png')
 
 
 if __name__ == '__main__':
