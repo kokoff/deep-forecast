@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import warnings
 
 DATA_PATH = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data'))
 DATA_PATH_XLS = os.path.join(DATA_PATH, 'Data_ILP.xls')
@@ -36,3 +37,9 @@ def get_data():
     data_ea = get_ea_data()
     data_us = get_us_data()
     return dict(EA=data_ea, US=data_us)
+
+
+def remove_na(series):
+    if series.hasnans:
+        warnings.warn('Dropped NA values from time series.',stacklevel=2)
+        return series.dropna(inplace=True)
