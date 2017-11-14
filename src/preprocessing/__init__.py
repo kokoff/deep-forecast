@@ -3,7 +3,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from sklearn.linear_model import LinearRegression
 
-from code.utils import data_utils as du
+from src.utils import data_utils as du
 
 
 def trend_regression(series, degree=1):
