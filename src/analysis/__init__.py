@@ -17,8 +17,8 @@ def plot_rolling_stats(series, window=8):
 
     plt.figure()
     series.plot(color='blue')
-    rolling_mean.plot(color='red', label=series.name + ' rolling mean')
-    rolling_std.plot(color='black', label=series.name + ' rolling std')
+    rolling_mean.plot(color='red', label=str(series.name) + ' rolling mean')
+    rolling_std.plot(color='black', label=str(series.name) + ' rolling std')
     plt.legend()
 
 
