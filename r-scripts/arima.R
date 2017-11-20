@@ -11,12 +11,14 @@ library(forecast)
 
 out= list()
 
-for (country in names(data))
-  for (name in names(data[country])){
+for (country in names(data)){
+  for (name in names(data[[country]])){
     print(country)
     print(name)
-  
-    series <- na.omit(ts(data = data[country][name], start = c(1998,1), frequency = 4))
+    
+
+    
+    series <- na.omit(ts(data = data[[country]][name], start = c(1998,1), frequency = 4))
     train = head(series, -12)
     test = tail(series, 12)
     
