@@ -1,3 +1,11 @@
 \chapter{Design and Implementation}
 
-Stuff
+
+\section{ARIMA benchmark models}
+Evaluating neural network performance using error metrics is useful but it is not enough on its own. In order the get an estimate of how well deep models are doing it is useful to compare their performance with an already established linear model. Auto regressive integrated moving average (ARIMA) models are probably the most widely used and successful models for macroeconomic forecasting. 
+
+\subsection{Experimental design}
+For each macroeconomic variable an ARIMA model was estimated using the R \lstinline[language=R]{auto.arima} function. The function automatically performs a grid search over all ARIMA and also models seasonality automatically. This type of automatic fitting can probably be outperformed by manual seasonal adjustment and trend removal, followed by fitting an ARMA model. However for the purpose of this project the automatically fitted models were used as a benchmark prediction model.
+\newline
+
+For each fitted ARIMA model the corresponding macroeconomic variable was split into two parts - a training and tests sets. The test set consisted of the most recent three year period (or 12 quarters) and the training set consisted of the rest of the data for the particular variable. Missing values were ignored. The models were evaluated on one step ahead predictions on the training and test set and recursive forecast on the test set.

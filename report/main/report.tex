@@ -1,13 +1,45 @@
+%Inside and top margins should be a minimum of 2 cm; other margins should be a minimum of 1 cm. You might find it simplest to leave 2 cm all round. Large blocks of closely spaced text can be hard to read, so if you use single-spaced lines, leave a good gap between paragraphs and around headings.
+
+%MEng, MMath, 60-credit MSc, PG Diploma — 55 pages
+%The limits include all material that is to be marked except the title page, abstract, table of contents, bibliography and any list of tables/figures in the report
+
+%The report must start with a title page, containing title, author, date, supervisor and wording to the effect that it is the report on a project submitted for the degree of such-and-such in the Department of Computer Science at the University of York. Do not include your examination number anywhere in your report. It should also contain a declaration of the word count, as described here.
+
+%The second page should normally contain an abstract of not more than 200 words.
+
+%Subsequent pages should show the contents of the report; this should include a table of contents showing the title and page number for each chapter and section (or each section and subsection). Where appropriate, appendices may start with their own table of contents. Each main subdivision (e.g. section, chapter or appendix) should start on a new page.
+
+%All tables, figures and equations should be labelled or numbered. Where appropriate, separate lists of tables, figures and equations should be included at the start of the report. Conventions for labelling or numbering tables and figures should be applied consistently.
+
+%Numbering of subsections to one level of decimals (e.g. 2.1) is desirable; numbering to two levels (e.g. 2.1.2) is acceptable. Numbering to further levels (e.g. 2.1.2.3) is not normally desirable. Conventions for headings and indentation at various levels should be applied consistently.
+%----------------------------------------------------------------------------------------
+
+
+
 %----------------------------------------------------------------------------------------
 %	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
 %----------------------------------------------------------------------------------------
 
-\documentclass[11pt]{report}
+\documentclass[11pt,a4paper]{report}
+%\usepackage[top=2cm, bottom=2cm, left=2cm, right=2cm]{geometry} %Margins if you run out of space
+
 
 \usepackage[utf8]{inputenc} % Required for inputting international characters
 \usepackage[T1]{fontenc} % Output font encoding for international characters
 
 \usepackage{mathpazo} % Palatino font
+\usepackage{graphicx}
+\usepackage{csvsimple}
+\usepackage{listings}
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks,
+	citecolor=black,
+	filecolor=black,
+	linkcolor=black,
+	urlcolor=black
+}
+
 
 \begin{document}
 
@@ -15,7 +47,7 @@
 %----------------------------------------------------------------------------------------
 %	TITLE PAGE
 %----------------------------------------------------------------------------------------
-
+%The title page of the report must specify which appendices are to be marked.
 \input{chapters/title_page}
 
 
@@ -24,7 +56,18 @@
 %----------------------------------------------------------------------------------------
 
 \begin{abstract}
-Abstract goes here.
+%	What is it?
+%		Brief summary of the work,
+%		context and findings of the project
+%	What to include?
+%		Problem
+%		Method
+%		Findings
+%		Important Conclusions
+%	What not to include?
+%		References, jargon, acronyms 
+%MAX 200 words
+
 \end{abstract}
 
 
@@ -34,6 +77,9 @@ Abstract goes here.
 
 \tableofcontents
 
+\listoffigures
+
+\listoftables
 
 %----------------------------------------------------------------------------------------
 %	CHAPTERS
@@ -64,6 +110,8 @@ Abstract goes here.
 %----------------------------------------------------------------------------------------
 
 \appendix
-\chapter{}
+\include{appendices/arima}
+
+
 
 \end{document}
