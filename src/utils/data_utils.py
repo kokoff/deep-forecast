@@ -41,5 +41,5 @@ def get_data():
 
 def remove_na(series):
     if series.hasnans:
-        warnings.warn('Dropped NA values from time series.',stacklevel=2)
+        warnings.warn('Dropped NA values from time series.', stacklevel=2)
         return series.dropna(inplace=True)
