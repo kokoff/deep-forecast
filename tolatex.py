@@ -20,7 +20,11 @@ def get_elements(dir):
     for i in os.listdir(dir):
         fname, ext = os.path.splitext(i)
         fpath = os.path.join(os.path.abspath(dir), fname)
+
         names = fname.split('_')
+        if len(names) < 3:
+            continue
+
         country = names[0]
         var = names[1]
         caption = ' '.join(names[2:])
@@ -46,8 +50,15 @@ def main(input, output):
                     if ext != '.csv':
                         with subsec.create(Figure(position='h!')) as fig:
                             fig.add_image(filepath)
-                            fig.add_caption(caption)
+                            fig.add_caption(caption + " " + country + ' ' + var)
                             fig.append(NoEscape('\label{' + label + '}'))
+                    elif ext == '.csv':
+                        with subsec.create(Figure(position='h!')) as fig:
+                            fig.append(NoEscape('\csvautotabular[respect all]{' + filepath + '.csv}'))
+                            fig.add_caption(caption + " " + country + ' ' + var)
+                            fig.append(NoEscape('\label{' + label + '}'))
+
+            main.append(NoEscape("\clearpage"))
 
     if output is None:
         print main.dumps()
