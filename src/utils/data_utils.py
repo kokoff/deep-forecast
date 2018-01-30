@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import warnings
+import numpy as np
 
 DATA_PATH = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data'))
 DATA_PATH_XLS = os.path.join(DATA_PATH, 'Data_ILP.xls')
@@ -21,25 +22,51 @@ def xls_to_csv():
     data_us.to_csv(DATA_PATH_CSV_US)
 
 
-def get_ea_data():
+def get_ea_data(drop_na=False):
     data = pd.read_csv(DATA_PATH_CSV_EA, index_col=0)
     data.index = pd.PeriodIndex(data.index, freq='Q')
+    if drop_na:
+        remove_na(data)
     return data
 
 
-def get_us_data():
+def get_us_data(drop_na=False):
     data = pd.read_csv(DATA_PATH_CSV_US, index_col=0)
     data.index = pd.PeriodIndex(data.index, freq='Q')
+    if drop_na:
+        remove_na(data)
     return data
 
 
-def get_data():
-    data_ea = get_ea_data()
-    data_us = get_us_data()
+def get_data(drop_na=False):
+    data_ea = get_ea_data(drop_na=drop_na)
+    data_us = get_us_data(drop_na=drop_na)
     return dict(EA=data_ea, US=data_us)
 
 
-def remove_na(series):
-    if series.hasnans:
+def train_val_test_split(data, val_size, test_size):
+    from sklearn.model_selection import train_test_split
+
+    if isinstance(val_size, float):
+        val_size = int(val_size * len(data))
+
+    if isinstance(test_size, float):
+        test_size = int(test_size * len(data))
+
+    split = []
+    split1 = train_test_split(data, shuffle=False, test_size=val_size + test_size)
+
+    for i in range(len(split1)):
+        if i % 2 is 0:
+            split.append(split1[i])
+        else:
+            new_split = train_test_split(split1[i], shuffle=False, test_size=test_size)
+            split.extend(new_split)
+
+    return split
+
+
+def remove_na(data):
+    if data.isnull().values.any():
         warnings.warn('Dropped NA values from time series.', stacklevel=2)
-        return series.dropna(inplace=True)
+    return data.dropna(axis=0, how='any', inplace=True)
