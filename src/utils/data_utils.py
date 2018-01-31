@@ -44,6 +44,33 @@ def get_data(drop_na=False):
     return dict(EA=data_ea, US=data_us)
 
 
+def get_data_frame_multi(drop_na=False):
+    data_ea = get_ea_data(drop_na=drop_na)
+    data_us = get_us_data(drop_na=drop_na)
+
+    columns = pd.MultiIndex.from_product([['EA', 'US'], data_ea.columns])
+
+    data_frame = pd.DataFrame(index=data_ea.index, columns=columns)
+    data_frame.at[:, ['EA']] = data_ea.values
+    data_frame.at[:, ['US']] = data_us.values
+
+    return data_frame
+
+
+def get_data_frame(drop_na=False):
+    data_ea = get_ea_data(drop_na=drop_na)
+    data_us = get_us_data(drop_na=drop_na)
+
+    ea_columns = ['EA_' + i for i in data_ea.columns]
+    us_columns = ['US_' + i for i in data_us.columns]
+
+    data_frame = pd.DataFrame(index=data_ea.index, columns=ea_columns + us_columns)
+    data_frame.at[:, ea_columns] = data_ea.values
+    data_frame.at[:, us_columns] = data_us.values
+
+    return data_frame
+
+
 def train_val_test_split(data, val_size, test_size):
     from sklearn.model_selection import train_test_split
 
@@ -70,3 +97,30 @@ def remove_na(data):
     if data.isnull().values.any():
         warnings.warn('Dropped NA values from time series.', stacklevel=2)
     return data.dropna(axis=0, how='any', inplace=True)
+
+
+if __name__ == '__main__':
+    print get_data_frame(True)
+
+
+def get_xy_data(data, lags1=1, lags2=1):
+    # Transform X with approapriate lag values
+    index = [(i, 'x' + str(j)) for i in data.columns for j in range(lags1)]
+    index = pd.MultiIndex.from_tuples(index, names=['variable', 'lag'])
+    x = pd.DataFrame(np.zeros((len(data), len(index))), index=data.index, columns=index, dtype='float64')
+    for i in range(lags1):
+        x[[(j, 'x' + str(i)) for j in data.columns]] = data.shift(i + lags2)
+
+    x = x.tail(-lags1 - lags2 + 1)
+
+    # Transform Y with approapriate lag values
+    index = [(i, 'y' + str(j)) for i in data.columns for j in range(lags2)]
+    index = pd.MultiIndex.from_tuples(index, names=['variable', 'lag'])
+    y = pd.DataFrame(np.zeros((len(data), len(index))), index=data.index, columns=index, dtype='float64')
+
+    for i in range(lags2):
+        y[[(j, 'y' + str(i)) for j in data.columns]] = data.shift(i)
+
+    y = y.tail(-lags1 - lags2 + 1)
+
+    return x, y
