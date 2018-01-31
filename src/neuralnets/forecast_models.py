@@ -9,9 +9,11 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import GridSearchCV, ParameterGrid, PredefinedSplit, train_test_split, fit_grid_point
 from sklearn.metrics import mean_squared_error, make_scorer
 import os
+from copy import deepcopy
 
 from src.utils import data_utils
 from src.utils.data_utils import get_xy_data
+from json import dumps, loads
 
 
 # Keras model with forecast and evaluate_forecast functions
@@ -103,9 +105,7 @@ class GridSearch:
     class Results:
 
         def __init__(self):
-            self.training = None
-            self.prediction = None
-            self.forecast = None
+            self.average = None
             self.dir = None
 
         def create_result_dir(self):
@@ -120,24 +120,17 @@ class GridSearch:
 
         def init_logs(self, param_grid, num_runs, epochs):
             self.create_result_dir()
-            index = [str(i) for i in param_grid]
-            columns = [i for i in range(num_runs)]
+            names = param_grid[0].keys()
+            index = [tuple(i.values()) for i in param_grid]
+            index = pd.MultiIndex.from_tuples(index, names=names)
 
-            self.prediction = pd.DataFrame(index=index, columns=columns)
-            self.forecast = pd.DataFrame(index=index, columns=columns)
-
-            index = pd.MultiIndex.from_product([index, ['train', 'val']], names=['params', 'set'])
-            columns = pd.MultiIndex.from_product([columns, [i for i in range(epochs)]], names=['run', 'epoch'])
-
-            self.training = pd.DataFrame(index=index, columns=columns)
+            self.average = pd.DataFrame(0.0, index=index, columns=['train', 'val'])
 
         def save_results(self):
             if not os.path.exists(self.dir):
                 self.create_result_dir()
 
-            self.training.to_csv(os.path.join(self.dir, 'training.csv'))
-            self.prediction.to_csv(os.path.join(self.dir, 'prediction.csv'))
-            self.forecast.to_csv(os.path.join(self.dir, 'forecast.csv'))
+            self.average.to_csv(os.path.join(self.dir, 'results.csv'))
 
     def __init__(self, build_fn, param_grid, num_runs=20):
         self.build_fn = build_fn
@@ -154,41 +147,37 @@ class GridSearch:
         self.results.init_logs(self.param_grid, self.num_runs, fit_params['epochs'])
 
         for params in self.param_grid:
+            train = np.zeros(self.num_runs)
+            val = np.zeros(self.num_runs)
+
             for i in range(self.num_runs):
                 print 'Run ', i, '\tParameters ', str(params)
                 self.estimator.set_params(**params)
 
                 # Fit model
-                history = self.estimator.fit(x_train, y_train, validation_data=[x_val, y_val], **fit_params)
-                self.results.training.at[(str(params), 'train'), i] = history.history['loss']
-                self.results.training.at[(str(params), 'val'), i] = history.history['val_loss']
+                self.estimator.fit(x_train, y_train, validation_data=[x_val, y_val], **fit_params)
 
-                # Eval prediction
-                pred = self.estimator.score(x_val, y_val, verbose=0)
-                self.results.prediction.at[[str(params)], [i]] = pred
+                train[i] = self.estimator.score(x_train, y_train, verbose=0)
+                val[i] = self.estimator.score(x_val, y_val, verbose=0)
 
-                # Eval forecast
-                forecast = self.estimator.score_forecast(x_val, y_val)
-                self.results.forecast.at[[str(params)], [i]] = forecast
+            self.results.average.at[tuple(params.values()), 'train'] = train.mean()
+            self.results.average.at[tuple(params.values()), 'val'] = val.mean()
 
-            self.save_best(params, fit_params)
+            self.save_best(params)
 
+        print self.results.average
         self.results.save_results()
         return self.best
 
-    def save_best(self, params, fit_params):
-        avg_prediction = self.results.prediction.ix[str(params)].mean()
-        avg_forecast = self.results.forecast.ix[str(params)].mean()
+    def save_best(self, params):
+        avg_prediction = self.results.average.ix[tuple(params.values()), 'val']
 
         if avg_prediction > self.best.prediction:
-            sk_params = {}
-            sk_params.update(params)
-            sk_params.update(fit_params)
-            self.best.model = ModelWrapper(self.build_fn, **sk_params)
-            self.best.model.model = Model.from_config(self.estimator.model.get_config())
+            print avg_prediction
+            self.best.model = ForecastModel.from_config(self.estimator.model.get_config())
             self.best.prediction = avg_prediction
-            self.best.forecast = avg_forecast
             self.best.params = params
+
 
 
 def test_forecast():
