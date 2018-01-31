@@ -11,7 +11,7 @@ from sklearn.metrics import mean_squared_error, make_scorer
 import os
 
 from src.utils import data_utils
-from utils import get_xy_data
+from src.utils.data_utils import get_xy_data
 
 
 # Keras model with forecast and evaluate_forecast functions
@@ -110,10 +110,10 @@ class GridSearch:
 
         def create_result_dir(self):
             dir = raw_input('Enter directory for results:')
+            dir = os.path.join('results', dir)
             while os.path.exists(dir):
                 dir = raw_input('Directory exists please enter another:')
-
-            dir = os.path.join('results', dir)
+                dir = os.path.join('results', dir)
 
             os.mkdir(dir)
             self.dir = dir
