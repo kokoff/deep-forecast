@@ -80,18 +80,19 @@ class ForecastModel(Model):
 
 class ModelWrapper(KerasRegressor):
 
-    # Recursively forecast on x (accepts any type of input output dimesnions)
+    def score(self, x, y, **kwargs):
+        return - super(ModelWrapper, self).score(x, y, **kwargs)
+
     def forecast(self, x, y, **kwargs):
-        kwargs = self.filter_sk_params(Model.predict, kwargs)
         return self.model.forecast(x, y, **kwargs)
 
     # Evaluate forecast MSE other losses not supported
     def score_forecast(self, x, y, **kwargs):
-        kwargs = self.filter_sk_params(Model.evaluate, kwargs)
         loss = self.model.evaluate_forecast(x, y, **kwargs)
+
         if isinstance(loss, list):
-            return -loss[0]
-        return -loss
+            return loss[0]
+        return loss
 
 
 class GridSearch:
@@ -132,52 +133,93 @@ class GridSearch:
 
             self.average.to_csv(os.path.join(self.dir, 'results.csv'))
 
-    def __init__(self, build_fn, param_grid, num_runs=20):
-        self.build_fn = build_fn
+    def __init__(self, build_fn, param_dict, data_dict, num_runs=20):
+        self.reset_logs(param_dict, data_dict)
         self.estimator = ModelWrapper(build_fn)
-        self.param_grid = param_grid
+        self.param_grid = ParameterGrid(param_dict)
+        self.data_params = ParameterGrid(data_dict)
         self.num_runs = num_runs
 
-        self.results = self.Results()
+        # self.run_results = None
 
-        self.best = self.Best()
+    def reset_logs(self, param_dict, data_disct):
+        columns = ['train prediction', 'val prediction', 'train forecast', 'val forecast']
+        self.run_results = pd.DataFrame(columns=columns)
 
-    def grid_search(self, x_train, y_train, x_val, y_val, **fit_params):
+        columns = pd.MultiIndex.from_product([['train', 'val'], ['prediction', 'forecast']])
+        columns = data_disct.keys() + param_dict.keys() + ['input_dim', 'output_dim', 'train prediction',
+                                                           'val prediction', 'train forecast', 'val forecast']
+        self.parameter_results = pd.DataFrame(columns=columns)
 
-        self.results.init_logs(self.param_grid, self.num_runs, fit_params['epochs'])
+        self.data_results = pd.DataFrame(columns=columns+['test prediction', 'test forecast'])
 
-        for params in self.param_grid:
-            train = np.zeros(self.num_runs)
-            val = np.zeros(self.num_runs)
+    def grid_search(self):
 
-            for i in range(self.num_runs):
-                print 'Run ', i, '\tParameters ', str(params)
-                self.estimator.set_params(**params)
+        # self.reset_logs()
 
-                # Fit model
-                self.estimator.fit(x_train, y_train, validation_data=[x_val, y_val], **fit_params)
+        for k, data_param in enumerate(self.data_params):
+            x_train, y_train, x_val, y_val, x_test, y_test = get_data(**data_param)
+            print data_param
 
-                train[i] = self.estimator.score(x_train, y_train, verbose=0)
-                val[i] = self.estimator.score(x_val, y_val, verbose=0)
+            for j, params in enumerate(self.param_grid):
+                params['input_dim'] = x_train.shape[1]
+                params['output_dim'] = y_train.shape[1]
 
-            self.results.average.at[tuple(params.values()), 'train'] = train.mean()
-            self.results.average.at[tuple(params.values()), 'val'] = val.mean()
+                for i in range(self.num_runs):
+                    print 'Run ', i, '\tParameters ', str(params)
+                    self.estimator.set_params(**params)
 
-            self.save_best(params)
+                    # Fit model
+                    self.estimator.fit(x_train, y_train, validation_data=[x_val, y_val])
 
-        print self.results.average
-        self.results.save_results()
-        return self.best
+                    self.evaluate_run(x_train, y_train, x_val, y_val, i)
 
-    def save_best(self, params):
-        avg_prediction = self.results.average.ix[tuple(params.values()), 'val']
+                self.evaluate_parameters(params, data_param, j, k)
+                self.parameter_results.to_csv('params.csv')
+            self.evaluate_data(x_test, y_test, data_param, k)
+            self.data_results.to_csv('best.csv')
 
-        if avg_prediction > self.best.prediction:
-            print avg_prediction
-            self.best.model = ForecastModel.from_config(self.estimator.model.get_config())
-            self.best.prediction = avg_prediction
-            self.best.params = params
+    def evaluate_run(self, x_train, y_train, x_val, y_val, run_num):
+        self.run_results.at[run_num, 'train prediction'] = self.estimator.score(x_train, y_train)
+        self.run_results.at[run_num, 'val prediction'] = self.estimator.score_forecast(x_train, y_train)
+        self.run_results.at[run_num, 'train forecast'] = self.estimator.score(x_val, y_val)
+        self.run_results.at[run_num, 'val forecast'] = self.estimator.score_forecast(x_val, y_val)
+        self.run_results.to_csv('params.csv')
 
+    def evaluate_parameters(self, params, data_params, param_index, data_index):
+        index = data_index * len(self.param_grid) + param_index
+        self.parameter_results.at[index, data_params.keys()] = data_params.values()
+        self.parameter_results.at[index, params.keys()] = params.values()
+
+        cols = ['train prediction', 'val prediction', 'train forecast', 'val forecast']
+        self.parameter_results.at[index, cols] = self.run_results.mean().values
+
+    def evaluate_model(self, x_val, y_val):
+        if self.best_model_prediction > self.estimator.score(x_val, y_val):
+            pass
+
+    def evaluate_data(self, x_test, y_test, data_params, data_index):
+        from operator import and_
+        var = reduce(and_, [self.parameter_results[i] == j for i, j in data_params.iteritems()])
+        max_index = self.parameter_results[var]['val prediction'].astype('float64').idxmin()
+        self.data_results.at[data_index, :] = self.parameter_results.iloc[max_index]
+
+        self.data_results.at[data_index, 'test prediction'] = self.estimator.score(x_test, y_test)
+        self.data_results.at[data_index, 'test forecast'] = self.estimator.score_forecast(x_test, y_test)
+
+
+def get_data(country, var_list, x_lag, y_lag, val_size, test_size):
+    data = data_utils.get_data(drop_na=True)
+    data = data[country]
+    X, Y = get_xy_data(data, x_lag, y_lag)
+
+    x = X[var_list['x']]
+    y = Y[var_list['y']]
+
+    x_train, x_val, x_test = data_utils.train_val_test_split(x, val_size=val_size, test_size=test_size)
+    y_train, y_val, y_test = data_utils.train_val_test_split(y, val_size=val_size, test_size=test_size)
+
+    return x_train, y_train, x_val, y_val, x_test, y_test
 
 
 def test_forecast():
