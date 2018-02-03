@@ -22,7 +22,7 @@ def xls_to_csv():
     data_us.to_csv(DATA_PATH_CSV_US)
 
 
-def get_ea_data(drop_na=False):
+def get_ea_data(drop_na=True):
     data = pd.read_csv(DATA_PATH_CSV_EA, index_col=0)
     data.index = pd.PeriodIndex(data.index, freq='Q')
     if drop_na:
@@ -30,7 +30,7 @@ def get_ea_data(drop_na=False):
     return data
 
 
-def get_us_data(drop_na=False):
+def get_us_data(drop_na=True):
     data = pd.read_csv(DATA_PATH_CSV_US, index_col=0)
     data.index = pd.PeriodIndex(data.index, freq='Q')
     if drop_na:
@@ -38,13 +38,13 @@ def get_us_data(drop_na=False):
     return data
 
 
-def get_data_dict(drop_na=False):
+def get_data_dict(drop_na=True):
     data_ea = get_ea_data(drop_na=drop_na)
     data_us = get_us_data(drop_na=drop_na)
     return dict(EA=data_ea, US=data_us)
 
 
-def get_data_frame(drop_na=False):
+def get_data_frame(drop_na=True):
     data_ea = get_ea_data(drop_na=drop_na)
     data_us = get_us_data(drop_na=drop_na)
 
@@ -57,7 +57,7 @@ def get_data_frame(drop_na=False):
     return data_frame
 
 
-def get_flat_data_frame(drop_na=False):
+def get_flat_data_frame(drop_na=True):
     data_ea = get_ea_data(drop_na=drop_na)
     data_us = get_us_data(drop_na=drop_na)
 
