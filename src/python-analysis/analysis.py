@@ -9,7 +9,7 @@ ANALYSIS_RESULTS_DIR = expr_sub_dir('python-analysis')
 
 
 def main():
-    data = du.get_data()
+    data = du.get_data_dict()
     output = True
 
     for country, data_frame in data.items():

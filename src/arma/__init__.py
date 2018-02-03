@@ -17,7 +17,7 @@ EXP_DIR = expr_sub_dir('arma')
 def main():
     country= 'EA'
     variable = 'CPI'
-    data = du.get_data()
+    data = du.get_data_dict()
     series = data[country][variable].dropna()
 
 

@@ -1,19 +1,12 @@
 import pandas as pd
 import numpy as np
-from keras import losses, activations
-from keras.layers import Input, Dense
 from keras.models import Model
 from keras.wrappers.scikit_learn import KerasRegressor
 from keras import backend as K
-from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import GridSearchCV, ParameterGrid, PredefinedSplit, train_test_split, fit_grid_point
-from sklearn.metrics import mean_squared_error, make_scorer
-import os
-from copy import deepcopy
+from sklearn.model_selection import ParameterGrid
 
 from src.utils import data_utils
-from src.utils.data_utils import get_xy_data
-from json import dumps, loads
+from src.utils.data_utils import get_xy_data, get_data_formatted
 
 
 # Keras model with forecast and evaluate_forecast functions
@@ -120,7 +113,7 @@ class GridSearch:
         # self.reset_logs()
 
         for k, data_param in enumerate(self.data_params):
-            x_train, y_train, x_val, y_val, x_test, y_test = get_data(**data_param)
+            x_train, y_train, x_val, y_val, x_test, y_test = get_data_formatted(**data_param)
             print data_param
 
             for j, params in enumerate(self.param_grid):
@@ -168,20 +161,6 @@ class GridSearch:
 
         self.data_results.at[data_index, 'test prediction'] = self.estimator.score(x_test, y_test)
         self.data_results.at[data_index, 'test forecast'] = self.estimator.score_forecast(x_test, y_test)
-
-
-def get_data(country, var_list, x_lag, y_lag, val_size, test_size):
-    data = data_utils.get_data(drop_na=True)
-    data = data[country]
-    X, Y = get_xy_data(data, x_lag, y_lag)
-
-    x = X[var_list['x']]
-    y = Y[var_list['y']]
-
-    x_train, x_val, x_test = data_utils.train_val_test_split(x, val_size=val_size, test_size=test_size)
-    y_train, y_val, y_test = data_utils.train_val_test_split(y, val_size=val_size, test_size=test_size)
-
-    return x_train, y_train, x_val, y_val, x_test, y_test
 
 
 def test_forecast():

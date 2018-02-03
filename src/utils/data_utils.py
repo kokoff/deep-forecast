@@ -38,13 +38,13 @@ def get_us_data(drop_na=False):
     return data
 
 
-def get_data(drop_na=False):
+def get_data_dict(drop_na=False):
     data_ea = get_ea_data(drop_na=drop_na)
     data_us = get_us_data(drop_na=drop_na)
     return dict(EA=data_ea, US=data_us)
 
 
-def get_data_frame_multi(drop_na=False):
+def get_data_frame(drop_na=False):
     data_ea = get_ea_data(drop_na=drop_na)
     data_us = get_us_data(drop_na=drop_na)
 
@@ -57,7 +57,7 @@ def get_data_frame_multi(drop_na=False):
     return data_frame
 
 
-def get_data_frame(drop_na=False):
+def get_flat_data_frame(drop_na=False):
     data_ea = get_ea_data(drop_na=drop_na)
     data_us = get_us_data(drop_na=drop_na)
 
@@ -99,10 +99,6 @@ def remove_na(data):
     return data.dropna(axis=0, how='any', inplace=True)
 
 
-if __name__ == '__main__':
-    print get_data_frame(True)
-
-
 def get_xy_data(data, lags1=1, lags2=1):
     # Transform X with approapriate lag values
     index = [(i, 'x' + str(j)) for i in data.columns for j in range(lags1)]
@@ -124,3 +120,17 @@ def get_xy_data(data, lags1=1, lags2=1):
     y = y.tail(-lags1 - lags2 + 1)
 
     return x, y
+
+
+def get_data_formatted(country, var_dict, x_lag, y_lag, val_size, test_size):
+    data = get_data_dict(drop_na=True)
+    data = data[country]
+    X, Y = get_xy_data(data, x_lag, y_lag)
+
+    x = X[var_dict['x']]
+    y = Y[var_dict['y']]
+
+    x_train, x_val, x_test = train_val_test_split(x, val_size=val_size, test_size=test_size)
+    y_train, y_val, y_test = train_val_test_split(y, val_size=val_size, test_size=test_size)
+
+    return x_train, y_train, x_val, y_val, x_test, y_test

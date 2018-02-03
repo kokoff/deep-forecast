@@ -3,14 +3,13 @@ from keras.layers import Input, Dense
 from forecast_models import ForecastModel, GridSearch, ModelWrapper
 from sklearn.model_selection import ParameterGrid
 from src.utils import data_utils
-from src.utils.data_utils import get_xy_data
+from src.utils.data_utils import get_xy_data, get_data_formatted
 from matplotlib import pyplot as plt
 import seaborn as sns
 from scipy.stats import mannwhitneyu
 from statsmodels.tsa.stattools import adfuller, kpss
 import numpy as np
 from collections import OrderedDict
-from forecast_models import get_data
 import seaborn as sns
 
 def getMLP(input_dim, output_dim, neurons, optimizer='adam'):
@@ -43,26 +42,26 @@ def main():
     parameters['epochs'] = [100]
     parameters['shuffle'] = [False]
     parameters['verbose'] = [0]
-    parameters['neurons'] = [2, 4, 6, 8]
+    parameters['neurons'] = [2, 4]
 
     data_dict = OrderedDict()
     data_dict['country'] = ['EA', 'US']
     data_dict['var_list'] = [
         dict(x=['CPI'], y=['CPI']),
-        dict(x=['GDP'], y=['GDP']),
-        dict(x=['UR'], y=['UR']),
-        dict(x=['IR'], y=['IR']),
-        dict(x=['LR10'], y=['LR10']),
-        dict(x=['LR10-IR'], y=['LR10-IR']),
-        dict(x=['EXRATE'], y=['EXRATE'])
+        # dict(x=['GDP'], y=['GDP']),
+        # dict(x=['UR'], y=['UR']),
+        # dict(x=['IR'], y=['IR']),
+        # dict(x=['LR10'], y=['LR10']),
+        # dict(x=['LR10-IR'], y=['LR10-IR']),
+        # dict(x=['EXRATE'], y=['EXRATE'])
     ]
     data_dict['x_lag'] = [1]
     data_dict['y_lag'] = [1]
     data_dict['val_size'] = [12]
     data_dict['test_size'] = [12]
 
-    # grid_search = GridSearch(getMLP, parameters, data_dict, num_runs=20)
-    # grid_search.grid_search()
+    grid_search = GridSearch(getMLP, parameters, data_dict, num_runs=2)
+    grid_search.grid_search()
 
     parameters = OrderedDict()
     parameters['batch_size'] = 10
@@ -74,7 +73,7 @@ def main():
     parameters['output_dim'] = 1
 
     m = ModelWrapper(getMLP, **parameters)
-    x_train, y_train, x_val, y_val, x_test, y_test = get_data('EA', {'x': 'CPI', 'y': 'CPI'}, 1, 1, 12, 12)
+    x_train, y_train, x_val, y_val, x_test, y_test = get_data_formatted('EA', {'x': 'CPI', 'y': 'CPI'}, 1, 1, 12, 12)
 
     m.fit(x_train, y_train, validation_data=[x_val, y_val])
 

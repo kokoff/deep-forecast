@@ -20,7 +20,7 @@ def main():
     exp_dir = expr_sub_dir('arma', country + '_' + variable)
     block = True
 
-    data = du.get_data()
+    data = du.get_data_dict()
     series = data[country][variable].dropna()
 
     # -----------------------------------
