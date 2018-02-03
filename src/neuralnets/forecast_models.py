@@ -96,42 +96,6 @@ class ModelWrapper(KerasRegressor):
 
 
 class GridSearch:
-    class Best:
-        def __init__(self):
-            self.prediction = - np.inf
-            self.forecast = - np.inf
-            self.model = None
-            self.params = None
-
-    class Results:
-
-        def __init__(self):
-            self.average = None
-            self.dir = None
-
-        def create_result_dir(self):
-            dir = raw_input('Enter directory for results:')
-            dir = os.path.join('results', dir)
-            while os.path.exists(dir):
-                dir = raw_input('Directory exists please enter another:')
-                dir = os.path.join('results', dir)
-
-            os.mkdir(dir)
-            self.dir = dir
-
-        def init_logs(self, param_grid, num_runs, epochs):
-            self.create_result_dir()
-            names = param_grid[0].keys()
-            index = [tuple(i.values()) for i in param_grid]
-            index = pd.MultiIndex.from_tuples(index, names=names)
-
-            self.average = pd.DataFrame(0.0, index=index, columns=['train', 'val'])
-
-        def save_results(self):
-            if not os.path.exists(self.dir):
-                self.create_result_dir()
-
-            self.average.to_csv(os.path.join(self.dir, 'results.csv'))
 
     def __init__(self, build_fn, param_dict, data_dict, num_runs=20):
         self.reset_logs(param_dict, data_dict)
@@ -139,8 +103,6 @@ class GridSearch:
         self.param_grid = ParameterGrid(param_dict)
         self.data_params = ParameterGrid(data_dict)
         self.num_runs = num_runs
-
-        # self.run_results = None
 
     def reset_logs(self, param_dict, data_disct):
         columns = ['train prediction', 'val prediction', 'train forecast', 'val forecast']
@@ -151,7 +113,7 @@ class GridSearch:
                                                            'val prediction', 'train forecast', 'val forecast']
         self.parameter_results = pd.DataFrame(columns=columns)
 
-        self.data_results = pd.DataFrame(columns=columns+['test prediction', 'test forecast'])
+        self.data_results = pd.DataFrame(columns=columns + ['test prediction', 'test forecast'])
 
     def grid_search(self):
 
