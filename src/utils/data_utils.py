@@ -61,8 +61,8 @@ def get_flat_data_frame(drop_na=True):
     data_ea = get_ea_data(drop_na=drop_na)
     data_us = get_us_data(drop_na=drop_na)
 
-    ea_columns = ['EA_' + i for i in data_ea.columns]
-    us_columns = ['US_' + i for i in data_us.columns]
+    ea_columns = ['EA ' + i for i in data_ea.columns]
+    us_columns = ['US ' + i for i in data_us.columns]
 
     data_frame = pd.DataFrame(index=data_ea.index, columns=ea_columns + us_columns)
     data_frame.at[:, ea_columns] = data_ea.values
