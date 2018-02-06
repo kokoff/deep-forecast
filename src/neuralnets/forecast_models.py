@@ -1,12 +1,16 @@
-import pandas as pd
+import keras.backend as K
 import numpy as np
+import pandas as pd
 from keras.models import Model
+from keras.models import model_from_json
 from keras.wrappers.scikit_learn import KerasRegressor
-from keras import backend as K
-from sklearn.model_selection import ParameterGrid
 
 from src.utils import data_utils
-from src.utils.data_utils import get_xy_data, get_data_formatted
+from src.utils.data_utils import get_xy_data
+from keras.models import load_model
+from keras.models import clone_model
+import os
+from copy import deepcopy
 
 
 # Keras model with forecast and evaluate_forecast functions
@@ -66,9 +70,30 @@ class ForecastModel(Model):
         y_true = np.array(y.as_matrix()[1:])
         forecast = self.forecast(x, y, batch_size=batch_size, verbose=verbose, steps=steps)
 
-        loss = K.eval(self.loss(y_true, forecast)).mean()
+        loss = self.loss(y_true, forecast)
+        loss = K.eval(loss)
+        loss = loss.mean()
 
         return loss
+
+    def copy(self):
+        # self.save('.temp')
+        # new_model = load_model('.temp', {'ForecastModel': ForecastModel})
+        # os.remove('.temp')
+        new_model =clone_model(self)
+        return new_model
+
+    def save_json(self, filename):
+        json_str = self.to_json()
+        with open(filename, 'w') as f:
+            f.write(json_str)
+
+    @classmethod
+    def from_json(cls, filename):
+        with open(filename, 'r') as f:
+            json_string = f.read()
+        config = model_from_json(json_string, {'ForecastModel': ForecastModel}).get_config()
+        return ForecastModel.from_config(config)
 
 
 class ModelWrapper(KerasRegressor):
@@ -86,81 +111,6 @@ class ModelWrapper(KerasRegressor):
         if isinstance(loss, list):
             return loss[0]
         return loss
-
-
-class GridSearch:
-
-    def __init__(self, build_fn, param_dict, data_dict, num_runs=20):
-        self.reset_logs(param_dict, data_dict)
-        self.estimator = ModelWrapper(build_fn)
-        self.param_grid = ParameterGrid(param_dict)
-        self.data_params = ParameterGrid(data_dict)
-        self.num_runs = num_runs
-
-    def reset_logs(self, param_dict, data_disct):
-        columns = ['train prediction', 'val prediction', 'train forecast', 'val forecast']
-        self.run_results = pd.DataFrame(columns=columns)
-
-        columns = pd.MultiIndex.from_product([['train', 'val'], ['prediction', 'forecast']])
-        columns = data_disct.keys() + param_dict.keys() + ['input_dim', 'output_dim', 'train prediction',
-                                                           'val prediction', 'train forecast', 'val forecast']
-        self.parameter_results = pd.DataFrame(columns=columns)
-
-        self.data_results = pd.DataFrame(columns=columns + ['test prediction', 'test forecast'])
-
-    def grid_search(self):
-
-        # self.reset_logs()
-
-        for k, data_param in enumerate(self.data_params):
-            x_train, y_train, x_val, y_val, x_test, y_test = get_data_formatted(**data_param)
-            print data_param
-
-            for j, params in enumerate(self.param_grid):
-                params['input_dim'] = x_train.shape[1]
-                params['output_dim'] = y_train.shape[1]
-
-                for i in range(self.num_runs):
-                    print 'Run ', i, '\tParameters ', str(params)
-                    self.estimator.set_params(**params)
-
-                    # Fit model
-                    self.estimator.fit(x_train, y_train, validation_data=[x_val, y_val])
-
-                    self.evaluate_run(x_train, y_train, x_val, y_val, i)
-
-                self.evaluate_parameters(params, data_param, j, k)
-                self.parameter_results.to_csv('params.csv')
-            self.evaluate_data(x_test, y_test, data_param, k)
-            self.data_results.to_csv('best.csv')
-
-    def evaluate_run(self, x_train, y_train, x_val, y_val, run_num):
-        self.run_results.at[run_num, 'train prediction'] = self.estimator.score(x_train, y_train)
-        self.run_results.at[run_num, 'val prediction'] = self.estimator.score_forecast(x_train, y_train)
-        self.run_results.at[run_num, 'train forecast'] = self.estimator.score(x_val, y_val)
-        self.run_results.at[run_num, 'val forecast'] = self.estimator.score_forecast(x_val, y_val)
-        self.run_results.to_csv('params.csv')
-
-    def evaluate_parameters(self, params, data_params, param_index, data_index):
-        index = data_index * len(self.param_grid) + param_index
-        self.parameter_results.at[index, data_params.keys()] = data_params.values()
-        self.parameter_results.at[index, params.keys()] = params.values()
-
-        cols = ['train prediction', 'val prediction', 'train forecast', 'val forecast']
-        self.parameter_results.at[index, cols] = self.run_results.mean().values
-
-    def evaluate_model(self, x_val, y_val):
-        if self.best_model_prediction > self.estimator.score(x_val, y_val):
-            pass
-
-    def evaluate_data(self, x_test, y_test, data_params, data_index):
-        from operator import and_
-        var = reduce(and_, [self.parameter_results[i] == j for i, j in data_params.iteritems()])
-        max_index = self.parameter_results[var]['val prediction'].astype('float64').idxmin()
-        self.data_results.at[data_index, :] = self.parameter_results.iloc[max_index]
-
-        self.data_results.at[data_index, 'test prediction'] = self.estimator.score(x_test, y_test)
-        self.data_results.at[data_index, 'test forecast'] = self.estimator.score_forecast(x_test, y_test)
 
 
 def test_forecast():
@@ -189,3 +139,25 @@ def test_forecast():
             if model.evaluate_forecast(x_test, y_test) - model.evaluate_forecast(x_test, y_test) != 0:
                 print y_vars, i, j
                 print model.evaluate_forecast(x_test, y_test) - model.evaluate_forecast(x_test, y_test)
+
+
+if __name__ == '__main__':
+    from mlp import getMLP
+
+    x_train, y_train, x_val, y_val, x_test, y_test = data_utils.get_data_formatted('EA', {'x': 'CPI', 'y': 'CPI'}, 2, 2,
+                                                                                   12, 12)
+    model = getMLP(x_train.shape[1], y_train.shape[1], 3)
+    model.fit(x_train, y_train, verbose=False)
+
+    model.save('temp')
+    from keras.models import load_model
+
+    nm = model.copy()
+
+    print model.evaluate(x_val, y_val)
+    print nm.evaluate(x_val, y_val)
+
+    model.save_json('model.json')
+    nm = ForecastModel.from_json('model.json')
+
+    print model.evaluate(x_val, y_val)

@@ -1,6 +1,7 @@
 from keras import losses, activations
 from keras.layers import Input, Dense
-from forecast_models import ForecastModel, GridSearch, ModelWrapper
+from forecast_models import ForecastModel, ModelWrapper
+from src.neuralnets.grid_search import GridSearch
 from sklearn.model_selection import ParameterGrid
 from src.utils import data_utils
 from src.utils.data_utils import get_xy_data, get_data_formatted
@@ -11,6 +12,9 @@ from statsmodels.tsa.stattools import adfuller, kpss
 import numpy as np
 from collections import OrderedDict
 import seaborn as sns
+from keras.models import model_from_json
+import pandas as pd
+
 
 def getMLP(input_dim, output_dim, neurons, optimizer='adam'):
     input = Input(shape=(input_dim,))
@@ -25,83 +29,69 @@ def getMLP(input_dim, output_dim, neurons, optimizer='adam'):
 
 
 def main():
-    # data = data_utils.get_ea_data(drop_na=True)
-    # X, Y = get_xy_data(data, 1, 1)
-    #
-    # x = X[['CPI']]
-    # y = Y[['CPI']]
-    #
-    # x_train, x_val, x_test = data_utils.train_val_test_split(x, val_size=12, test_size=12)
-    # y_train, y_val, y_test = data_utils.train_val_test_split(y, val_size=12, test_size=12)
-    #
-    # input_dim = x_train.shape[1]
-    # output_dim = y_train.shape[1]
-
     parameters = OrderedDict()
-    parameters['batch_size'] = [10]
-    parameters['epochs'] = [100]
+    parameters['batch_size'] = [6, 10]
+    parameters['epochs'] = [50, 100, 150, 200]
     parameters['shuffle'] = [False]
     parameters['verbose'] = [0]
-    parameters['neurons'] = [2, 4]
+    parameters['neurons'] = [2, 4, 6, 8, 10]
 
     data_dict = OrderedDict()
     data_dict['country'] = ['EA', 'US']
-    data_dict['var_list'] = [
+    data_dict['var_dict'] = [
         dict(x=['CPI'], y=['CPI']),
-        # dict(x=['GDP'], y=['GDP']),
-        # dict(x=['UR'], y=['UR']),
-        # dict(x=['IR'], y=['IR']),
-        # dict(x=['LR10'], y=['LR10']),
-        # dict(x=['LR10-IR'], y=['LR10-IR']),
-        # dict(x=['EXRATE'], y=['EXRATE'])
+        dict(x=['GDP'], y=['GDP']),
+        dict(x=['UR'], y=['UR']),
+        dict(x=['IR'], y=['IR']),
+        dict(x=['LR10'], y=['LR10']),
+        dict(x=['LR10-IR'], y=['LR10-IR']),
+        dict(x=['EXRATE'], y=['EXRATE'])
     ]
     data_dict['x_lag'] = [1]
     data_dict['y_lag'] = [1]
     data_dict['val_size'] = [12]
     data_dict['test_size'] = [12]
 
-    grid_search = GridSearch(getMLP, parameters, data_dict, num_runs=2)
-    grid_search.grid_search()
+    # x_train, y_train, x_val, y_val, x_test, y_test = data_utils.get_data_formatted('EA', {'x': ['CPI'], 'y': ['CPI']},
+    #                                                                                1, 1,
+    #                                                                                12, 12)
 
-    parameters = OrderedDict()
-    parameters['batch_size'] = 10
-    parameters['epochs'] = 100
-    parameters['shuffle'] = False
-    parameters['verbose'] = 1
-    parameters['neurons'] = 8
-    parameters['input_dim'] = 1
-    parameters['output_dim'] = 1
+    grid_search = GridSearch(getMLP, parameters, directory='CPI')
+    grid_search.grid_search_data(data_dict)
+    # model = grid_search.grid_search(x_train, y_train, x_val, y_val)
+    # model = getMLP(1, 1, 1)
+    # model.fit(x_train, y_train)
 
-    m = ModelWrapper(getMLP, **parameters)
-    x_train, y_train, x_val, y_val, x_test, y_test = get_data_formatted('EA', {'x': 'CPI', 'y': 'CPI'}, 1, 1, 12, 12)
+    # data = {'val prediction': model.evaluate(x_val, y_val),
+    #         'val forecast': model.evaluate_forecast(x_val, y_val),
+    #         'test prediction': model.evaluate(x_test, y_test),
+    #         'test forecast': model.evaluate_forecast(x_test, y_test)}
+    #
+    # df = pd.DataFrame(data=data, index=[0])
+    # print df
+    #
+    # plot_model(model, x_val, y_val, x_test, y_test)
 
-    m.fit(x_train, y_train, validation_data=[x_val, y_val])
 
-    import pandas as pd
-    # print m.predict(x_val)
-    print y_val.index.to_native_types()
-    print y_test.index.to_native_types()
-    plt.plot(y_val.index.to_native_types(), y_val.values, label='val targets')
-    plt.plot(y_val.index.to_native_types(), m.predict(x_val), label='val prediction')
-    plt.plot(y_test.index.to_native_types(), y_test.values, label='test targets')
-    plt.plot(y_test.index.to_native_types(), m.predict(x_test), label='test prediction')
-    plt.legend()
+def plot_model(model, x_val, y_val, x_test, y_test):
+    val_real = pd.DataFrame(y_val.values, index=y_val.index, columns=['real val'])
+    test_real = pd.DataFrame(y_test.values, index=y_test.index, columns=['real test'])
+    val_prediction = pd.DataFrame(model.predict(x_val), index=y_val.index, columns=['prediction val'])
+    test_prediction = pd.DataFrame(model.predict(x_test), index=y_test.index, columns=['prediction test'])
+    val_forecast = pd.DataFrame(model.forecast(x_val, y_val), index=y_val.index[1:], columns=['forecast val'])
+    test_forecast = pd.DataFrame(model.forecast(x_test, y_test), index=y_test.index[1:], columns=['forecast test'])
+
+    ax = val_real.plot()
+    test_real.plot(ax=ax)
+    val_prediction.plot(ax=ax)
+    test_prediction.plot(ax=ax)
     plt.show()
 
-    print np.squeeze(y_test.as_matrix()) - m.predict(x_test)
-
-    sns.distplot(np.squeeze(y_test.as_matrix()) - m.predict(x_test))
-
-    # plt.plot(y_val.index.to_native_types(), y_val.values, label='val targets')
-    # plt.plot(y_val.index.to_native_types(), m.forecast(x_val, y_val), label='val forecast')
-    # plt.plot(y_test.index.to_native_types(), y_test.values, label='test targets')
-    # plt.plot(y_test.index.to_native_types(), m.forecast(x_test, y_test), label='test forecast')
-    # plt.legend()
+    ax = val_real.plot()
+    test_real.plot(ax=ax)
+    val_forecast.plot(ax=ax)
+    test_forecast.plot(ax=ax)
     plt.show()
-
-    # plt.plot(y_val.values)
-    # plt.plot(m.forecast(x_val))
-    # plt.show()
 
 
 if __name__ == '__main__':
