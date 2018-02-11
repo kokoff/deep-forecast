@@ -4,11 +4,13 @@ import keras.backend as K
 import numpy as np
 import pandas as pd
 from keras.models import Model
+from keras.layers import Input, Dense, concatenate
+from keras.activations import linear
 
 from src.utils import data_utils
 
 
-def split_inputs_variables(data):
+def split_input_variables(data):
     data_vars = []
     for column in data.columns.levels[0]:
         df = pd.DataFrame(data[column])
@@ -21,19 +23,46 @@ def split_inputs_variables(data):
 
 class ForecastModel(Model):
 
+    @classmethod
+    def InputLayerFromData(cls, x):
+        variables = x.columns.levels[0].tolist()
+        num_lags = len(x.columns.levels[1].tolist())
+        if len(variables) == 1:
+            inputs = Input(shape=(num_lags,), name='input_'+variables[0])
+            layer = inputs
+            return inputs, layer
+        else:
+            inputs = []
+            for variable in variables:
+                inputs.append(Input(shape=(num_lags,), name='input_' + variable))
+            layer = concatenate(inputs)
+            return inputs, layer
+
+    @classmethod
+    def OutputLayerFromData(cls, y, prev_layers):
+        variables = y.columns.levels[0].tolist()
+        num_lags = len(y.columns.levels[1].tolist())
+        if len(variables) == 1:
+            return Dense(1, activation=linear, name='output_' + variables[0])(prev_layers)
+        else:
+            outputs = []
+            for variable in variables:
+                outputs.append(Dense(num_lags, activation=linear, name='output_' + variable)(prev_layers))
+            return outputs
+
     def fit(self, x=None, y=None, batch_size=None, epochs=1, verbose=1, callbacks=None, validation_split=0.,
             validation_data=None, shuffle=True, class_weight=None, sample_weight=None, initial_epoch=0,
             steps_per_epoch=None, validation_steps=None, **kwargs):
-        x = split_inputs_variables(x)
-        y = split_inputs_variables(y)
-        validation_data = [split_inputs_variables(i) for i in validation_data]
+        x = split_input_variables(x)
+        y = split_input_variables(y)
+        validation_data = [split_input_variables(i) for i in validation_data]
         return super(ForecastModel, self).fit(x, y, batch_size, epochs, verbose, callbacks, validation_split,
                                               validation_data,
                                               shuffle, class_weight, sample_weight, initial_epoch, steps_per_epoch,
                                               validation_steps, **kwargs)
 
     def predict(self, x, y, batch_size=None, verbose=0, steps=None):
-        x = split_inputs_variables(x)
+        x = split_input_variables(x)
         prediction = pd.DataFrame(0.0, index=y.index, columns=y.columns)
 
         output = super(ForecastModel, self).predict(x, batch_size, verbose, steps)
@@ -45,16 +74,16 @@ class ForecastModel(Model):
         return prediction
 
     def evaluate(self, x=None, y=None, batch_size=None, verbose=1, sample_weight=None, steps=None):
-        x = split_inputs_variables(x)
-        y = split_inputs_variables(y)
+        x = split_input_variables(x)
+        y = split_input_variables(y)
         return super(ForecastModel, self).evaluate(x, y, batch_size, verbose, sample_weight, steps)
 
     def forecast(self, x, y, batch_size=None, verbose=0, steps=None):
         x_labels = x.columns.levels[0].tolist()
         y_labels = y.columns.levels[0].tolist()
         forecast = pd.DataFrame(0.0, index=y.index, columns=y.columns)
-        x = split_inputs_variables(x)
-        y = split_inputs_variables(y)
+        x = split_input_variables(x)
+        y = split_input_variables(y)
 
         if not isinstance(self.input, list) and not isinstance(self.output, list):
             x_lags = int(self.input.shape[1])
@@ -228,7 +257,7 @@ class ModelWrapper:
     def reset(self):
         self.check()
         params = self.filter_params(self.build_fn)
-        self.model = self.build_fn(self.input_size, self.output_size, **params)
+        self.model = self.build_fn(self.x_train, self.y_train, **params)
         self.fitted = False
 
     def fit(self, verbose=False):
@@ -244,11 +273,11 @@ class ModelWrapper:
             self.fit()
 
         if data is 'train':
-            return self.model.predict(self.x_train, verbose=verbose)
+            return self.model.predict(self.x_train, self.y_train, verbose=verbose)
         elif data is 'val':
-            return self.model.predict(self.x_val, verbose=verbose)
+            return self.model.predict(self.x_val, self.y_val, verbose=verbose)
         elif data is 'test':
-            return self.model.predict(self.x_test, verbose=verbose)
+            return self.model.predict(self.x_test, self.y_test, verbose=verbose)
 
     def evaluate(self, data):
         self.check()
@@ -268,8 +297,20 @@ class ModelWrapper:
             self.fit()
 
         if data is 'train':
-            return self.model.predict(self.x_train, verbose=verbose)
+            return self.model.forecast(self.x_train, self.y_train, verbose=verbose)
         elif data is 'val':
-            return self.model.predict(self.x_val, verbose=verbose)
+            return self.model.forecast(self.x_val, self.y_val, verbose=verbose)
         elif data is 'test':
-            return self.model.predict(self.x_test, verbose=verbose)
+            return self.model.forecast(self.x_test, self.y_test, verbose=verbose)
+
+    def evaluate_forecast(self, data):
+        self.check()
+        if not self.fitted:
+            self.fit()
+
+        if data is 'train':
+            return self.model.evaluate_forecast(self.x_train, self.y_train)
+        elif data is 'val':
+            return self.model.evaluate_forecast(self.x_val, self.y_val)
+        elif data is 'test':
+            return self.model.evaluate_forecast(self.x_test, self.y_test)
