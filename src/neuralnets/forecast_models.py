@@ -28,7 +28,7 @@ class ForecastModel(Model):
         variables = x.columns.levels[0].tolist()
         num_lags = len(x.columns.levels[1].tolist())
         if len(variables) == 1:
-            inputs = Input(shape=(num_lags,), name='input_'+variables[0])
+            inputs = Input(shape=(num_lags,), name='input_' + variables[0])
             layer = inputs
             return inputs, layer
         else:
@@ -237,6 +237,11 @@ class ModelWrapper:
         self.data_set = True
         if self.param_set:
             self.reset()
+
+    def get_data(self):
+        if not self.data_set:
+            raise ValueError('Cannot get data. Data has not been set.')
+        return self.x_train, self.y_train, self.x_val, self.y_val, self.x_test, self.y_test
 
     def set_data_params(self, **data_params):
         self.x_train, self.y_train, self.x_val, self.y_val, self.x_test, self.y_test = data_utils.get_data_formatted(
