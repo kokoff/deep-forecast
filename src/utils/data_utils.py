@@ -2,6 +2,7 @@ import pandas as pd
 import os
 import warnings
 import numpy as np
+from sklearn.model_selection import train_test_split
 
 DATA_PATH = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..', 'data'))
 DATA_PATH_XLS = os.path.join(DATA_PATH, 'Data_ILP.xls')
@@ -72,8 +73,6 @@ def get_flat_data_frame(drop_na=True):
 
 
 def train_val_test_split(data, val_size, test_size):
-    from sklearn.model_selection import train_test_split
-
     if isinstance(val_size, float):
         val_size = int(val_size * len(data))
 
@@ -127,8 +126,8 @@ def get_data_formatted(country, var_dict, x_lag, y_lag, val_size, test_size):
     data = data[country]
     X, Y = get_xy_data(data, x_lag, y_lag)
 
-    x = X[var_dict['x']]
-    y = Y[var_dict['y']]
+    x = X.reindex(labels=var_dict['x'], axis='columns', level=0, copy=True)
+    y = Y.reindex(labels=var_dict['y'], axis='columns', level=0, copy=True)
 
     x_train, x_val, x_test = train_val_test_split(x, val_size=val_size, test_size=test_size)
     y_train, y_val, y_test = train_val_test_split(y, val_size=val_size, test_size=test_size)
