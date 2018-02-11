@@ -1,163 +1,275 @@
+from inspect import getargspec
+
 import keras.backend as K
 import numpy as np
 import pandas as pd
 from keras.models import Model
-from keras.models import model_from_json
-from keras.wrappers.scikit_learn import KerasRegressor
 
 from src.utils import data_utils
-from src.utils.data_utils import get_xy_data
-from keras.models import load_model
-from keras.models import clone_model
-import os
-from copy import deepcopy
 
 
-# Keras model with forecast and evaluate_forecast functions
-# NOTE: evaluation may not work with multiple outputs
+def split_inputs_variables(data):
+    data_vars = []
+    for column in data.columns.levels[0]:
+        df = pd.DataFrame(data[column])
+        data_vars.append(df)
+    if len(data_vars) == 1:
+        return data_vars[0]
+    else:
+        return data_vars
+
+
 class ForecastModel(Model):
-    # Recursively forecast on x (accepts any type of input output dimesnions)
+
+    def fit(self, x=None, y=None, batch_size=None, epochs=1, verbose=1, callbacks=None, validation_split=0.,
+            validation_data=None, shuffle=True, class_weight=None, sample_weight=None, initial_epoch=0,
+            steps_per_epoch=None, validation_steps=None, **kwargs):
+        x = split_inputs_variables(x)
+        y = split_inputs_variables(y)
+        validation_data = [split_inputs_variables(i) for i in validation_data]
+        return super(ForecastModel, self).fit(x, y, batch_size, epochs, verbose, callbacks, validation_split,
+                                              validation_data,
+                                              shuffle, class_weight, sample_weight, initial_epoch, steps_per_epoch,
+                                              validation_steps, **kwargs)
+
+    def predict(self, x, y, batch_size=None, verbose=0, steps=None):
+        x = split_inputs_variables(x)
+        prediction = pd.DataFrame(0.0, index=y.index, columns=y.columns)
+
+        output = super(ForecastModel, self).predict(x, batch_size, verbose, steps)
+        if isinstance(self.output, list):
+            prediction.iloc[:, :] = np.concatenate(output, axis=1)
+        else:
+            prediction.iloc[:, :] = output
+
+        return prediction
+
+    def evaluate(self, x=None, y=None, batch_size=None, verbose=1, sample_weight=None, steps=None):
+        x = split_inputs_variables(x)
+        y = split_inputs_variables(y)
+        return super(ForecastModel, self).evaluate(x, y, batch_size, verbose, sample_weight, steps)
+
     def forecast(self, x, y, batch_size=None, verbose=0, steps=None):
-        if not self.built:
-            self.build()
+        x_labels = x.columns.levels[0].tolist()
+        y_labels = y.columns.levels[0].tolist()
+        forecast = pd.DataFrame(0.0, index=y.index, columns=y.columns)
+        x = split_inputs_variables(x)
+        y = split_inputs_variables(y)
 
-        x_lags = len(x.columns.levels[1])
-        y_lags = len(y.columns.levels[1])
+        if not isinstance(self.input, list) and not isinstance(self.output, list):
+            x_lags = int(self.input.shape[1])
+            x_vars = 1
+            y_lags = int(self.output.shape[1])
+            y_vars = 1
+            data_len = len(x)
+            x_matrix = x.as_matrix()
 
-        x_vars = [i for i in list(x.columns.levels[0]) if not x[[i]].empty]
-        y_vars = [i for i in list(y.columns.levels[0]) if not y[[i]].empty]
+            assert (y_lags == 1)
 
-        x_mat = np.copy(x.as_matrix())
-        y_mat = np.copy(y.as_matrix())
+            y_matrix = np.zeros((data_len, y_lags))
+            input = x_matrix[0].reshape(1, x_lags)
 
-        y_get_index = [y_vars.index(i) * y_lags + y_lags - 1 for i in x_vars if i in y_vars]
-        y_set_index = [x_vars.index(i) * x_lags for i in x_vars if i in y_vars]
-        x_set_index = [x_vars.index(i) * x_lags + j for i in x_vars for j in range(1, x_lags) if i in y_vars]
-        x_get_index = [i - 1 for i in x_set_index if i > 0]
-        next_get_index = [i for i in range(len(x_vars) * x_lags) if i not in x_set_index and i not in y_set_index]
-        next_set_index = [i for i in range(len(x_vars) * x_lags) if i not in x_set_index and i not in y_set_index]
+            for i in range(data_len):
+                output = super(ForecastModel, self).predict(input, batch_size, verbose, steps)
+                # output = x_matrix[i + 1][0:1].reshape(1, y_lags)
+                y_matrix[i] = output
+                input = np.concatenate((output, input[:, :-y_lags]), axis=1)
 
-        def get_next_val(input, output, row):
-            if len(y_get_index) > 0 and len(y_set_index) > 0:
-                input[0][y_set_index] = output[0][y_get_index]
-            input[0][x_set_index] = x_mat[row][x_get_index]
-            input[0][next_set_index] = x_mat[row + 1][next_get_index]
-            return input
+            forecast.iloc[:, :] = y_matrix
+            return forecast
 
-        # Check for bugs
-        input = np.copy(x_mat[0:1])
-        input = get_next_val(input, y_mat, 0)
-        assert (np.array_equal(input[0], x_mat[1]))
+        elif isinstance(self.input, list) and not isinstance(self.output, list):
+            x_lags = int(self.input[0].shape[1])
+            x_vars = len(self.input)
+            y_lags = int(self.output.shape[1])
+            y_vars = 1
+            data_len = len(x[0])
+            x_matrices = [i.as_matrix() for i in x]
 
-        forecast = np.copy(y_mat[1:])
-        input = np.copy(x_mat[0:1])
+            y_matrix = np.zeros((data_len, y_lags))
+            input = [i[0].reshape(1, x_lags) for i in x_matrices]
+            valid_indexes = [x_labels.index(i) for i in y_labels if i in x_labels]
 
-        for i in range(len(x_mat) - 1):
-            output = self.predict(input, batch_size=batch_size, verbose=verbose, steps=steps)
-            if y_lags * len(y_vars) == 1:
-                output = np.array([output])
+            for i in range(data_len):
+                new_input = [j[i].reshape(1, x_lags) for j in x_matrices]
+                for index, var in enumerate(input):
+                    if index in valid_indexes and i > 0:
+                        new_input[index] = np.concatenate((output, var[:, :-y_lags]), axis=1)
+                input = new_input
 
-            forecast[i] = output
-            input = get_next_val(input, output, i)
+                output = super(ForecastModel, self).predict(input, batch_size, verbose, steps)
+                # output = x_matrix[i + 1][0:1].reshape(1, y_lags)
+                y_matrix[i] = output
 
-        return forecast
+            forecast.iloc[:, :] = y_matrix
+            return forecast
+
+        elif isinstance(self.input, list) and isinstance(self.output, list):
+            x_lags = int(self.input[0].shape[1])
+            x_vars = len(self.input)
+            y_lags = int(self.output[0].shape[1])
+            y_vars = len(self.output)
+
+            data_len = len(x[0])
+            x_matrices = [i.as_matrix() for i in x]
+
+            y_matrix = [np.zeros((data_len, y_lags)) for i in range(y_vars)]
+            input = [i[0].reshape(1, x_lags) for i in x_matrices]
+            valid_indexes = [x_labels.index(i) for i in y_labels if i in x_labels]
+
+            for i in range(data_len):
+                new_input = [j[i].reshape(1, x_lags) for j in x_matrices]
+                for index, var in enumerate(input):
+                    if index in valid_indexes and i > 0:
+                        new_input[index] = np.concatenate((output[index], var[:, :-y_lags]), axis=1)
+                input = new_input
+
+                output = super(ForecastModel, self).predict(input, batch_size, verbose, steps)
+                # output = x_matrix[i + 1][0:1].reshape(1, y_lags)
+                for j in range(y_vars):
+                    y_matrix[j][i] = output[j]
+
+            forecast.iloc[:, :] = np.concatenate(output, axis=1)
+            return forecast
+
+        else:
+            raise ValueError('Output cannot be bigger than input')
 
     def evaluate_forecast(self, x, y, batch_size=None, verbose=0, steps=None):
         if not self.built:
             raise RuntimeError('The model needs to be compiled '
                                'before being used.')
 
-        y_true = np.array(y.as_matrix()[1:])
         forecast = self.forecast(x, y, batch_size=batch_size, verbose=verbose, steps=steps)
 
-        loss = self.loss(y_true, forecast)
-        loss = K.eval(loss)
-        loss = loss.mean()
+        if not isinstance(self.output, list):
+            y_true = np.array(y.as_matrix())
+            forecast = np.array(forecast.as_matrix())
+            loss = self.loss(y_true, forecast)
+            loss = K.eval(loss)
+            losses = loss.mean()
+        else:
+            losses = [0]
+            for column in forecast.columns.levels[0]:
+                forc = np.array(forecast[column].as_matrix())
+                y_true = np.array(y[column].as_matrix())
+                loss = self.loss(y_true, forc)
+                loss = K.eval(loss)
+                losses.append(loss.mean())
+            losses[0] = sum(losses)
 
-        return loss
-
-    def copy(self):
-        # self.save('.temp')
-        # new_model = load_model('.temp', {'ForecastModel': ForecastModel})
-        # os.remove('.temp')
-        new_model =clone_model(self)
-        return new_model
-
-    def save_json(self, filename):
-        json_str = self.to_json()
-        with open(filename, 'w') as f:
-            f.write(json_str)
-
-    @classmethod
-    def from_json(cls, filename):
-        with open(filename, 'r') as f:
-            json_string = f.read()
-        config = model_from_json(json_string, {'ForecastModel': ForecastModel}).get_config()
-        return ForecastModel.from_config(config)
+        return losses
 
 
-class ModelWrapper(KerasRegressor):
+class ModelWrapper:
+    def __init__(self, build_fn):
+        self.build_fn = build_fn
+        self.data_set = False
+        self.param_set = False
+        self.fitted = False
 
-    def score(self, x, y, **kwargs):
-        return - super(ModelWrapper, self).score(x, y, **kwargs)
+        self.input_size = None
+        self.output_size = None
 
-    def forecast(self, x, y, **kwargs):
-        return self.model.forecast(x, y, **kwargs)
+        self.params = None
+        self.x_train = None
+        self.x_val = None
+        self.x_test = None
+        self.y_train = None
+        self.y_val = None
+        self.y_test = None
+        self.model = None
 
-    # Evaluate forecast MSE other losses not supported
-    def score_forecast(self, x, y, **kwargs):
-        loss = self.model.evaluate_forecast(x, y, **kwargs)
+    def check(self):
+        if not self.data_set:
+            raise ValueError('Data has not been set!')
+        if not self.param_set:
+            raise ValueError('Params have not been set!')
 
-        if isinstance(loss, list):
-            return loss[0]
-        return loss
+    def filter_params(self, func):
+        new_args = {}
+        f_args = getargspec(func).args
+        for key in self.params:
+            if key in f_args:
+                new_args[key] = self.params[key]
+        return new_args
 
+    def set_data(self, x_train, y_train, x_val, y_val, x_test, y_test):
+        self.x_train = x_train
+        self.x_val = x_val
+        self.x_test = x_test
+        self.y_train = y_train
+        self.y_val = y_val
+        self.y_test = y_test
 
-def test_forecast():
-    for i, j in [(i, j) for i in range(1, 3) for j in range(1, 3)]:
-        data = data_utils.get_ea_data(drop_na=True)
-        X, Y = get_xy_data(data, i, j)
+        self.input_size = self.x_train.shape[1]
+        self.output_size = self.y_train.shape[1]
 
-        for x_vars, y_vars in [(['CPI'], ['CPI']),
-                               (['CPI', 'GDP'], ['CPI']),
-                               (['CPI'], ['CPI', 'GDP']),
-                               (['CPI', 'GDP'], ['CPI', 'GDP']),
-                               (['CPI'], ['GDP']),
-                               (['CPI', 'GDP'], ['CPI', 'UR'])]:
-            x = X[x_vars]
-            y = Y[y_vars]
+        self.data_set = True
+        if self.param_set:
+            self.reset()
 
-            x_train, x_val, x_test = data_utils.train_val_test_split(x, val_size=0.15, test_size=0.15)
-            y_train, y_val, y_test = data_utils.train_val_test_split(y, val_size=0.15, test_size=0.15)
+    def set_data_params(self, **data_params):
+        self.x_train, self.y_train, self.x_val, self.y_val, self.x_test, self.y_test = data_utils.get_data_formatted(
+            **data_params)
+        self.input_size = self.x_train.shape[1]
+        self.output_size = self.y_train.shape[1]
 
-            input_dim = x_train.shape[1]
-            output_dim = y_train.shape[1]
+        self.data_set = True
+        if self.param_set:
+            self.reset()
 
-            model = getModel(input_dim, output_dim, 7)
-            model.fit(x_train, y_train, batch_size=10, epochs=100, validation_data=[x_val, y_val], shuffle=False,
-                      verbose=0)
-            if model.evaluate_forecast(x_test, y_test) - model.evaluate_forecast(x_test, y_test) != 0:
-                print y_vars, i, j
-                print model.evaluate_forecast(x_test, y_test) - model.evaluate_forecast(x_test, y_test)
+    def set_params(self, **params):
+        self.params = params
+        self.param_set = True
+        if self.data_set:
+            self.reset()
 
+    def reset(self):
+        self.check()
+        params = self.filter_params(self.build_fn)
+        self.model = self.build_fn(self.input_size, self.output_size, **params)
+        self.fitted = False
 
-if __name__ == '__main__':
-    from mlp import getMLP
+    def fit(self, verbose=False):
+        self.check()
+        params = self.filter_params(self.model.fit)
+        self.fitted = True
+        return self.model.fit(self.x_train, self.y_train, verbose=verbose, validation_data=[self.x_val, self.y_val],
+                              **params)
 
-    x_train, y_train, x_val, y_val, x_test, y_test = data_utils.get_data_formatted('EA', {'x': 'CPI', 'y': 'CPI'}, 2, 2,
-                                                                                   12, 12)
-    model = getMLP(x_train.shape[1], y_train.shape[1], 3)
-    model.fit(x_train, y_train, verbose=False)
+    def predict(self, data, verbose=0):
+        self.check()
+        if not self.fitted:
+            self.fit()
 
-    model.save('temp')
-    from keras.models import load_model
+        if data is 'train':
+            return self.model.predict(self.x_train, verbose=verbose)
+        elif data is 'val':
+            return self.model.predict(self.x_val, verbose=verbose)
+        elif data is 'test':
+            return self.model.predict(self.x_test, verbose=verbose)
 
-    nm = model.copy()
+    def evaluate(self, data):
+        self.check()
+        if not self.fitted:
+            self.fit()
 
-    print model.evaluate(x_val, y_val)
-    print nm.evaluate(x_val, y_val)
+        if data is 'train':
+            return self.model.evaluate(self.x_train, self.y_train)
+        elif data is 'val':
+            return self.model.evaluate(self.x_val, self.y_val)
+        elif data is 'test':
+            return self.model.evaluate(self.x_test, self.y_test)
 
-    model.save_json('model.json')
-    nm = ForecastModel.from_json('model.json')
+    def forecast(self, data, verbose=0):
+        self.check()
+        if not self.fitted:
+            self.fit()
 
-    print model.evaluate(x_val, y_val)
+        if data is 'train':
+            return self.model.predict(self.x_train, verbose=verbose)
+        elif data is 'val':
+            return self.model.predict(self.x_val, verbose=verbose)
+        elif data is 'test':
+            return self.model.predict(self.x_test, verbose=verbose)
