@@ -284,17 +284,17 @@ class ModelWrapper:
         elif data is 'test':
             return self.model.predict(self.x_test, self.y_test, verbose=verbose)
 
-    def evaluate(self, data):
+    def evaluate(self, data, verbose=0):
         self.check()
         if not self.fitted:
             self.fit()
 
         if data is 'train':
-            return self.model.evaluate(self.x_train, self.y_train)
+            return self.model.evaluate(self.x_train, self.y_train, verbose=verbose)
         elif data is 'val':
-            return self.model.evaluate(self.x_val, self.y_val)
+            return self.model.evaluate(self.x_val, self.y_val, verbose=verbose)
         elif data is 'test':
-            return self.model.evaluate(self.x_test, self.y_test)
+            return self.model.evaluate(self.x_test, self.y_test, verbose=verbose)
 
     def forecast(self, data, verbose=0):
         self.check()
@@ -308,14 +308,14 @@ class ModelWrapper:
         elif data is 'test':
             return self.model.forecast(self.x_test, self.y_test, verbose=verbose)
 
-    def evaluate_forecast(self, data):
+    def evaluate_forecast(self, data, verbose=0):
         self.check()
         if not self.fitted:
             self.fit()
 
         if data is 'train':
-            return self.model.evaluate_forecast(self.x_train, self.y_train)
+            return self.model.evaluate_forecast(self.x_train, self.y_train, verbose=verbose)
         elif data is 'val':
-            return self.model.evaluate_forecast(self.x_val, self.y_val)
+            return self.model.evaluate_forecast(self.x_val, self.y_val, verbose=verbose)
         elif data is 'test':
-            return self.model.evaluate_forecast(self.x_test, self.y_test)
+            return self.model.evaluate_forecast(self.x_test, self.y_test, verbose=verbose)
