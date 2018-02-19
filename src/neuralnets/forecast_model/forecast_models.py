@@ -33,18 +33,17 @@ def create_output_layers(num_outputs, output_size, prev_layers):
         return outputs
 
 
-def _split_data(self, x, y=None):
-    if isinstance(self.input, list):
-        x = np.split(x, len(self.input), axis=1)
-    if y is not None and isinstance(self.output, list):
-        y = np.split(y, len(self.output), axis=1)
-    if y is not None:
-        return x, y
-    else:
-        return x
-
-
 class ForecastModel(Model):
+
+    def _split_data(self, x, y=None):
+        if isinstance(self.input, list):
+            x = np.split(x, len(self.input), axis=1)
+        if y is not None and isinstance(self.output, list):
+            y = np.split(y, len(self.output), axis=1)
+        if y is not None:
+            return x, y
+        else:
+            return x
 
     def fit(self, x=None, y=None, batch_size=None, epochs=1, verbose=0, callbacks=None, validation_split=0.,
             validation_data=None, shuffle=False, class_weight=None, sample_weight=None, initial_epoch=0,
