@@ -9,6 +9,9 @@ DATA_PATH_XLS = os.path.join(DATA_PATH, 'Data_ILP.xls')
 DATA_PATH_CSV_EA = os.path.join(DATA_PATH, 'EA.csv')
 DATA_PATH_CSV_US = os.path.join(DATA_PATH, 'US.csv')
 
+VAL_SIZE = 12
+TEST_SIZE = 12
+
 
 def xls_to_csv():
     data_ea = pd.read_excel(DATA_PATH_XLS, sheet_name=0, header=0, index_col=0, usecols=[i for i in range(3, 11)])
@@ -133,3 +136,44 @@ def get_data_formatted(country, var_dict, x_lag, y_lag, val_size, test_size):
     y_train, y_val, y_test = train_val_test_split(y, val_size=val_size, test_size=test_size)
 
     return x_train, y_train, x_val, y_val, x_test, y_test
+
+
+def get_train_test_data(country, vars, lags, test_size):
+    '''
+    Formats model input and target data and returns a test and training sets
+    :param country: EA or US
+    :param vars: ([inputs],[outputs]) tuple of input vars list and output vars list
+    :param lags: (x lags,y lags) tuple of ints
+    :param split: test set size
+    :return: x_train, y_train, x_test, y_test
+    '''
+    data = get_data_dict(drop_na=True)
+    data = data[country]
+    X, Y = get_xy_data(data, lags[0], lags[1])
+
+    x = X.reindex(labels=vars[0], axis='columns', level=0, copy=True)
+    y = Y.reindex(labels=vars[1], axis='columns', level=0, copy=True)
+
+    x_train, x_test = train_test_split(x, test_size=test_size, shuffle=False)
+    y_train, y_test = train_test_split(y, test_size=test_size, shuffle=False)
+
+    return x_train, y_train, x_test, y_test
+
+
+def get_data_in_shape(country, vars, lags):
+    '''
+    Formats model input and target data and returns a test and training sets
+    :param country: EA or US
+    :param vars: ([inputs],[outputs]) tuple of input vars list and output vars list
+    :param lags: (x lags,y lags) tuple of ints
+    :param split: test set size
+    :return: x_train, y_train, x_test, y_test
+    '''
+    data = get_data_dict(drop_na=True)
+    data = data[country]
+    X, Y = get_xy_data(data, lags[0], lags[1])
+
+    x = X.reindex(labels=vars[0], axis='columns', level=0, copy=True)
+    y = Y.reindex(labels=vars[1], axis='columns', level=0, copy=True)
+
+    return x, y
