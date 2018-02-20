@@ -3,31 +3,80 @@ from collections import OrderedDict
 import numpy as np
 
 
+class SingleValue:
+    def __init__(self, val):
+        self.value = val
+
+    def num_prams(self):
+        return 0
+
+    def transform(self, num):
+        return self.value
+
+    def get_lb(self):
+        return []
+
+    def get_ub(self):
+        return []
+
+
 class ContinuousVariable:
     def __init__(self, tup):
         self.trans = tup[0]
-        self.lb = tup[1]
-        self.ub = tup[2]
+        self.lb = float(tup[1])
+        self.ub = float(tup[2])
+
+    def num_params(self):
+        return 1
 
     def transform(self, num):
-        return self.trans(num)
+        return self.trans(num[0])
 
     def get_lb(self):
-        return self.lb
+        return [self.lb]
 
     def get_ub(self):
-        return self.ub
+        return [self.ub]
 
 
 class DiscreteVariable:
     def __init__(self, lst):
         self.values = lst
-        self.lb = 0
-        self.ub = len(lst) - np.finfo(float).eps  # not inclusive range
+        lb = 0.0
+        ub = len(lst) - np.finfo(float).eps  # not inclusive range
+        self.variable = ContinuousVariable((int, lb, ub))
+
+    def num_params(self):
+        return 1
 
     def transform(self, num):
-        idx = int(num)
+        idx = self.variable.transform(num)
         return self.values[idx]
+
+    def get_lb(self):
+        return self.variable.get_lb()
+
+    def get_ub(self):
+        return self.variable.get_ub()
+
+
+class ListVariable:
+    def __init__(self, lst):
+        self.values = []
+        for index, item in enumerate(lst):
+            self.values.append(Node(index, item))
+
+        self.lb = []
+        self.ub = []
+        for node in self.values:
+            self.lb.extend(node.get_lb())
+            self.ub.extend(node.get_ub())
+
+    def num_params(self):
+        return sum([n.num_params() for n in self.values])
+
+    def transform(self, tr_lst):
+        return [node.transform([num]) for node, num in zip(self.values, tr_lst)]
 
     def get_lb(self):
         return self.lb
@@ -39,10 +88,21 @@ class DiscreteVariable:
 class Node:
     def __init__(self, key, value):
         self.key = key
-        if isinstance(value, tuple):
+        if isinstance(value, tuple) and callable(value[0]):
             self.value = ContinuousVariable(value)
-        elif isinstance(value, list):
+        elif isinstance(value, tuple):
             self.value = DiscreteVariable(value)
+        elif isinstance(value, list):
+            self.value = ListVariable(value)
+
+    def __str__(self):
+        return str(self.key)
+
+    def __repr__(self):
+        return str(self.key)
+
+    def num_params(self):
+        return self.value.num_params()
 
     def get_key(self):
         return self.key
@@ -60,8 +120,12 @@ class Node:
 class SearchSpace:
     def __init__(self, dic):
         self.nodes = self.create_nodes(dic)
-        self.lb = np.array([n.get_lb() for n in self.nodes])
-        self.ub = np.array([n.get_ub() for n in self.nodes])
+
+        self.lb = []
+        self.ub = []
+        for node in self.nodes:
+            self.lb.extend(node.get_lb())
+            self.ub.extend(node.get_ub())
 
     def create_nodes(self, dic):
         nodes = []
@@ -80,8 +144,11 @@ class SearchSpace:
 
     def transform(self, lst):
         transformed = OrderedDict()
-        for i in range(len(lst)):
-            transformed[self.nodes[i].key] = self.nodes[i].transform(lst[i])
+        for i, node in enumerate(self.nodes):
+            trans_params = []
+            for j in range(node.num_params()):
+                trans_params.append(lst[i + j])
+            transformed[node.key] = node.transform(trans_params)
         return transformed
 
     def get_lb(self):
@@ -97,3 +164,27 @@ def param_decorator(f, ss):
         return f(**params)
 
     return decoratet_f
+
+
+class pizza():
+    def __init__(self):
+        self.values = 1
+
+    def itr(self):
+        yield self.values
+
+
+def main():
+    params = OrderedDict()
+    params['a'] = (1, 2, 3, 4, 5, 6)
+    params['b'] = (int, 2, 3)
+
+    ss = SearchSpace(params)
+    print ss.nodes
+    print ss.get_lb()
+    print ss.get_ub()
+    print ss.transform([0.5, 1, 6.5, 2.5])
+
+
+if __name__ == '__main__':
+    main()
