@@ -170,6 +170,8 @@ class HyperSearch:
 
         result = ResultManager(data_param, res.params, runner.get_log(), performance, predictions, forecasts)
 
+        print result
+        
         if not os.path.exists(self.output_dir):
             os.mkdir(self.output_dir)
         out_dir = os.path.join(self.output_dir, get_name_from_data_params(data_param))
