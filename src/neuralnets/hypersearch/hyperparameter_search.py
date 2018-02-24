@@ -14,6 +14,7 @@ from src.utils import data_utils
 from validation import ModelValidator, ModelEvaluator
 from results import ResultManager
 from src.neuralnets.forecast_model.forecast_model_wrapper import ModelWrapper
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 
@@ -63,12 +64,10 @@ class Runner:
         self.validator = validator
 
     def run(self, **params):
-        K.clear_session()
-
         print params,
 
         self.validator.set_params(**params)
-        val, train = self.validator.validate(5,2)
+        val, train = self.validator.validate(5, 2)
 
         print 'val', val, 'train', train
 
@@ -157,8 +156,8 @@ class HyperSearch:
 
         # x, y = data_utils.get_data_in_shape(**data_param)
 
-        validator = ModelWrapper(build_fn, data_param, params)
-        runner = Runner(validator)
+        model = ModelWrapper(build_fn, data_param, params)
+        runner = Runner(model)
 
         res = self.solver.optimize(runner.run, params)
         print 'best params:\t', res.params
@@ -169,11 +168,14 @@ class HyperSearch:
         # performance = evaluator.evaluate(self.eval_runs, **res.params)
         # predictions, forecasts = evaluator.predict(**res.params)
 
-        print validator.evaluate_all(10)
+        performance = model.evaluate_losses(2)
+        predictions = model.predict_all(False)
+        forecasts = model.predict_all(True)
 
-        # result = ResultManager(data_param, res.params, runner.get_log(), performance, predictions, forecasts)
-        #
-        # print result
+        result = ResultManager(data_param, res.params, runner.get_log(), performance, predictions,
+                               forecasts)
+
+        print result
         #
         # if not os.path.exists(self.output_dir):
         #     os.mkdir(self.output_dir)
