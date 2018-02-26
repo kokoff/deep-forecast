@@ -3,10 +3,14 @@ from matplotlib import pyplot as plt
 import seaborn as sns
 import os
 from io import StringIO
+from rpy2 import robjects
+from src.utils import EXPERIMENTS_DIR
+
+r = robjects.r
 
 sns.set()
 
-arima_dir = '/home/skokov/project/experiments/arima'
+ARIMA_DIR = os.path.join(EXPERIMENTS_DIR, 'arima')
 
 
 def read_predictions(file_path):
@@ -25,7 +29,8 @@ def plot_predictions(df, label):
     plt.xlabel('Time')
     plt.ylabel(label)
 
-def plot_results():
+
+def plot_results(arima_dir):
     for dir in os.listdir(arima_dir):
         res_dir = os.path.join(arima_dir, dir)
 
@@ -42,16 +47,17 @@ def plot_results():
 
         plot_predictions(predictions, label)
         plt.savefig(prediction_fig_path)
-        plt.show()
+        # plt.show()
 
         plot_predictions(forecasts, label)
         plt.savefig(forecast_fig_path)
-        plt.show()
+        # plt.show()
 
 
 def main():
-    plot_results()
-
+    robjects.globalenv["output_dir"] = ARIMA_DIR
+    robjects.r.source("arima.R")
+    plot_results(ARIMA_DIR)
 
 
 if __name__ == '__main__':

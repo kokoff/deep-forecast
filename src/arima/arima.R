@@ -3,7 +3,7 @@ library(ggplot2)
 library(Metrics)
 library(zoo)
 
-output_dir = '/home/skokov/project/experiments/arima'
+#output_dir = '/home/skokov/project/experiments/arima'
 
 
 ea_data = read.csv('/home/skokov/project/data/EA.csv', row.names = 1, check.names = FALSE)
@@ -42,21 +42,19 @@ for (country in names(data)) {
     prediction.train = fitted(model_fit)
     prediction.val = tail(fitted(val_fit), 12)
     prediction.test = tail(fitted(test_fit), 12)
-    prediction = cbind(prediction.train, prediction.val, prediction.test)
-    prediction = ts(data=prediction, start = c(1999,2), frequency = 4)
-    prediction = tail(head(cbind(prediction.true, prediction), -1), -1)
+    prediction = cbind(prediction.true, prediction.train, prediction.val, prediction.test)
+    #prediction = ts(data=prediction, start = c(1999,2), frequency = 4)
+    #prediction = tail(head(cbind(prediction.true, prediction), -1), -1)
     
-    print(mse(series.val, prediction.val))
-    autoplot(prediction)
     
     # evaluate forecasts
     forecast.true = series
     forecast.train= fitted(model_fit)
     forecast.val = tail(forecast(model_fit, h=12)$mean, 12)
     forecast.test = tail(forecast(val_fit, h=12)$mean, 12)
-    forecast = cbind(forecast.train, forecast.val, forecast.test)
-    forecast = ts(data=forecast, start = c(1999,2), frequency = 4)
-    forecast = tail(head(cbind(forecast.true, forecast), -1), -1)
+    forecast = cbind(forecast.true, forecast.train, forecast.val, forecast.test)
+    #forecast = ts(data=forecast, start = c(1999,2), frequency = 4)
+    #forecast = tail(head(cbind(forecast.true, forecast), -1), -1)
     
     # calculate mse
     out = matrix(nrow = 1, ncol = 6)
@@ -98,3 +96,12 @@ for (country in names(data)) {
     print(out)
   }
 }
+
+data = series.train
+
+model_fit = auto.arima(data, stepwise = FALSE, approximation = FALSE)
+prediction = fitted(model_fit)
+
+print(data)
+print(prediction)
+
