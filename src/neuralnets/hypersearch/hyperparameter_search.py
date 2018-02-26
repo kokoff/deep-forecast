@@ -111,8 +111,18 @@ def experiment_dir(data_param):
     return full_path
 
 
+def get_name_from_data_params(data_params):
+    name = ''
+    name += data_params['country'] + '_['
+    name += '_'.join(data_params['vars'][0]) + ']_['
+    name += '_'.join(data_params['vars'][1]) + ']_'
+    name += str(data_params['lags'][0]) + '_'
+    name += str(data_params['lags'][1])
+    return name
+
+
 class HyperSearch:
-    def __init__(self, solver, cv_splits, validation_runs, *solver_args, **solver_kwargs):
+    def __init__(self, solver, cv_splits, validation_runs, eval_runs, output_dir='experiments', **solver_kwargs):
         '''Perform hyper parameter search using optunity as backend. Possible solvers include
         grid search     args: None
         random search   args: num_evals
@@ -120,31 +130,27 @@ class HyperSearch:
         sobol           args: num_evals, seed=None, skip=None
         '''
         if solver == 'pso':
-            self.solver = PSOptimizer(*solver_args, **solver_kwargs)
+            self.solver = PSOptimizer(**solver_kwargs)
         elif solver == 'gso':
             self.solver = GSOptimizer()
         elif solver == 'rso':
-            self.solver = RSOptimizer(*solver_args, **solver_kwargs)
+            self.solver = RSOptimizer(**solver_kwargs)
         else:
             raise ValueError('Solver must be one of pso, gso, rso!')
 
         self.runs = validation_runs
         self.cv_splits = cv_splits
+        self.output_dir = output_dir
+        self.eval_runs = eval_runs
 
     def hyper_data_search(self, build_fn, data_params_dict, params):
         data_params = ParameterGrid(data_params_dict)
 
         for data_param in data_params:
-            print data_param
-            try:
-                result = self.hyper_search(build_fn, data_param, params)
+            print 'data params:\t', data_param
 
-                exp_dir = experiment_dir(data_param)
-                result.save(exp_dir)
-
-                print result
-            except Exception as e:
-                print e
+            result = self.hyper_search(build_fn, data_param, params)
+            print result
 
     def hyper_search(self, build_fn, data_param, params):
 
@@ -154,18 +160,20 @@ class HyperSearch:
         runner = Runner(validator)
 
         res = self.solver.optimize(runner.run, params)
-        print res.params
-        print res.score
-        print res.time
-
-        print runner.get_log()
-        print runner.get_best_params()
-        print runner.get_best_results()
+        print 'best params:\t', res.params
+        print 'best score:\t', res.score
+        print 'run time:\t', res.time
 
         evaluator = ModelEvaluator(build_fn, x, y, data_param)
-        performance = evaluator.evaluate(10, **res.params)
+        performance = evaluator.evaluate(self.eval_runs, **res.params)
         predictions, forecasts = evaluator.predict(**res.params)
 
         result = ResultManager(data_param, res.params, runner.get_log(), performance, predictions, forecasts)
+
         print result
-        result.save('temp')
+        
+        if not os.path.exists(self.output_dir):
+            os.mkdir(self.output_dir)
+        out_dir = os.path.join(self.output_dir, get_name_from_data_params(data_param))
+        result.save(out_dir)
+        return result

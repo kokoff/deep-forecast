@@ -18,20 +18,6 @@ def forecast_scorer(estimator, x, y):
     return loss
 
 
-def multi_prediction_scorer(estimator, x, y):
-    loss = estimator.score(x, y)
-    if isinstance(loss, list):
-        return loss[0:]
-    return loss
-
-
-def multi_forecast_scorer(estimator, x, y):
-    loss = estimator.score_forecast(x, y)
-    if isinstance(loss, list):
-        return loss[0:]
-    return loss
-
-
 class ForecastRegressor(KerasRegressor):
 
     def predict(self, x, **kwargs):

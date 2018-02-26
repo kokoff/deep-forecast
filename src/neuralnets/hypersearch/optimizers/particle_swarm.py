@@ -54,9 +54,19 @@ class PSO:
         self.swarm = [Particle(pos, phi1, phi2, lb, ub) for pos in positions]
 
         self.best_fitness = np.inf
-        self.best_position = rand(len(lb))
+        self.best_position = None
 
     def optimize(self, eval_fn):
+        for j, particle in enumerate(self.swarm):
+
+            # evaluate particle
+            fitness = particle.evaluate_fitness(eval_fn)
+
+            if fitness < self.best_fitness:
+                self.best_fitness = fitness
+                self.best_position = particle.get_position()
+
+            self.swarm[j] = particle
 
         for i in range(self.num_generations):
             for j, particle in enumerate(self.swarm):

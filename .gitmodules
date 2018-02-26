@@ -1,0 +1,3 @@
+[submodule "report"]
+	path = report
+	url = https://github.com/kokoff/deep-forecast-report.git

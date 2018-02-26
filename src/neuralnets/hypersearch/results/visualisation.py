@@ -20,6 +20,7 @@ def plot_predictions(df, country, var, path):
     df.plot()
     plt.ylabel(country + ' ' + var)
     plt.savefig(path)
+    plt.close('all')
 
 
 class ResultsPlotter:
@@ -158,27 +159,31 @@ class ResultsPlotter:
             plt.close()
         except Exception as e:
             print e
+        plt.close('all')
         try:
             self.pairplot_val()
             plt.close()
         except Exception as e:
             print e
+        plt.close('all')
         try:
             self.parallel_coordinates()
             plt.close()
         except Exception as e:
             print e
+        plt.close('all')
         try:
             self.cond_one_to_many()
             plt.close()
         except Exception as e:
             print e
+        plt.close('all')
         try:
             self.cond_one_to_one()
             plt.close()
         except Exception as e:
             print e
-
+        plt.close('all')
 
 def main():
     log = pd.read_csv('/home/skokov/project/src/neuralnets/temp/EA_CPI/log.csv')
