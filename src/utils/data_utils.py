@@ -9,6 +9,9 @@ DATA_PATH_XLS = os.path.join(DATA_PATH, 'Data_ILP.xls')
 DATA_PATH_CSV_EA = os.path.join(DATA_PATH, 'EA.csv')
 DATA_PATH_CSV_US = os.path.join(DATA_PATH, 'US.csv')
 
+COUNTRIES = ['EA', 'US']
+VARIABLES = ['CPI', 'GDP', 'UR', 'IR', 'LR10', 'LR10-IR', 'EXRATE']
+
 VAL_SIZE = 12
 TEST_SIZE = 12
 
