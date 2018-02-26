@@ -3,6 +3,9 @@ from matplotlib import pyplot as plt
 import seaborn as sns
 import os
 from io import StringIO
+from rpy2 import robjects
+
+r = robjects.r
 
 sns.set()
 
@@ -24,6 +27,7 @@ def plot_predictions(df, label):
     df.plot()
     plt.xlabel('Time')
     plt.ylabel(label)
+
 
 def plot_results():
     for dir in os.listdir(arima_dir):
@@ -50,8 +54,9 @@ def plot_results():
 
 
 def main():
+    robjects.globalenv["output_dir"] = '/home/skokov/project/experiments/arima'
+    robjects.r.source("arima.R")
     plot_results()
-
 
 
 if __name__ == '__main__':
