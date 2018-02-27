@@ -1,16 +1,15 @@
+import __builtin__
+from collections import OrderedDict
+
 import numpy as np
-from keras.wrappers.scikit_learn import KerasRegressor, BaseWrapper
-from sklearn.metrics import mean_squared_error as mse
+import pandas as pd
+from keras import backend as K
+from keras.wrappers.scikit_learn import BaseWrapper
+from scoop.futures import map
+from sklearn.model_selection import PredefinedSplit, TimeSeriesSplit
 
 from src.neuralnets.forecast_model.forecast_models import ForecastModel
-from sklearn.model_selection import PredefinedSplit, cross_validate, TimeSeriesSplit
-from collections import OrderedDict
-from scoop.futures import map
-from keras import backend as K
-from matplotlib import pyplot as plt
 from src.utils import data_utils
-import pandas as pd
-import __builtin__
 
 
 class ForecastRegressor(BaseWrapper):
@@ -195,11 +194,11 @@ class ForecastRegressor(BaseWrapper):
     def _get_estimates(self, forecast=False):
 
         if forecast:
-            pred_func = self.predict
-            labels = ['train prediction', 'val prediction', 'test prediction']
-        else:
             pred_func = self.forecast
             labels = ['train forecast', 'val forecast', 'test forecast']
+        else:
+            pred_func = self.predict
+            labels = ['train prediction', 'val prediction', 'test prediction']
 
         num_vars = len(self.variables)
         y = pd.concat([self.y_train, self.y_val, self.y_test], axis=0)
@@ -240,7 +239,7 @@ class ForecastRegressor(BaseWrapper):
 
 
 def model(neurons):
-    from keras import layers, activations, losses
+    from keras import layers, losses
     from forecast_models import create_input_layers, create_output_layers
     inputs, layer = create_input_layers(2, 1)
 
