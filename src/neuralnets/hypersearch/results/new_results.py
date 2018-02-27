@@ -9,6 +9,7 @@ def error_prone(func):
             return func(*args, **kwargs)
         except Exception as e:
             warn('Did not manage to save some of the results!', stacklevel=2)
+            return func(*args, **kwargs)
     return try_catch
 
 
@@ -19,7 +20,6 @@ def make_dir(directory):
 
 class ResultManager:
 
-    @error_prone
     def __init__(self, data_params, best_params, log, performance, predictions, forecasts):
         country = data_params['country']
         variables = data_params['vars'][1]
@@ -27,7 +27,7 @@ class ResultManager:
         best_params = pd.DataFrame(best_params, index=[0])
 
         if len(variables) == 1:
-            self.result = Result(country, variables[0], log, best_params, performance, predictions, forecasts)
+            self.result = Result(country, variables[0], log, best_params, performance, predictions[0], forecasts[0])
         else:
             self.result = MultiResult(country, variables, log, best_params, performance, predictions, forecasts)
 
@@ -38,14 +38,12 @@ class ResultManager:
             print e
             return ''
 
-    @error_prone
     def save(self, directory):
         self.result.save(directory)
 
 
 class Result(object):
 
-    @error_prone
     def __init__(self, country, variable, log, best_params, performance, predictions, forecasts):
         self.country = country
         self.variables = variable
@@ -57,7 +55,6 @@ class Result(object):
         self.predictions = predictions
         self.forecasts = forecasts
 
-    @error_prone
     def __str__(self):
         string = ''
         string += '------------------------------------------------------------------------------\n'
@@ -164,7 +161,6 @@ class Result(object):
 
 class MultiResult:
 
-    @error_prone
     def __init__(self, country, variable, log, best_params, performance, predictions, forecasts):
         self.results = [None for _ in range(len(variable))]
 

@@ -1,17 +1,10 @@
 import os
-import sys
 from collections import OrderedDict
 
 import numpy as np
-import optunity
-from keras import backend as K
-from optunity import functions, search_spaces
-from optunity.constraints import wrap_constraints
 from sklearn.model_selection import ParameterGrid
 
 from optimizers import RSOptimizer, PSOptimizer, GSOptimizer
-from src.utils import data_utils
-from validation import ModelValidator, ModelEvaluator
 from results import ResultManager
 from src.neuralnets.forecast_model.forecast_model_wrapper import ForecastRegressor
 
@@ -154,8 +147,6 @@ class HyperSearch:
 
     def hyper_search(self, build_fn, data_param, params):
 
-        # x, y = data_utils.get_data_in_shape(**data_param)
-
         model = ForecastRegressor(build_fn, data_param, params)
         runner = Runner(model)
 
@@ -164,21 +155,15 @@ class HyperSearch:
         print 'best score:\t', res.score
         print 'run time:\t', res.time
 
-        # evaluator = ModelEvaluator(build_fn, x, y, data_param)
-        # performance = evaluator.evaluate(self.eval_runs, **res.params)
-        # predictions, forecasts = evaluator.predict(**res.params)
-
         performance = model.evaluate_losses(2)
-        predictions = model._get_estimates(False)
-        forecasts = model._get_estimates(True)
+        predictions = model.get_predictions()
+        forecasts = model.get_forecasts()
 
         result = ResultManager(data_param, res.params, runner.get_log(), performance, predictions,
                                forecasts)
 
-        print result
-        #
-        # if not os.path.exists(self.output_dir):
-        #     os.mkdir(self.output_dir)
-        # out_dir = os.path.join(self.output_dir, get_name_from_data_params(data_param))
-        # result.save(out_dir)
-        # return result
+        if not os.path.exists(self.output_dir):
+            os.mkdir(self.output_dir)
+        out_dir = os.path.join(self.output_dir, get_name_from_data_params(data_param))
+        result.save(out_dir)
+        return result
