@@ -13,7 +13,7 @@ from optimizers import RSOptimizer, PSOptimizer, GSOptimizer
 from src.utils import data_utils
 from validation import ModelValidator, ModelEvaluator
 from results import ResultManager
-from src.neuralnets.forecast_model.forecast_model_wrapper import ModelWrapper
+from src.neuralnets.forecast_model.forecast_model_wrapper import ForecastRegressor
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
@@ -156,7 +156,7 @@ class HyperSearch:
 
         # x, y = data_utils.get_data_in_shape(**data_param)
 
-        model = ModelWrapper(build_fn, data_param, params)
+        model = ForecastRegressor(build_fn, data_param, params)
         runner = Runner(model)
 
         res = self.solver.optimize(runner.run, params)
@@ -169,8 +169,8 @@ class HyperSearch:
         # predictions, forecasts = evaluator.predict(**res.params)
 
         performance = model.evaluate_losses(2)
-        predictions = model.predict_all(False)
-        forecasts = model.predict_all(True)
+        predictions = model._get_estimates(False)
+        forecasts = model._get_estimates(True)
 
         result = ResultManager(data_param, res.params, runner.get_log(), performance, predictions,
                                forecasts)
