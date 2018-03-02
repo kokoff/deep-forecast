@@ -10,6 +10,7 @@ from sklearn.model_selection import PredefinedSplit, TimeSeriesSplit
 
 from src.neuralnets.forecast_model.forecast_models import ForecastModel
 from src.utils import data_utils
+from preprocessing import DifferenceTransformer
 
 
 class ForecastRegressor(BaseWrapper):
@@ -30,6 +31,8 @@ class ForecastRegressor(BaseWrapper):
         self.y_val = None
         self.y_test = None
 
+        self.transformer = DifferenceTransformer()
+
         if data_params is not None:
             self.set_data_params(**data_params)
 
@@ -37,6 +40,8 @@ class ForecastRegressor(BaseWrapper):
 
     def set_data_params(self, **data_params):
         self.x, self.y = data_utils.get_data_in_shape(**data_params)
+        self.x, self.y = self.transformer.fit(self.x, self.y)
+
         self.x_train, self.x_val, self.x_test, = data_utils.train_val_test_split(self.x, 12, 12)
         self.y_train, self.y_val, self.y_test = data_utils.train_val_test_split(self.y, 12, 12)
 
@@ -66,15 +71,20 @@ class ForecastRegressor(BaseWrapper):
     def _fit(self, x, y, **kwargs):
         self.check_data_params()
         self.is_fitted = True
+        x, y = self.transformer.transform(x, y)
         return super(ForecastRegressor, self).fit(x, y, **kwargs)
 
-    def _predict(self, x, **kwargs):
+    def _predict(self, x, y, **kwargs):
         self.check_data_params()
         if not self.is_fitted:
             self.fit()
 
         kwargs = self.filter_sk_params(ForecastModel.predict, kwargs)
-        return np.squeeze(self.model.predict(x, **kwargs))
+
+        x, y = self.transformer.transform(x, y)
+        y_pred = np.squeeze(self.model.predict(x, **kwargs))
+        y_pred = self.transformer.inverse_transform(y_pred, y)
+        return y_pred
 
     def _forecast(self, x, y, **kwargs):
         self.check_data_params()
@@ -82,7 +92,11 @@ class ForecastRegressor(BaseWrapper):
             self.fit()
 
         kwargs = self.filter_sk_params(ForecastModel.forecast, kwargs)
-        return np.squeeze(self.model.forecast(x, y, **kwargs))
+
+        x, y = self.transformer.transform(x, y)
+        y_fcast = np.squeeze(self.model.forecast(x, y, **kwargs))
+        y_fcast = self.transformer.inverse_transform(y_fcast, y)
+        return y_fcast
 
     def _loss_function(self, y, y_pred):
         loss = K.eval(self.model.loss_functions[0](y.T, y_pred))
@@ -93,7 +107,7 @@ class ForecastRegressor(BaseWrapper):
         return loss
 
     def _evaluate_prediction(self, x, y, **kwargs):
-        y_pred = self._predict(x, **kwargs)
+        y_pred = self._predict(x, y, **kwargs)
         loss = self._loss_function(y, y_pred)
         return loss
 
@@ -106,8 +120,8 @@ class ForecastRegressor(BaseWrapper):
         return self._fit(self.x_train, self.y_train, **kwargs)
 
     def predict(self, fold, **kwargs):
-        x, _ = self._get_data_fold(fold)
-        return self._predict(x, **kwargs)
+        x, y = self._get_data_fold(fold)
+        return self._predict(x, y, **kwargs)
 
     def forecast(self, fold, **kwargs):
         x, y = self._get_data_fold(fold)
@@ -162,8 +176,8 @@ class ForecastRegressor(BaseWrapper):
         vl_res = self._evaluate_prediction(x_val, y_val)
 
         if self.is_multioutput:
-            tr_res = tr_res[0]
-            vl_res = vl_res[0]
+            tr_res = [tr_res[0]]
+            vl_res = [vl_res[0]]
 
         return [vl_res, tr_res]
 
@@ -177,10 +191,10 @@ class ForecastRegressor(BaseWrapper):
 
         for pred_key, fcast_key, set in zip(pred_keys, fcast_keys, sets):
             pred_res = list(map(self.evaluate_prediction, [set] * num_runs, [True] * num_runs))
-            result[pred_key] = np.mean(np.squeeze(pred_res), axis=-1)
+            result[pred_key] = np.mean(np.squeeze(pred_res), axis=0)
 
             fcast_res = list(map(self.evaluate_forecast, [set] * num_runs, [True] * num_runs))
-            result[fcast_key] = np.mean(np.squeeze(fcast_res), axis=-1)
+            result[fcast_key] = np.mean(np.squeeze(fcast_res), axis=0)
 
             K.clear_session()
 
@@ -241,7 +255,7 @@ class ForecastRegressor(BaseWrapper):
 def model(neurons):
     from keras import layers, losses
     from forecast_models import create_input_layers, create_output_layers
-    inputs, layer = create_input_layers(2, 1)
+    inputs, layer = create_input_layers(1, 1)
 
     layer = layers.Dense(neurons, activation='relu')(layer)
 
@@ -259,12 +273,14 @@ def main():
 
     data_params = OrderedDict()
     data_params['country'] = 'EA'
-    data_params['vars'] = (['CPI', 'GDP'], ['CPI'])
+    data_params['vars'] = (['CPI'], ['CPI'])
     data_params['lags'] = (1, 1)
 
     wrapper = ForecastRegressor(model, data_params, params)
+    print wrapper.evaluate_prediction('train')
     print wrapper.validate(5, 2)
-    print wrapper.evaluate_losses(10)
+    print wrapper.evaluate_losses(2)
+    print wrapper.get_predictions()
 
 
 if __name__ == '__main__':
