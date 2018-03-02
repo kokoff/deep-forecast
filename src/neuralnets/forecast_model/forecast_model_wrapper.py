@@ -1,52 +1,25 @@
+import __builtin__
+from collections import OrderedDict
+
 import numpy as np
-from keras.wrappers.scikit_learn import KerasRegressor
-from sklearn.metrics import mean_squared_error as mse
+import pandas as pd
+from keras import backend as K
+from keras.wrappers.scikit_learn import BaseWrapper
+from scoop.futures import map
+from sklearn.model_selection import PredefinedSplit, TimeSeriesSplit
 
 from src.neuralnets.forecast_model.forecast_models import ForecastModel
-from sklearn.model_selection import PredefinedSplit, cross_validate, TimeSeriesSplit
-from collections import OrderedDict
-from scoop.futures import map
-from keras import backend as K
-from matplotlib import pyplot as plt
-import __builtin__
-
-
-def prediction_scorer(estimator, x, y):
-    loss = estimator.score(x, y)
-    if isinstance(loss, list):
-        return loss[0]
-    return loss
-
-
-def forecast_scorer(estimator, x, y):
-    loss = estimator.score_forecast(x, y)
-    if isinstance(loss, list):
-        return loss[0]
-    return loss
-
-
-class ForecastRegressor(KerasRegressor):
-
-    def predict(self, x, **kwargs):
-        kwargs = self.filter_sk_params(ForecastModel.predict, kwargs)
-        return np.squeeze(self.model.predict(x, **kwargs))
-
-    def forecast(self, x, y, **kwargs):
-        kwargs = self.filter_sk_params(ForecastModel.forecast, kwargs)
-        return np.squeeze(self.model.forecast(x, y, **kwargs))
-
-
 from src.utils import data_utils
-import pandas as pd
+from preprocessing import DifferenceTransformer
 
 
-class ModelWrapper(ForecastRegressor):
+class ForecastRegressor(BaseWrapper):
     def __init__(self, build_fn, data_params=None, params=None):
         self.data_params = None
         self.variables = None
 
-        self.data_set = False
-        self.fitted = False
+        self.is_data_set = False
+        self.is_fitted = False
         self.is_multioutput = None
 
         self.x = None
@@ -58,68 +31,74 @@ class ModelWrapper(ForecastRegressor):
         self.y_val = None
         self.y_test = None
 
+        self.transformer = DifferenceTransformer()
+
         if data_params is not None:
             self.set_data_params(**data_params)
 
-        super(ModelWrapper, self).__init__(build_fn, **params)
-
-    def check(self):
-        if not self.data_set:
-            raise ValueError('Data has not been set!')
-
-    def get_data(self):
-        self.check()
-        return self.x_train, self.y_train, self.x_val, self.y_val, self.x_test, self.y_test
+        super(ForecastRegressor, self).__init__(build_fn, **params)
 
     def set_data_params(self, **data_params):
-        x, y = data_utils.get_data_in_shape(**data_params)
-        self.x_train, self.x_val, self.x_test, = data_utils.train_val_test_split(x, 12, 12)
-        self.y_train, self.y_val, self.y_test = data_utils.train_val_test_split(y, 12, 12)
+        self.x, self.y = data_utils.get_data_in_shape(**data_params)
+        self.x, self.y = self.transformer.fit(self.x, self.y)
+
+        self.x_train, self.x_val, self.x_test, = data_utils.train_val_test_split(self.x, 12, 12)
+        self.y_train, self.y_val, self.y_test = data_utils.train_val_test_split(self.y, 12, 12)
 
         self.data_params = data_params
         self.is_multioutput = len(data_params['vars'][1]) > 1
         self.variables = data_params['vars'][1]
-        self.data_set = True
-        self.fitted = False
+        self.is_data_set = True
+        self.is_fitted = False
 
-    def _get_xy(self, set):
-        if set == 'train':
+    def get_data_params(self):
+        return self.data_params
+
+    def check_data_params(self):
+        if not self.is_data_set:
+            raise ValueError('Data has not been set!')
+
+    def _get_data_fold(self, fold):
+        if fold == 'train':
             return self.x_train, self.y_train
-        elif set == 'val':
+        elif fold == 'val':
             return self.x_val, self.y_val
-        elif set == 'test':
+        elif fold == 'test':
             return self.x_test, self.y_test
         else:
             raise ValueError('Set must be train, val or test')
 
-    def _fit(self, x, y):
-        self.check()
-        self.fitted = True
-        return super(ModelWrapper, self).fit(x, y)
+    def _fit(self, x, y, **kwargs):
+        self.check_data_params()
+        self.is_fitted = True
+        x, y = self.transformer.transform(x, y)
+        return super(ForecastRegressor, self).fit(x, y, **kwargs)
 
-    def fit(self):
-        return self._fit(self.x_train, self.y_train)
-
-    def _predict(self, x):
-        self.check()
-        if not self.fitted:
+    def _predict(self, x, y, **kwargs):
+        self.check_data_params()
+        if not self.is_fitted:
             self.fit()
 
-        return super(ModelWrapper, self).predict(x)
+        kwargs = self.filter_sk_params(ForecastModel.predict, kwargs)
 
-    def _forecast(self, x, y):
-        self.check()
-        if not self.fitted:
+        x, y = self.transformer.transform(x, y)
+        y_pred = np.squeeze(self.model.predict(x, **kwargs))
+        y_pred = self.transformer.inverse_transform(y_pred, y)
+        return y_pred
+
+    def _forecast(self, x, y, **kwargs):
+        self.check_data_params()
+        if not self.is_fitted:
             self.fit()
 
-        return super(ModelWrapper, self).forecast(x, y)
+        kwargs = self.filter_sk_params(ForecastModel.forecast, kwargs)
 
-    def _evaluate(self, x, y):
-        y_pred = self._predict(x)
-        loss = self._loss(y, y_pred)
-        return loss
+        x, y = self.transformer.transform(x, y)
+        y_fcast = np.squeeze(self.model.forecast(x, y, **kwargs))
+        y_fcast = self.transformer.inverse_transform(y_fcast, y)
+        return y_fcast
 
-    def _loss(self, y, y_pred):
+    def _loss_function(self, y, y_pred):
         loss = K.eval(self.model.loss_functions[0](y.T, y_pred))
         if self.is_multioutput:
             sm = np.sum(loss)
@@ -127,26 +106,41 @@ class ModelWrapper(ForecastRegressor):
 
         return loss
 
-    def predict(self, set):
-        x, _ = self._get_xy(set)
-        return self._predict(x)
-
-    def forecast(self, set):
-        x, y = self._get_xy(set)
-        return self._forecast(x, y)
-
-    def evaluate_prediction(self, set):
-        x, y = self._get_xy(set)
-        y_pred = self._predict(x)
-
-        loss = self._loss(y, y_pred)
+    def _evaluate_prediction(self, x, y, **kwargs):
+        y_pred = self._predict(x, y, **kwargs)
+        loss = self._loss_function(y, y_pred)
         return loss
 
-    def evaluate_forecast(self, set):
-        x, y = self._get_xy(set)
-        y_pred = self._forecast(x, y)
+    def _evaluate_forecast(self, x, y, **kwargs):
+        y_pred = self._forecast(x, y, **kwargs)
+        loss = self._loss_function(y, y_pred)
+        return loss
 
-        loss = self._loss(y, y_pred)
+    def fit(self, **kwargs):
+        return self._fit(self.x_train, self.y_train, **kwargs)
+
+    def predict(self, fold, **kwargs):
+        x, y = self._get_data_fold(fold)
+        return self._predict(x, y, **kwargs)
+
+    def forecast(self, fold, **kwargs):
+        x, y = self._get_data_fold(fold)
+        return self._forecast(x, y, **kwargs)
+
+    def evaluate_prediction(self, fold, refit=False, **kwargs):
+        if refit:
+            self.fit()
+
+        x, y = self._get_data_fold(fold)
+        loss = self._evaluate_prediction(x, y, **kwargs)
+        return loss
+
+    def evaluate_forecast(self, fold, refit=False, **kwargs):
+        if refit:
+            self.fit()
+
+        x, y = self._get_data_fold(fold)
+        loss = self._evaluate_forecast(x, y, **kwargs)
         return loss
 
     def validate(self, cv_splits, num_runs):
@@ -167,33 +161,25 @@ class ModelWrapper(ForecastRegressor):
 
         return res[0][0], res[1][0]
 
-    def _validate(self, splt):
+    def _validate(self, split):
 
-        x = pd.concat([self.x_train, self.x_val], axis=0)
-        y = pd.concat([self.y_train, self.y_val], axis=0)
+        x = self.x
+        y = self.y
 
-        x_train = x.iloc[splt[0], :]
-        x_val = x.iloc[splt[1], :]
-        y_train = y.iloc[splt[0], :]
-        y_val = y.iloc[splt[1], :]
+        x_train = x.iloc[split[0], :]
+        x_val = x.iloc[split[1], :]
+        y_train = y.iloc[split[0], :]
+        y_val = y.iloc[split[1], :]
 
         self._fit(x_train, y_train)
-        tr_res = self._evaluate(x_train, y_train)
-        vl_res = self._evaluate(x_val, y_val)
+        tr_res = self._evaluate_prediction(x_train, y_train)
+        vl_res = self._evaluate_prediction(x_val, y_val)
 
         if self.is_multioutput:
-            tr_res = tr_res[0]
-            vl_res = vl_res[0]
+            tr_res = [tr_res[0]]
+            vl_res = [vl_res[0]]
 
         return [vl_res, tr_res]
-
-    def _fit_eval_pred(self, set):
-        self.fit()
-        return self.evaluate_prediction(set)
-
-    def _fit_eval_fcast(self, set):
-        self.fit()
-        return self.evaluate_forecast(set)
 
     def evaluate_losses(self, num_runs):
         variables = self.variables
@@ -204,11 +190,11 @@ class ModelWrapper(ForecastRegressor):
         result = OrderedDict()
 
         for pred_key, fcast_key, set in zip(pred_keys, fcast_keys, sets):
-            pred_res = list(map(self._fit_eval_pred, [set] * num_runs))
-            result[pred_key] = np.mean(np.squeeze(pred_res), axis=-1)
+            pred_res = list(map(self.evaluate_prediction, [set] * num_runs, [True] * num_runs))
+            result[pred_key] = np.mean(np.squeeze(pred_res), axis=0)
 
-            fcast_res = list(map(self._fit_eval_fcast, [set] * num_runs))
-            result[fcast_key] = np.mean(np.squeeze(fcast_res), axis=-1)
+            fcast_res = list(map(self.evaluate_forecast, [set] * num_runs, [True] * num_runs))
+            result[fcast_key] = np.mean(np.squeeze(fcast_res), axis=0)
 
             K.clear_session()
 
@@ -219,14 +205,14 @@ class ModelWrapper(ForecastRegressor):
 
         return result
 
-    def predict_all(self, recursive=False):
+    def _get_estimates(self, forecast=False):
 
-        if recursive:
-            pred_func = self.predict
-            labels = ['train prediction', 'val prediction', 'test prediction']
-        else:
+        if forecast:
             pred_func = self.forecast
             labels = ['train forecast', 'val forecast', 'test forecast']
+        else:
+            pred_func = self.predict
+            labels = ['train prediction', 'val prediction', 'test prediction']
 
         num_vars = len(self.variables)
         y = pd.concat([self.y_train, self.y_val, self.y_test], axis=0)
@@ -252,24 +238,24 @@ class ModelWrapper(ForecastRegressor):
 
         return predictions
 
-    def predictions_and_forecasts(self):
-        pred = self.predict_all()
-        fcast = self.predict_all(True)
-        return pred, fcast
+    def get_predictions(self):
+        prediction = self._get_estimates()
+        return prediction
 
-    def plot_prediction(self, recursive=False):
+    def get_forecasts(self):
+        forecast = self._get_estimates(forecast=True)
+        return forecast
 
-        predictions = self.predict_all(recursive)
-
-        for prediction in predictions:
-            prediction.plot()
-            plt.show()
+    def get_predictions_and_forecasts(self):
+        predictions = self.get_predictions()
+        forecasts = self.get_forecasts()
+        return predictions, forecasts
 
 
 def model(neurons):
-    from keras import layers, activations, losses
+    from keras import layers, losses
     from forecast_models import create_input_layers, create_output_layers
-    inputs, layer = create_input_layers(2, 1)
+    inputs, layer = create_input_layers(1, 1)
 
     layer = layers.Dense(neurons, activation='relu')(layer)
 
@@ -287,14 +273,14 @@ def main():
 
     data_params = OrderedDict()
     data_params['country'] = 'EA'
-    data_params['vars'] = (['CPI', 'GDP'], ['CPI'])
+    data_params['vars'] = (['CPI'], ['CPI'])
     data_params['lags'] = (1, 1)
 
-    wrapper = ModelWrapper(model, data_params, params)
+    wrapper = ForecastRegressor(model, data_params, params)
+    print wrapper.evaluate_prediction('train')
     print wrapper.validate(5, 2)
-    print wrapper.evaluate_losses(10)
-    print wrapper.plot_prediction()
-    wrapper.plot_prediction(recursive=True)
+    print wrapper.evaluate_losses(2)
+    print wrapper.get_predictions()
 
 
 if __name__ == '__main__':
