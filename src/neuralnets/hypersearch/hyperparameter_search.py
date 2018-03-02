@@ -104,18 +104,11 @@ def experiment_dir(data_param):
     return full_path
 
 
-def get_name_from_data_params(data_params):
-    name = ''
-    name += data_params['country'] + '_['
-    name += '_'.join(data_params['vars'][0]) + ']_['
-    name += '_'.join(data_params['vars'][1]) + ']_'
-    name += str(data_params['lags'][0]) + '_'
-    name += str(data_params['lags'][1])
-    return name
+
 
 
 class HyperSearch:
-    def __init__(self, solver, cv_splits, validation_runs, eval_runs, output_dir='experiments', **solver_kwargs):
+    def __init__(self, solver, cv_splits=5, validation_runs=2, eval_runs=10, output_dir='experiments', **solver_kwargs):
         '''Perform hyper parameter search using optunity as backend. Possible solvers include
         grid search     args: None
         random search   args: num_evals
@@ -163,7 +156,6 @@ class HyperSearch:
                                forecasts)
 
         if not os.path.exists(self.output_dir):
-            os.mkdir(self.output_dir)
-        out_dir = os.path.join(self.output_dir, get_name_from_data_params(data_param))
-        result.save(out_dir)
+            os.makedirs(self.output_dir)
+        result.save(self.output_dir)
         return result
