@@ -1,4 +1,5 @@
 import sys
+
 print sys.path
 from collections import OrderedDict
 
@@ -7,8 +8,7 @@ from keras.layers import Dense
 from src.neuralnets.forecast_model.forecast_models import ForecastModel, create_input_layers, create_output_layers
 from src.neuralnets.hypersearch import HyperSearch
 from src.utils import data_utils
-
-
+from keras import callbacks
 
 
 def makeModel(neurons):
@@ -35,7 +35,7 @@ def main():
     params['epochs'] = (int, 50, 250)
     params['batch_size'] = (int, 1, 10)
 
-    searcher = HyperSearch(solver='rso', num_runs=10)
+    searcher = HyperSearch(solver='rso', num_runs=4)
 
     searcher.hyper_data_search(makeModel, DATA_PARAMS, params)
 
