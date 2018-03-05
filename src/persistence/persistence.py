@@ -16,7 +16,7 @@ def persistence_mse(series):
     columns = ['train pred', 'val pred', 'test pred']
     lossess = OrderedDict([(i, 0) for i in columns])
 
-    y_pred, y_true = data_utils.get_xy_data(series, 1, 1)
+    y_pred, y_true = data_utils.get_xy_data(series, 1)
     true_data = data_utils.train_val_test_split(y_true, 12, 12)
     pred_data = data_utils.train_val_test_split(y_pred, 12, 12)
 
@@ -27,7 +27,7 @@ def persistence_mse(series):
 
 
 def persistence_prediction(series):
-    y_pred, y_true = data_utils.get_xy_data(series, 1, 1)
+    y_pred, y_true = data_utils.get_xy_data(series, 1)
     y_train, y_val, y_test = data_utils.train_val_test_split(y_pred, 12, 12)
     predictions = pd.concat([y_true, y_train, y_val, y_test], axis=1)
     predictions.columns = ['true values', 'train prediction', 'val prediction', 'test prediction']

@@ -276,7 +276,7 @@ def main():
     data_params = OrderedDict()
     data_params['country'] = 'EA'
     data_params['vars'] = (['CPI'], ['CPI'])
-    data_params['lags'] = (8, 1)
+    data_params['lags'] = 6
 
     wrapper = ForecastRegressor(model, data_params, params)
     # print wrapper.evaluate_prediction('train')
