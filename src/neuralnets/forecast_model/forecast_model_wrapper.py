@@ -83,7 +83,7 @@ class ForecastRegressor(BaseWrapper):
 
         x, y = self.transformer.transform(x, y)
         y_pred = np.squeeze(self.model.predict(x, **kwargs))
-        y_pred = self.transformer.inverse_transform(y_pred, y)
+        y_pred = self.transformer.inverse_transform(y_pred, y, recursive=False)
         return y_pred
 
     def _forecast(self, x, y, **kwargs):
@@ -95,7 +95,7 @@ class ForecastRegressor(BaseWrapper):
 
         x, y = self.transformer.transform(x, y)
         y_fcast = np.squeeze(self.model.forecast(x, y, **kwargs))
-        y_fcast = self.transformer.inverse_transform(y_fcast, y)
+        y_fcast = self.transformer.inverse_transform(y_fcast, y, recursive=True)
         return y_fcast
 
     def _loss_function(self, y, y_pred):
@@ -255,7 +255,7 @@ class ForecastRegressor(BaseWrapper):
 def model(neurons):
     from keras import layers, losses
     from forecast_models import create_input_layers, create_output_layers
-    inputs, layer = create_input_layers(1, 1)
+    inputs, layer = create_input_layers(1, 6)
 
     layer = layers.Dense(neurons, activation='relu')(layer)
 
@@ -267,20 +267,28 @@ def model(neurons):
 
 
 def main():
+    from matplotlib import pyplot as plt
     params = OrderedDict()
-    params['neurons'] = 10
-    params['epochs'] = 100
+    params['neurons'] = 16
+    params['epochs'] = 1000
+    params['batch_size'] = 10
 
     data_params = OrderedDict()
     data_params['country'] = 'EA'
     data_params['vars'] = (['CPI'], ['CPI'])
-    data_params['lags'] = (1, 1)
+    data_params['lags'] = 6
 
     wrapper = ForecastRegressor(model, data_params, params)
-    print wrapper.evaluate_prediction('train')
-    print wrapper.validate(5, 2)
-    print wrapper.evaluate_losses(2)
-    print wrapper.get_predictions()
+    # print wrapper.evaluate_prediction('train')
+    # print wrapper.validate(5, 2)
+    # print wrapper.evaluate_losses(2)
+    print wrapper.predict('val')
+    pred = wrapper.get_predictions_and_forecasts()
+    print pred
+    pred[0][0].plot()
+    plt.show()
+    pred[1][0].plot()
+    plt.show()
 
 
 if __name__ == '__main__':
