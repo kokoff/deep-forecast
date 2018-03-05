@@ -45,8 +45,14 @@ class DifferenceTransformer(object):
 
         return x_trans, y_trans
 
-    def inverse_transform(self, y, y_true):
-        y_trans = y + self.y.reindex(y_true.index).values.T
+    def inverse_transform(self, y, y_true, recursive=False):
+        if recursive:
+            constant = self.y.reindex(y_true.index).iloc[0].values
+            y_trans = np.cumsum(y, axis=-1).T + constant
+            y_trans = y_trans.T
+        else:
+            y_trans = y + self.y.reindex(y_true.index).values.T
+
         return y_trans
 
 
@@ -63,16 +69,24 @@ def main():
     x_train, x_val, x_test = data_utils.train_val_test_split(x, 12, 12)
     y_train, y_val, y_test = data_utils.train_val_test_split(y, 12, 12)
 
-    x_trans, y_trans = tr.transform(x_train, y_train)
-    print pd.concat([x_train, y_train], axis=1)
-    print pd.concat([x_trans, y_trans], axis=1)
 
-    plt.plot(y_train.values, 'r+', label='a')
+    curr_x = x_val
+    cuur_y = y_val
+    x_trans, y_trans = tr.transform(curr_x, cuur_y)
+    y_orig = tr.inverse_transform(y_trans.values, cuur_y)
+
+    print np.concatenate([cuur_y, y_orig], axis=1)
+    print y_orig
+
+    # print pd.concat([x_train, y_train], axis=1)
+    # print pd.concat([x_trans, y_trans], axis=1)
+
+    # plt.plot(y_train.values, 'r+', label='a')
     # print y_trans
-    inv_tr = tr.inverse_transform(y_trans.values, y_train)
-    plt.plot(inv_tr, 'b--', label='b')
-    plt.legend()
-    plt.show()
+    # inv_tr = tr.inverse_transform(y_trans.values, y_train)
+    # plt.plot(inv_tr, 'b--', label='b')
+    # plt.legend()
+    # plt.show()
 
 
 if __name__ == '__main__':
