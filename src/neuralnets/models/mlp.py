@@ -24,8 +24,10 @@ def main():
     data_params = OrderedDict()
     data_params['country'] = COUNTRIES
     data_params['vars'] = [([i], [i]) for i in VARIABLES]
+    data_params['vars'].extend([(VARIABLES, [i]) for i in VARIABLES])
+    data_params['vars'].extend([(VARIABLES, VARIABLES)])
     data_params['lags'] = [4, 8]
-
+    print data_params
     params = OrderedDict()
     params['neurons'] = choice([var(1, 8, int)],
                                [var(1, 8, int), var(1, 8, int)])
