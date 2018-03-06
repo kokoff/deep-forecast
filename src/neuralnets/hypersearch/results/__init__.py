@@ -1,1 +1,1 @@
-from new_results import ResultManager, Result, MultiResult
+from results import ResultManager, Result, MultiResult
