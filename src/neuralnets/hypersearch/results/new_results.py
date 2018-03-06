@@ -11,8 +11,7 @@ def get_name_from_data_params(data_params):
     name += ']_['
     name += 'many' if len(data_params['vars'][1]) > 1 else 'one'
     name += ']_'
-    name += str(data_params['lags'][0]) + '_'
-    name += str(data_params['lags'][1])
+    name += str(data_params['lags'])
     return name
 
 
@@ -38,15 +37,13 @@ class ResultManager:
         country = data_params['country']
         variables = data_params['vars'][1]
         log = pd.DataFrame(log)
-        best_params = pd.DataFrame(best_params, index=[0])
+        best_params = pd.DataFrame([best_params])
         self.dir = get_name_from_data_params(data_params)
 
         if len(variables) == 1:
             self.result = Result(country, variables[0], log, best_params, performance, predictions[0], forecasts[0])
         else:
             self.result = MultiResult(country, variables, log, best_params, performance, predictions, forecasts)
-
-
 
     def __str__(self):
         try:
