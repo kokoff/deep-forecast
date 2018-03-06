@@ -50,15 +50,15 @@ class GSOptimizer:
         return Result(best_params, score, end)
 
 
-def func(x, y, pizza):
+def func(x, y, pizza=None):
     print x, y, pizza
     return x ** 2 + y ** 2
 
 
 def main():
     params = OrderedDict()
-    params['x'] = [1, 2, 3, 4, 5, 6]
-    params['y'] = {1: {'pizza': [1, 2, 3]}}
+    params['x'] = (1, 2, 3, 4, 5)
+    params['y'] = {1, 2}
 
     opt = GSOptimizer()
     res = opt.optimize(func, params)

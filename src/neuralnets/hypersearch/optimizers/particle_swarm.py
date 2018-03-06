@@ -118,8 +118,14 @@ def func(x, y):
 
 def main():
     params = OrderedDict()
-    params['x'] = (int, -100, 100)
-    params['y'] = (int, 1, 100)
+    params['x'] = {-100, 100}
+    params['y'] = ({0, 10}, {0, 100})
+
+    params2 = OrderedDict()
+    params2['x'] = 10
+    params2['y'] = 12
+
+    params = (params, params2)
 
     opt = PSOptimizer(10, 10)
     res = opt.optimize(func, params)
