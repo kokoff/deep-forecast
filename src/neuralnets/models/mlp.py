@@ -24,15 +24,17 @@ def main():
     data_params = OrderedDict()
     data_params['country'] = COUNTRIES
     data_params['vars'] = [([i], [i]) for i in VARIABLES]
+    data_params['vars'].extend([(VARIABLES, [i]) for i in VARIABLES])
+    data_params['vars'].extend([(VARIABLES, VARIABLES)])
     data_params['lags'] = [4, 8]
-
+    print data_params
     params = OrderedDict()
     params['neurons'] = choice([var(1, 8, int)],
                                [var(1, 8, int), var(1, 8, int)])
     params['epochs'] = var(50, 300, int)
     params['batch_size'] = var(5, 20, int)
 
-    searcher = HyperSearch(solver='pso', num_particles=6, num_generations=6)
+    searcher = HyperSearch(solver='pso', num_particles=6, num_generations=6, output_dir='mlp_experiments')
 
     searcher.hyper_data_search(mlp, data_params, params)
 
