@@ -1,5 +1,5 @@
 import numpy as np
-from collections import OrderedDict
+from collections import OrderedDict, Iterable
 
 
 class BaseVariable(object):
@@ -42,11 +42,12 @@ class BasePrimitiveVariable(BaseVariable):
 
 class ContinuousVariable(BasePrimitiveVariable):
 
-    def __init__(self, lb, ub):
+    def __init__(self, lb, ub, type=int):
+        self.type = type
         super(ContinuousVariable, self).__init__(lb, ub)
 
     def get_value(self):
-        return self.internal_state
+        return self.type(self.internal_state)
 
     def __iter__(self):
         yield self
@@ -158,13 +159,13 @@ class SearchSpace(object):
                 lst.append(self.init_variables(i))
             return ListVariable(lst)
 
-        elif isinstance(param, tuple):
+        elif isinstance(param, tuple) or isinstance(param, Choice):
             lst = []
             for i in param:
                 lst.append(self.init_variables(i))
             return DiscreteVariable(*lst)
 
-        elif isinstance(param, set):
+        elif isinstance(param, set) or isinstance(param, Variable):
             return ContinuousVariable(*param)
 
         else:
@@ -183,6 +184,24 @@ class SearchSpace(object):
         return self.variables.get_value()
 
 
+class Choice(Iterable):
+    def __init__(self, *args):
+        self.args = args
+
+    def __iter__(self):
+        for i in self.args:
+            yield i
+
+
+class Variable(Iterable):
+    def __init__(self, lb, ub, type):
+        self.args = [lb, ub, type]
+
+    def __iter__(self):
+        for i in self.args:
+            yield i
+
+
 def param_decorator(f, ss):
     def decorated_f(*args):
         params = ss.transform(args)
@@ -192,6 +211,11 @@ def param_decorator(f, ss):
 
 
 def main():
+    par = Variable(1, 5, int)
+    cvar = ContinuousVariable(*par)
+    print cvar
+    return
+
     params = OrderedDict()
     params['epochs'] = {1, 10}
     params['neurons'] = (
