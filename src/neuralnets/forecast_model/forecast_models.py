@@ -23,13 +23,13 @@ def create_input_layers(num_inputs, input_size):
         return inputs, layer
 
 
-def create_output_layers(num_outputs, output_size, prev_layers):
+def create_output_layers(num_outputs, prev_layers):
     if num_outputs == 1:
-        return Dense(output_size, activation=linear)(prev_layers)
+        return Dense(1, activation=linear)(prev_layers)
     else:
         outputs = []
         for i in range(num_outputs):
-            outputs.append(Dense(output_size, activation=linear)(prev_layers))
+            outputs.append(Dense(1, activation=linear)(prev_layers))
         return outputs
 
 

@@ -58,6 +58,13 @@ class ForecastRegressor(BaseWrapper):
         if not self.is_data_set:
             raise ValueError('Data has not been set!')
 
+    def set_params(self, **params):
+        self.check_data_params()
+        params['num_inputs'] = len(self.data_params['vars'][0])
+        params['num_outputs'] = len(self.data_params['vars'][1])
+        params['input_size'] = self.data_params['lags']
+        super(ForecastRegressor, self).set_params(**params)
+
     def _get_data_fold(self, fold):
         if fold == 'train':
             return self.x_train, self.y_train

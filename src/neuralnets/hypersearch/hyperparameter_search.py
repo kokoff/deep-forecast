@@ -104,17 +104,8 @@ def experiment_dir(data_param):
     return full_path
 
 
-
-
-
 class HyperSearch:
     def __init__(self, solver, cv_splits=5, validation_runs=2, eval_runs=10, output_dir='experiments', **solver_kwargs):
-        '''Perform hyper parameter search using optunity as backend. Possible solvers include
-        grid search     args: None
-        random search   args: num_evals
-        particle swarm  args: num_particles, num_generations, max_speed=None, phi1=1.5, phi2=2.0
-        sobol           args: num_evals, seed=None, skip=None
-        '''
         if solver == 'pso':
             self.solver = PSOptimizer(**solver_kwargs)
         elif solver == 'gso':
