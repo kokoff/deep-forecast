@@ -25,8 +25,9 @@ def main(args):
                                [var(1, 8, int), var(1, 8, int)])
     params['epochs'] = var(50, 300, int)
     params['batch_size'] = var(5, 20, int)
+    # params['input_size'] = var(1, 16, int)
 
-    searcher = HyperSearch(solver='pso', num_particles=6, num_generations=6, output_dir='mlp_experiments')
+    searcher = HyperSearch(solver='pso', num_particles=5, num_generations=5, output_dir='mlp_experiments')
 
     searcher.hyper_data_search(mlp, data_params, params)
 
@@ -39,5 +40,5 @@ if __name__ == '__main__':
     parser.add_argument('lags', type=int)
     args = parser.parse_args()
     args = vars(args)
-    # args = {'country': 'EA', 'vars': 'one_one', 'lags': 4}
+    # args = {'country': 'EA', 'vars': 'many_many', 'lags': 4}
     main(args)

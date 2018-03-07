@@ -99,14 +99,13 @@ class Result(object):
         self.save_log(var_directory)
         self.save_log_plots(var_directory)
 
-        if True or self.is_performance_better(var_directory):
+        if self.is_performance_better(var_directory):
             self.save_params(var_directory)
             self.save_performance(var_directory)
             self.save_prediction(var_directory)
             self.save_forecasts(var_directory)
             self.save_performance_plots(var_directory)
 
-    @error_prone
     def is_performance_better(self, directory):
         if os.path.exists(os.path.join(directory, 'performance.csv')):
             old_perf = pd.read_csv(os.path.join(directory, 'performance.csv'))
@@ -114,27 +113,22 @@ class Result(object):
         else:
             return True
 
-    @error_prone
     def save_prediction(self, directory):
         predictions_file = os.path.join(directory, 'predictions.csv')
         self.predictions.to_csv(predictions_file)
 
-    @error_prone
     def save_forecasts(self, directory):
         predictions_file = os.path.join(directory, 'predictions.csv')
         self.predictions.to_csv(predictions_file)
 
-    @error_prone
     def save_performance(self, directory):
         params_path = os.path.join(directory, 'performance.csv')
         self.performance.to_csv(params_path, index=False)
 
-    @error_prone
     def save_params(self, directory):
         params_path = os.path.join(directory, 'parameters.csv')
         self.params.to_csv(params_path, index=False)
 
-    @error_prone
     def save_log(self, directory):
         log_file = os.path.join(directory, 'log.csv')
 
@@ -154,7 +148,6 @@ class Result(object):
 
         res.to_csv(log_file, index=False)
 
-    @error_prone
     def save_log_plots(self, directory):
         figures_directory = os.path.join(directory, 'parameter_figures')
         make_dir(figures_directory)
@@ -164,7 +157,6 @@ class Result(object):
         plotter = ResultsPlotter(log_path, figures_directory)
         plotter.plot_all()
 
-    @error_prone
     def save_performance_plots(self, directory):
         figures_directory = os.path.join(directory, 'performance_figures')
         make_dir(figures_directory)

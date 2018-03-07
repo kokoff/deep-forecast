@@ -62,15 +62,17 @@ class Logger:
 
 class Runner:
 
-    def __init__(self, validator):
+    def __init__(self, validator, cv_splits, runs):
         self.logger = Logger()
         self.validator = validator
+        self.cv_splits = cv_splits
+        self.runs = runs
 
     def run(self, **params):
         print params,
 
         self.validator.set_params(**params)
-        val, train = self.validator.validate(5, 2)
+        val, train = self.validator.validate(self.cv_splits, self.runs)
 
         print '\tval', val, 'train', train
 
@@ -142,17 +144,20 @@ class HyperSearch:
     def hyper_search(self, build_fn, data_param, params):
 
         model = ForecastRegressor(build_fn, data_param, params)
-        runner = Runner(model)
+        runner = Runner(model, self.cv_splits, self.runs)
 
         res = self.solver.optimize(runner.run, params)
         print 'best params:\t', res.params
         print 'best score:\t', res.score
         print 'run time:\t', res.time
 
-        performance = model.evaluate_losses(2)
+        # evaluate model
+        model.set_params(**res.params)
+        performance = model.evaluate_losses(self.eval_runs)
         predictions = model.get_predictions()
         forecasts = model.get_forecasts()
 
+        # create results
         result = ResultManager(data_param, res.params, runner.get_log(), performance, predictions,
                                forecasts)
 
