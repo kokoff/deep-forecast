@@ -1,3 +1,6 @@
+import warnings
+warnings.filterwarnings("ignore")
+
 from mlp import mlp
 
 from collections import OrderedDict
@@ -5,6 +8,8 @@ from src.utils.data_utils import VARIABLES, COUNTRIES
 import argparse
 
 from src.neuralnets.hypersearch import HyperSearch, var, choice
+
+
 
 one_one = [([i], [i]) for i in VARIABLES]
 all_one = [(VARIABLES, [i]) for i in VARIABLES]
