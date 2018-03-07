@@ -1,7 +1,7 @@
 import os
 
 import matplotlib
-matplotlib.use('Agg')
+# matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 
 import pandas as pd
@@ -10,8 +10,7 @@ from pandas.plotting import parallel_coordinates
 import itertools
 from src.utils import data_utils
 import numpy as np
-
-
+from matplotlib import ticker
 
 sns.set()
 
@@ -55,7 +54,7 @@ class ResultsPlotter:
                          palette=sns.color_palette('hls'))
 
         path = os.path.join(self.out, 'pairplot.pdf')
-        plt.savefig(path)
+        plt.savefig(path, bbox_inches='tight')
         if self.show:
             plt.show()
 
@@ -70,9 +69,10 @@ class ResultsPlotter:
         g = sns.pairplot(data, x_vars=cols, y_vars=['train', 'val'], kind='scatter')
         g.set(yscale='log')
         g.map(plt.scatter)
+        plt.ylabel('val')
 
         path = os.path.join(self.out, 'pairplot_val.pdf')
-        plt.savefig(path)
+        plt.savefig(path, bbox_inches='tight')
         if self.show:
             plt.show()
 
@@ -81,115 +81,115 @@ class ResultsPlotter:
         data = data.sort_values('val', ascending=False)
         data = pd.get_dummies(data)
 
-        if len(data) > 6:
-            data['val'], bins = pd.qcut(data['val'], [0, .05, .1, .25, .5, 1.], retbins=True)
-
-        cols = [i for i in data.columns if i not in ['train', 'val']]
-        ticks = np.unique(data[cols].values.flatten())
-        ticks = np.delete(ticks, ticks[ticks == 0])
-
-        len_bins = len(data) if len(data) < 6 else len(bins)
-        colors = sns.color_palette('hls', len_bins)
-        ax = parallel_coordinates(data, 'val', cols=cols, color=colors)
-        ax.set_yscale('log')
-        ax.set_yticks(ticks)
-        ax.get_yaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
-        ax.get_yaxis().get_major_formatter().labelOnlyBase = False
+        parallel_coords1(data)
 
         path = os.path.join(self.out, 'parallel_coordinates.pdf')
-        plt.savefig(path)
+        plt.savefig(path, bbox_inches='tight')
         if self.show:
             plt.show()
-
-    def cond_one_to_many(self):
-        data = self._remove_cols()
-        data = data.sort_values('val', ascending=False)
-        # data = pd.get_dummies(data)
-
-        cols = list(data.columns[:-2])
-        cols.sort(key=lambda x: len(data[x].dropna().unique()), reverse=True)
-        if len(cols) < 2:
-            return
-
-        param = cols.pop(0)
-
-        new_data = pd.DataFrame(columns=['params', 'val', 'train'], index=data.index)
-        for i in range(len(data)):
-            new_data.at[i, 'params'] = '(' + ','.join([str(data.at[i, j]) for j in cols]) + ')'
-
-        new_data[param] = data[param]
-        new_data['val'] = data['val']
-        new_data['train'] = data['train']
-
-        sns.set()
-        col_wrap = 4 if len(new_data['params'].unique()) >= 4 else len(new_data['params'].unique())
-        g = sns.FacetGrid(new_data, col='params', col_wrap=col_wrap)
-        g = g.map(plt.plot, param, 'val', color='r', label='val')
-        g = g.map(plt.plot, param, 'train', color='b', label='train')
-        g.add_legend()
-
-        path = os.path.join(self.out, 'conditional_many.pdf')
-        plt.savefig(path)
-        if self.show:
-            plt.show()
-
-    def cond_one_to_one(self):
-        cols = list(self.data.columns[:-2])
-        cols.sort(key=lambda x: len(self.data[x].dropna().unique()), reverse=True)
-        cols = cols[:2] + [i for i in cols[2:] if len(self.data[i].dropna().unique()) > 1]
-
-        combs = list(itertools.combinations(cols, 2))
-
-        for i, comb in enumerate(combs):
-            sns.set()
-            col_wrap = 4 if len(self.data[comb[1]].unique()) >= 4 else len(self.data[comb[1]].unique())
-            g = sns.FacetGrid(self.data, col=comb[1], col_wrap=col_wrap)
-            g = g.map(plt.plot, comb[0], 'train', color='b', label='train')
-            g = g.map(plt.plot, comb[0], 'val', color='r', label='val')
-            g.add_legend()
-
-            path = os.path.join(self.out, 'conditional' + str(i) + '.pdf')
-            plt.savefig(path)
-            if self.show:
-                plt.show()
 
     def plot_all(self):
-        try:
-            self.pairplot()
-            plt.close()
-        except Exception as e:
-            print e
+        self.pairplot()
         plt.close('all')
-        try:
-            self.pairplot_val()
-            plt.close()
-        except Exception as e:
-            print e
+
+        self.pairplot_val()
+        plt.close()
         plt.close('all')
-        try:
-            self.parallel_coordinates()
-            plt.close()
-        except Exception as e:
-            print e
+
+        self.parallel_coordinates()
         plt.close('all')
-        try:
-            self.cond_one_to_many()
-            plt.close()
-        except Exception as e:
-            print e
-        plt.close('all')
-        try:
-            self.cond_one_to_one()
-            plt.close()
-        except Exception as e:
-            print e
-        plt.close('all')
+        # try:
+        #     self.cond_one_to_many()
+        #     plt.close()
+        # except Exception as e:
+        #     print e
+        # plt.close('all')
+        # try:
+        #     self.cond_one_to_one()
+        #     plt.close()
+        # except Exception as e:
+        #     print e
+        # plt.close('all')
+
+
+def parallel_coords1(df):
+    cols = df.columns[:-2]
+
+    if len(df) > 6:
+        df['val'], bins = pd.qcut(df['val'], [0, .05, .1, .25, .5, 1.], retbins=True)
+    else:
+        bins = np.squeeze(df['val'].values)
+
+    x = [i for i, _ in enumerate(cols)]
+    colours = sns.hls_palette(len(bins))
+
+    # create dict of categories: colours
+    # colours = {df.loc[i, 'val']: colours[i] for i in df.index}
+
+    # Create (X-1) sublots along x axis
+    fig, axes = plt.subplots(1, len(x) - 1, sharey=False, figsize=(15, 5))
+
+    # Get min, max and range for each column
+    # Normalize the data for each column
+    min_max_range = {}
+    for col in cols:
+        min_max_range[col] = [df[col].min(), df[col].max(), np.ptp(df[col])]
+        df[col] = np.true_divide(df[col] - df[col].min(), np.ptp(df[col]))
+
+    # Plot each row
+    for i, ax in enumerate(axes):
+        for idx in df.index:
+            mpg_category = df.loc[idx, 'val']
+            ax.plot(x, df.loc[idx, cols], colours)
+        ax.set_xlim([x[i], x[i + 1]])
+
+    # Set the tick positions and labels on y axis for each plot
+    # Tick positions based on normalised data
+    # Tick labels are based on original data
+    def set_ticks_for_axis(dim, ax, ticks):
+        min_val, max_val, val_range = min_max_range[cols[dim]]
+        step = val_range / float(ticks - 1)
+        tick_labels = [round(min_val + step * i, 2) for i in range(ticks)]
+        norm_min = df[cols[dim]].min()
+        norm_range = np.ptp(df[cols[dim]])
+        norm_step = norm_range / float(ticks - 1)
+        ticks = [round(norm_min + norm_step * i, 2) for i in range(ticks)]
+        ax.yaxis.set_ticks(ticks)
+        ax.set_yticklabels(tick_labels)
+
+    for dim, ax in enumerate(axes):
+        ax.xaxis.set_major_locator(ticker.FixedLocator([dim]))
+        set_ticks_for_axis(dim, ax, ticks=6)
+        ax.set_xticklabels([cols[dim]])
+
+    # Move the final axis' ticks to the right-hand side
+    ax = plt.twinx(axes[-1])
+    dim = len(axes)
+    ax.xaxis.set_major_locator(ticker.FixedLocator([x[-2], x[-1]]))
+    set_ticks_for_axis(dim, ax, ticks=6)
+    ax.set_xticklabels([cols[-2], cols[-1]])
+
+    # Remove space between subplots
+    plt.subplots_adjust(wspace=0)
+
+    # Add legend to plot
+    plt.legend(
+        [plt.Line2D((0, 1), (0, 0), color=colours[idx]) for idx in range(len(bins))],
+        df['val'].unique(),
+        bbox_to_anchor=(1.2, 1), loc=2, borderaxespad=0.)
+
+    # plt.show()
+
 
 def main():
-    log = pd.read_csv('/home/skokov/project/src/neuralnets/temp/EA_CPI/log.csv')
+    print sns.hls_palette(10)
 
-    pltr = ResultsPlotter('/home/skokov/project/src/neuralnets/temp/EA_CPI/log.csv', '../temp', show=True)
-    pltr.cond_one_to_many()
+    log = pd.read_csv('/home/skokov/project/src/neuralnets/models/mlp_experiments/EA_[one]_[one]4/EA_CPI/log.csv')
+
+    pltr = ResultsPlotter('/home/skokov/project/src/neuralnets/models/mlp_experiments/EA_[one]_[one]4/EA_CPI/log.csv',
+                          '/home/skokov/project/src/neuralnets/models/mlp_experiments/EA_[one]_[one]4/EA_CPI/parameter_figures',
+                          show=True)
+    pltr.plot_all()
 
 
 if __name__ == '__main__':
