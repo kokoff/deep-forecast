@@ -41,6 +41,7 @@ class ResultsPlotter:
         data = self._remove_cols()
         data.sort_values('val', ascending=True, inplace=True)
         data = pd.get_dummies(data)
+        data = data.fillna(0)
 
         if len(data) > 6:
             data['val'], bins = pd.qcut(data['val'], [0, .05, .1, .25, .5, 1.], retbins=True)
@@ -182,12 +183,12 @@ def parallel_coords1(df):
 
 
 def main():
-    print sns.hls_palette(10)
+    # print sns.hls_palette(10)
 
     log = pd.read_csv('/home/skokov/project/src/neuralnets/models/mlp_experiments/EA_[one]_[one]4/EA_CPI/log.csv')
 
-    pltr = ResultsPlotter('/home/skokov/project/src/neuralnets/models/mlp_experiments/EA_[one]_[one]4/EA_CPI/log.csv',
-                          '/home/skokov/project/src/neuralnets/models/mlp_experiments/EA_[one]_[one]4/EA_CPI/parameter_figures',
+    pltr = ResultsPlotter('/home/skokov/mlp_experiments/EA_[one]_[one]_8/EA_LR10/log.csv',
+                          '/home/skokov/mlp_experiments/EA_[one]_[one]_8/EA_LR10/parameter_figures',
                           show=True)
     pltr.plot_all()
 
