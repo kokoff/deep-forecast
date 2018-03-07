@@ -32,7 +32,7 @@ def main(args):
     params['batch_size'] = var(5, 20, int)
     # params['input_size'] = var(1, 16, int)
 
-    searcher = HyperSearch(solver='pso', num_particles=5, num_generations=5, output_dir='mlp_experiments')
+    searcher = HyperSearch(solver='pso', num_particles=7, num_generations=7, output_dir='mlp_experiments', cv_splits=3)
 
     searcher.hyper_data_search(mlp, data_params, params)
 
