@@ -36,7 +36,7 @@ class ResultManager:
     def __init__(self, data_params, best_params, log, performance, predictions, forecasts):
         country = data_params['country']
         variables = data_params['vars'][1]
-        log = pd.DataFrame(log)
+        log = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in log.items()]))
         best_params = pd.DataFrame([best_params])
         self.dir = get_name_from_data_params(data_params)
 
@@ -82,10 +82,10 @@ class Result(object):
         string += str(self.params) + '\n'
         string += '------------------------------------------------------------------------------\n'
         string += str(self.performance) + '\n'
-        string += '------------------------------------------------------------------------------\n'
-        string += str(self.predictions) + '\n'
-        string += '------------------------------------------------------------------------------\n'
-        string += str(self.forecasts) + '\n'
+        # string += '------------------------------------------------------------------------------\n'
+        # string += str(self.predictions) + '\n'
+        # string += '------------------------------------------------------------------------------\n'
+        # string += str(self.forecasts) + '\n'
         string += '------------------------------------------------------------------------------\n\n'
 
         return string

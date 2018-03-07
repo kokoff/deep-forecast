@@ -23,7 +23,11 @@ class Logger:
 
     def init_log(self, params):
         for key in params:
-            self._log[key] = []
+            if isinstance(params[key], list):
+                for i, val in enumerate(params[key]):
+                    self._log[key + str(i)] = []
+            else:
+                self._log[key] = []
         self._log.update({'train': [], 'val': []})
         self.log_initialised = True
 
@@ -36,7 +40,13 @@ class Logger:
         self._log['train'].append(train)
 
         for param, value in params.iteritems():
-            self._log[param].append(value)
+            if isinstance(value, list):
+                for i, val in enumerate(value):
+                    if param + str(i) not in self._log:
+                        self._log[param + str(i)] = []
+                    self._log[param + str(i)].append(val)
+            else:
+                self._log[param].append(value)
 
         if val < self.best_results['val']:
             self.best_params = params
@@ -62,7 +72,7 @@ class Runner:
         self.validator.set_params(**params)
         val, train = self.validator.validate(5, 2)
 
-        print 'val', val, 'train', train
+        print '\tval', val, 'train', train
 
         self.logger.log(params, val, train)
 
