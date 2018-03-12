@@ -77,81 +77,50 @@ class ForecastModel(Model):
 
         x, y = self._split_data(x, y)
 
-        if not isinstance(self.input, list) and not isinstance(self.output, list):
+        if isinstance(self.input, list):
+            x_lags = int(self.input[0].shape[1])
+            x_vars = len(self.input)
+            x_matrix = np.array([i.as_matrix() for i in x])
+        else:
             x_lags = int(self.input.shape[1])
             x_vars = 1
-            y_lags = int(self.output.shape[1])
-            y_vars = 1
-            data_len = len(x)
-            x_matrix = x.as_matrix()
+            x_matrix = np.reshape(x.as_matrix(), (x_vars, len(x), x_lags))
 
-            assert (y_lags == 1)
-
-            y_matrix = np.zeros((data_len, y_lags))
-            input = x_matrix[0].reshape(1, x_lags)
-
-            for i in range(data_len):
-                output = super(ForecastModel, self).predict(input, batch_size, verbose, steps)
-                # output = x_matrix[i + 1][0:1].reshape(1, y_lags)
-                y_matrix[i] = output
-                input = np.concatenate((output, input[:, :-y_lags]), axis=1)
-
-            return np.array(y_matrix)
-
-        elif isinstance(self.input, list) and not isinstance(self.output, list):
-            x_lags = int(self.input[0].shape[1])
-            x_vars = len(self.input)
-            y_lags = int(self.output.shape[1])
-            y_vars = 1
-            data_len = len(x[0])
-            x_matrices = [i.as_matrix() for i in x]
-
-            y_matrix = np.zeros((data_len, y_lags))
-            input = [i[0].reshape(1, x_lags) for i in x_matrices]
-            valid_indexes = [x_labels.index(i) for i in y_labels if i in x_labels]
-
-            for i in range(data_len):
-                new_input = [j[i].reshape(1, x_lags) for j in x_matrices]
-                for index, var in enumerate(input):
-                    if index in valid_indexes and i > 0:
-                        new_input[index] = np.concatenate((output, var[:, :-y_lags]), axis=1)
-                input = new_input
-
-                output = super(ForecastModel, self).predict(input, batch_size, verbose, steps)
-                # output = x_matrix[i + 1][0:1].reshape(1, y_lags)
-                y_matrix[i] = output
-
-            return np.array(y_matrix)
-
-        elif isinstance(self.input, list) and isinstance(self.output, list):
-            x_lags = int(self.input[0].shape[1])
-            x_vars = len(self.input)
+        if isinstance(self.output, list):
             y_lags = int(self.output[0].shape[1])
             y_vars = len(self.output)
+            y_true_matrix = np.array([i.as_matrix() for i in y])
+        else:
+            y_lags = int(self.output.shape[1])
+            y_vars = 1
+            y_true_matrix = np.reshape(y.as_matrix(), (y_vars, len(y), y_lags))
 
-            data_len = len(x[0])
-            x_matrices = [i.as_matrix() for i in x]
+        data_len = x_matrix.shape[1]
+        y_matrix = np.zeros((y_vars, data_len, y_lags))
 
-            y_matrix = [np.zeros((data_len, y_lags)) for i in range(y_vars)]
-            input = [i[0].reshape(1, x_lags) for i in x_matrices]
-            valid_indexes = [x_labels.index(i) for i in y_labels if i in x_labels]
+        input = x_matrix[:, 0:1]
+        var_indexes = [x_labels.index(i) for i in y_labels if i in x_labels]
 
-            for i in range(data_len):
-                new_input = [j[i].reshape(1, x_lags) for j in x_matrices]
-                for index, var in enumerate(input):
-                    if index in valid_indexes and i > 0:
-                        new_input[index] = np.concatenate((output[index], var[:, :-y_lags]), axis=1)
+        for i in range(data_len):
+            if i > 0:
+                new_input = x_matrix[0:x_vars, i:i + 1].copy()
+                old = input[var_indexes, :, :-y_lags]
+                new_input[var_indexes] = np.concatenate([output, old], axis=-1)
                 input = new_input
 
-                output = super(ForecastModel, self).predict(input, batch_size, verbose, steps)
-                # output = x_matrix[i + 1][0:1].reshape(1, y_lags)
-                for j in range(y_vars):
-                    y_matrix[j][i] = output[j]
+            output = super(ForecastModel, self).predict(list(input), batch_size, verbose, steps)
+            output = np.reshape(output, (y_vars, 1, y_lags))
 
-            return np.squeeze(y_matrix)
+            # output = y_true_matrix[:, i:i + 1]
+            y_matrix[:, i:i + 1] = output
 
-        else:
-            raise ValueError('Output cannot be bigger than input')
+            # print list(input)
+            # print list(x_matrix[:, i:i + 1])
+
+        y_matrix = np.squeeze(y_matrix)
+        if y_vars == 1:
+            y_matrix = np.expand_dims(y_matrix, -1)
+        return y_matrix
 
     def evaluate_forecast(self, x, y, batch_size=None, verbose=0, steps=None):
         if not self.built:
@@ -178,3 +147,113 @@ class ForecastModel(Model):
             losses[0] = sum(losses)
 
         return losses
+
+
+class RecurrentModel(ForecastModel):
+    def fit(self, x=None, y=None, batch_size=None, epochs=1, verbose=0, callbacks=None, validation_split=0.,
+            validation_data=None, shuffle=False, class_weight=None, sample_weight=None, initial_epoch=0,
+            steps_per_epoch=None, validation_steps=None, **kwargs):
+        for i in range(epochs):
+            super(RecurrentModel, self).fit(x=x, y=y, batch_size=batch_size, epochs=1, verbose=verbose,
+                                            callbacks=callbacks, validation_split=validation_split,
+                                            validation_data=validation_data, shuffle=shuffle, class_weight=class_weight,
+                                            sample_weight=sample_weight, initial_epoch=initial_epoch,
+                                            steps_per_epoch=steps_per_epoch, validation_steps=validation_steps,
+                                            **kwargs)
+            self.reset_states()
+
+
+def main():
+    from src.utils import data_utils
+    from keras import layers
+
+    x, y = data_utils.get_data_in_shape('EA', (['CPI'], ['CPI']), 1)
+    x_train, x_val, x_test, = data_utils.train_val_test_split(x, 12, 12)
+    y_train, y_val, y_test = data_utils.train_val_test_split(y, 12, 12)
+
+    input = Input(batch_shape=(1, 1,))
+    layer = layers.Reshape((1, 1))(input)
+    layer = layers.LSTM(1, input_shape=(), stateful=True)(layer)
+    layer = layers.Dense(1)(layer)
+
+    model = RecurrentModel(inputs=input, outputs=layer)
+    model.compile(optimizer='adam', loss='mse')
+
+    model.fit(x_train, y_train, batch_size=2)
+    print model.predict(x_val, batch_size=2)
+    print model.forecast(x_val, y_val)
+
+
+def one_one():
+    from src.utils import data_utils
+    from keras import layers
+
+    x, y = data_utils.get_data_in_shape('EA', (['CPI'], ['CPI']), 1)
+    x_train, x_val, x_test, = data_utils.train_val_test_split(x, 12, 12)
+    y_train, y_val, y_test = data_utils.train_val_test_split(y, 12, 12)
+
+    input = Input(shape=(1,))
+    layer = Dense(1)(input)
+
+    model = ForecastModel(inputs=input, outputs=layer)
+    model.compile(optimizer='adam', loss='mse')
+
+    print model.forecast(x_val, y_val)
+
+
+def many_one():
+    from src.utils import data_utils
+    from keras import layers
+
+    x, y = data_utils.get_data_in_shape('EA', (['CPI', 'GDP'], ['CPI']), 2)
+    x_train, x_val, x_test, = data_utils.train_val_test_split(x, 12, 12)
+    y_train, y_val, y_test = data_utils.train_val_test_split(y, 12, 12)
+
+    input1 = Input(shape=(2,))
+    input2 = Input(shape=(2,))
+
+    layer = layers.concatenate([input1, input2])
+    layer = Dense(1)(layer)
+
+    model = ForecastModel(inputs=[input1, input2], outputs=layer)
+    model.compile(optimizer='adam', loss='mse')
+
+    print model.forecast(x_val, y_val)
+
+
+def many_many():
+    from src.utils import data_utils
+    from keras import layers
+
+    x, y = data_utils.get_data_in_shape('EA', (['CPI', 'GDP'], ['CPI', 'GDP']), 1)
+    x_train, x_val, x_test, = data_utils.train_val_test_split(x, 12, 12)
+    y_train, y_val, y_test = data_utils.train_val_test_split(y, 12, 12)
+
+    input1 = Input(shape=(1,))
+    input2 = Input(shape=(1,))
+
+    layer = layers.concatenate([input1, input2])
+    layer1 = Dense(1)(layer)
+    layer2 = Dense(1)(layer)
+
+    model = ForecastModel(inputs=[input1, input2], outputs=[layer1, layer2])
+    model.compile(optimizer='adam', loss='mse')
+
+    print model.forecast(x_val, y_val)
+
+
+def main1():
+    pass
+
+    # from src.utils import data_utils
+    # data = data_utils.get_ea_data()[['CPI']]
+    # print data
+    # x, y = data_utils.get_xy_data(data, lags=2, lags2=2)
+    # print pd.concat([x, y], axis=1)
+
+
+if __name__ == '__main__':
+    # one_one()
+    # many_one()
+    # many_many()
+    main()
