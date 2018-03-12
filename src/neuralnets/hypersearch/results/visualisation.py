@@ -1,6 +1,7 @@
 import os
 
 import matplotlib
+
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 
@@ -182,15 +183,57 @@ def parallel_coords1(df):
     # plt.show()
 
 
+def plot_log(dir_path):
+    log_file = os.path.join(dir_path, 'log.csv')
+    base_dir = os.path.dirname(log_file)
+    fig_path = os.path.join(base_dir, 'parameter_figures')
+    if not os.path.exists(fig_path):
+        os.mkdir(fig_path)
+
+    plotter = ResultsPlotter(log_file, fig_path)
+    plotter.plot_all()
+
+
+def plot_performance(dir_path):
+    pred_file = os.path.join(dir_path, 'prediction.csv')
+    fcast_file = os.path.join(dir_path, 'forecast.csv')
+    out_dir = os.path.join(dir_path, 'performance_figures')
+    pred_fig = os.path.join(out_dir, 'prediction.pdf')
+    fcast_fig = os.path.join(out_dir, 'forecast.pdf')
+    country, variable = os.path.basename(dir_path).split('_')
+
+    if not os.path.exists(out_dir):
+        os.mkdir(out_dir)
+
+    predictions = pd.read_csv(pred_file)
+    forecasts = pd.read_csv(fcast_file)
+
+    plot_predictions(predictions, country, variable, pred_fig)
+    plot_predictions(forecasts, country, variable, fcast_fig)
+
+
+def produce_plots(exp_dir, performances=True, parameters=False):
+    for base_data_dir in os.listdir(exp_dir):
+        data_dir = os.path.join(exp_dir, base_data_dir)
+        for base_var_dir in os.listdir(data_dir):
+            var_dir = os.path.join(data_dir, base_var_dir)
+            if performances:
+                plot_performance(var_dir)
+            if parameters:
+                plot_log(var_dir)
+
+
 def main():
     # print sns.hls_palette(10)
+    #
+    # log = pd.read_csv('/home/skokov/project/src/neuralnets/models/mlp_experiments/EA_[one]_[one]4/EA_CPI/log.csv')
+    #
+    # pltr = ResultsPlotter('/home/skokov/mlp_experiments/EA_[one]_[one]_8/EA_LR10/log.csv',
+    #                       '/home/skokov/mlp_experiments/EA_[one]_[one]_8/EA_LR10/parameter_figures',
+    #                       show=True)
+    # pltr.plot_all()
 
-    log = pd.read_csv('/home/skokov/project/src/neuralnets/models/mlp_experiments/EA_[one]_[one]4/EA_CPI/log.csv')
-
-    pltr = ResultsPlotter('/home/skokov/mlp_experiments/EA_[one]_[one]_8/EA_LR10/log.csv',
-                          '/home/skokov/mlp_experiments/EA_[one]_[one]_8/EA_LR10/parameter_figures',
-                          show=True)
-    pltr.plot_all()
+    produce_plots('/home/skokov/project/src/neuralnets/models/mlp_experiments', parameters=True)
 
 
 if __name__ == '__main__':

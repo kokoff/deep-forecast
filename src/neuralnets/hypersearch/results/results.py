@@ -97,14 +97,14 @@ class Result(object):
         make_dir(var_directory)
 
         self.save_log(var_directory)
-        self.save_log_plots(var_directory)
+        # self.save_log_plots(var_directory)
 
         if self.is_performance_better(var_directory):
             self.save_params(var_directory)
             self.save_performance(var_directory)
             self.save_prediction(var_directory)
             self.save_forecasts(var_directory)
-            self.save_performance_plots(var_directory)
+            # self.save_performance_plots(var_directory)
 
     def is_performance_better(self, directory):
         if os.path.exists(os.path.join(directory, 'performance.csv')):
@@ -114,12 +114,12 @@ class Result(object):
             return True
 
     def save_prediction(self, directory):
-        predictions_file = os.path.join(directory, 'predictions.csv')
+        predictions_file = os.path.join(directory, 'prediction.csv')
         self.predictions.to_csv(predictions_file)
 
     def save_forecasts(self, directory):
-        predictions_file = os.path.join(directory, 'predictions.csv')
-        self.predictions.to_csv(predictions_file)
+        predictions_file = os.path.join(directory, 'forecast.csv')
+        self.forecasts.to_csv(predictions_file)
 
     def save_performance(self, directory):
         params_path = os.path.join(directory, 'performance.csv')

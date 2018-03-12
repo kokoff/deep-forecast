@@ -1,4 +1,5 @@
 import warnings
+
 warnings.filterwarnings("ignore")
 
 from mlp import mlp
@@ -8,8 +9,7 @@ from src.utils.data_utils import VARIABLES, COUNTRIES
 import argparse
 
 from src.neuralnets.hypersearch import HyperSearch, var, choice
-
-
+from src.neuralnets.hypersearch.results.visualisation import produce_plots
 
 one_one = [([i], [i]) for i in VARIABLES]
 all_one = [(VARIABLES, [i]) for i in VARIABLES]
@@ -21,20 +21,21 @@ data_vars = {'one_one': one_one,
 
 def main(args):
     data_params = OrderedDict()
-    data_params['country'] = [args['country']]
-    data_params['vars'] = data_vars[args['vars']]
+    data_params['country'] = ['EA']
+    data_params['vars'] = [(['CPI'], ['CPI'])]
     data_params['lags'] = [args['lags']]
 
     params = OrderedDict()
-    params['neurons'] = choice([var(1, 8, int)],
-                               [var(1, 8, int), var(1, 8, int)])
-    params['epochs'] = var(50, 300, int)
-    params['batch_size'] = var(5, 20, int)
+    params['neurons'] = choice([var(1, 15, int)],
+                               [var(1, 15, int), var(1, 15, int)])
+    params['epochs'] = var(50, 1500, int)
+    params['batch_size'] = 2
     # params['input_size'] = var(1, 16, int)
 
-    searcher = HyperSearch(solver='pso', num_particles=7, num_generations=7, output_dir='mlp_experiments', cv_splits=3)
+    searcher = HyperSearch(solver='pso', num_particles=5, num_generations=5, output_dir='mlp_experiments', cv_splits=4, eval_runs=2)
 
     searcher.hyper_data_search(mlp, data_params, params)
+    produce_plots('mlp_experiments')
 
 
 if __name__ == '__main__':
@@ -45,5 +46,5 @@ if __name__ == '__main__':
     parser.add_argument('lags', type=int)
     args = parser.parse_args()
     args = vars(args)
-    # args = {'country': 'EA', 'vars': 'many_many', 'lags': 4}
+    args = {'country': 'EA', 'vars': 'one_one', 'lags': 4}
     main(args)
