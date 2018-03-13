@@ -164,4 +164,5 @@ class HyperSearch:
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
         result.save(self.output_dir)
+        print result
         return result

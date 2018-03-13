@@ -13,3 +13,16 @@ IR - Interest Rate (Immediate rates (< 24 hrs) Federal funds rate Percentage)
 Short-term interest rates are the rates at which short-term borrowings are effected between financial institutions or the rate at which short-term government paper is issued or traded in the market. Short-term interest rates are generally averages of daily rates, measured as a percentage. Short-term interest rates are based on three-month money market rates where available. Typical standardised names are "money market rate" and "treasury bill rate".
 
 LR10 - Long-term government bond yields ()
+
+
+
+CPI
+Growth rate same period previous year
+Percentage
+
+GDP
+Growth rate same period previous year, s.a.
+Percentage
+
+
+
