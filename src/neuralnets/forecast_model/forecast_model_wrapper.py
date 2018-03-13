@@ -59,6 +59,7 @@ class ForecastRegressor(BaseWrapper):
             raise ValueError('Data has not been set!')
 
     def set_params(self, **params):
+        K.clear_session()
         self.check_data_params()
         # data_params = self.data_params
         # data_params['lags'] = params['input_size']
@@ -168,7 +169,7 @@ class ForecastRegressor(BaseWrapper):
         res = map(self._validate, split)
         res = np.mean(list(res), axis=0)
 
-        K.clear_session()
+        # K.clear_session()
 
         return res[0][0], res[1][0]
 
@@ -201,13 +202,17 @@ class ForecastRegressor(BaseWrapper):
         result = OrderedDict()
 
         for pred_key, fcast_key, set in zip(pred_keys, fcast_keys, sets):
-            pred_res = list(map(self.evaluate_prediction, [set] * num_runs, [True] * num_runs))
+            pred_fcast = list(map(self._evaluate_losses, [set] * num_runs))
+            pred_res = [i[0] for i in pred_fcast]
+            fcast_res = [i[1] for i in pred_fcast]
+
+            # pred_res = list(map(self.evaluate_prediction, [set] * num_runs, [True] * num_runs))
             result[pred_key] = np.mean(np.squeeze(pred_res), axis=0)
 
-            fcast_res = list(map(self.evaluate_forecast, [set] * num_runs, [True] * num_runs))
+            # fcast_res = list(map(self.evaluate_forecast, [set] * num_runs, [True] * num_runs))
             result[fcast_key] = np.mean(np.squeeze(fcast_res), axis=0)
 
-            K.clear_session()
+            # K.clear_session()
 
         if self.is_multioutput:
             result = pd.DataFrame(result, index=['total'] + variables)
@@ -215,6 +220,12 @@ class ForecastRegressor(BaseWrapper):
             result = pd.DataFrame(result, index=variables)
 
         return result
+
+    def _evaluate_losses(self, fold):
+        self.fit()
+        pred = self.evaluate_prediction(fold)
+        fcast = self.evaluate_forecast(fold)
+        return (pred, fcast)
 
     def _get_estimates(self, forecast=False):
 
@@ -230,8 +241,6 @@ class ForecastRegressor(BaseWrapper):
         sets = ['train', 'val', 'test']
         data_series = [self.x_train, self.x_val, self.x_test]
         predictions = []
-
-        self.fit()
 
         # true y
         temp = pd.DataFrame(y.values, index=y.index, columns=['true values'] * num_vars)
@@ -270,7 +279,7 @@ def model(neurons):
 
     layer = layers.Dense(neurons, activation='relu')(layer)
 
-    outputs = create_output_layers(1, 1, layer)
+    outputs = create_output_layers(1, layer)
 
     model = ForecastModel(inputs=inputs, outputs=outputs)
     model.compile('adam', losses.mse)
@@ -286,20 +295,20 @@ def main():
 
     data_params = OrderedDict()
     data_params['country'] = 'EA'
-    data_params['vars'] = (['CPI'], ['CPI'])
+    data_params['vars'] = (['CPI'], ['GDP'], ['CPI'], ['GDP'])
     data_params['lags'] = 6
 
     wrapper = ForecastRegressor(model, data_params, params)
     # print wrapper.evaluate_prediction('train')
     # print wrapper.validate(5, 2)
-    # print wrapper.evaluate_losses(2)
-    print wrapper.predict('val')
-    pred = wrapper.get_predictions_and_forecasts()
-    print pred
-    pred[0][0].plot()
-    plt.show()
-    pred[1][0].plot()
-    plt.show()
+    print wrapper.evaluate_losses(2)
+    # print wrapper.predict('val')
+    # pred = wrapper.get_predictions_and_forecasts()
+    # print pred
+    # pred[0][0].plot()
+    # plt.show()
+    # pred[1][0].plot()
+    # plt.show()
 
 
 if __name__ == '__main__':
