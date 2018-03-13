@@ -12,6 +12,8 @@ from src.neuralnets.forecast_model.forecast_models import ForecastModel
 from src.utils import data_utils
 from preprocessing import DifferenceTransformer
 
+def clear_session(dumy):
+    K.clear_session()
 
 class ForecastRegressor(BaseWrapper):
     def __init__(self, build_fn, data_params=None, params=None):
@@ -60,13 +62,14 @@ class ForecastRegressor(BaseWrapper):
 
     def set_params(self, **params):
         K.clear_session()
+        map(clear_session, [10]*10)
         self.check_data_params()
-        # data_params = self.data_params
-        # data_params['lags'] = params['input_size']
-        # self.set_data_params(**data_params)
+        data_params = self.data_params
+        data_params['lags'] = params['input_size']
+        self.set_data_params(**data_params)
         params['num_inputs'] = len(self.data_params['vars'][0])
         params['num_outputs'] = len(self.data_params['vars'][1])
-        params['input_size'] = self.data_params['lags']
+        # params['input_size'] = self.data_params['lags']
 
         super(ForecastRegressor, self).set_params(**params)
 
@@ -275,11 +278,11 @@ class ForecastRegressor(BaseWrapper):
 def model(neurons):
     from keras import layers, losses
     from forecast_models import create_input_layers, create_output_layers
-    inputs, layer = create_input_layers(1, 6)
+    inputs, layer = create_input_layers(2, 6)
 
     layer = layers.Dense(neurons, activation='relu')(layer)
 
-    outputs = create_output_layers(1, layer)
+    outputs = create_output_layers(2, layer)
 
     model = ForecastModel(inputs=inputs, outputs=outputs)
     model.compile('adam', losses.mse)
@@ -295,7 +298,7 @@ def main():
 
     data_params = OrderedDict()
     data_params['country'] = 'EA'
-    data_params['vars'] = (['CPI'], ['GDP'], ['CPI'], ['GDP'])
+    data_params['vars'] = (['CPI', 'GDP'], ['CPI', 'GDP'])
     data_params['lags'] = 6
 
     wrapper = ForecastRegressor(model, data_params, params)

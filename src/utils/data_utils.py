@@ -104,8 +104,7 @@ def remove_na(data):
     return data.dropna(axis=0, how='any', inplace=True)
 
 
-def get_xy_data(data, lags=1):
-    lags2 = 1
+def get_xy_data(data, lags=1, lags2=1):
     # Transform X with approapriate lag values
     index = [(i, 'x' + str(j)) for i in data.columns for j in range(lags)]
     index = pd.MultiIndex.from_tuples(index, names=['variable', 'lag'])
@@ -142,7 +141,7 @@ def get_data_formatted(country, var_dict, x_lag, y_lag, val_size, test_size):
     return x_train, y_train, x_val, y_val, x_test, y_test
 
 
-def get_data_in_shape(country, vars, lags):
+def get_data_in_shape(country, vars, lags=1):
     '''
     Formats model input and target data and returns a test and training sets
     :param country: EA or US

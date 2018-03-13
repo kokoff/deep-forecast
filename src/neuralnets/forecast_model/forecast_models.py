@@ -150,7 +150,7 @@ class ForecastModel(Model):
 
 
 class RecurrentModel(ForecastModel):
-    def fit(self, x=None, y=None, batch_size=None, epochs=1, verbose=0, callbacks=None, validation_split=0.,
+    def fit(self, x=None, y=None, batch_size=1, epochs=1, verbose=0, callbacks=None, validation_split=0.,
             validation_data=None, shuffle=False, class_weight=None, sample_weight=None, initial_epoch=0,
             steps_per_epoch=None, validation_steps=None, **kwargs):
         for i in range(epochs):
@@ -162,10 +162,17 @@ class RecurrentModel(ForecastModel):
                                             **kwargs)
             self.reset_states()
 
+    def predict(self, x, batch_size=1, verbose=0, steps=None):
+        return super(RecurrentModel, self).predict(x=x, batch_size=batch_size, verbose=verbose, steps=steps)
+
+    def forecast(self, x, y, batch_size=1, verbose=0, steps=None):
+        return super(RecurrentModel, self).forecast(x=x, y=y, batch_size=batch_size, verbose=verbose, steps=steps)
+
 
 def main():
     from src.utils import data_utils
     from keras import layers
+    from matplotlib import pyplot as plt
 
     x, y = data_utils.get_data_in_shape('EA', (['CPI'], ['CPI']), 1)
     x_train, x_val, x_test, = data_utils.train_val_test_split(x, 12, 12)
@@ -173,15 +180,29 @@ def main():
 
     input = Input(batch_shape=(1, 1,))
     layer = layers.Reshape((1, 1))(input)
-    layer = layers.LSTM(1, input_shape=(), stateful=True)(layer)
-    layer = layers.Dense(1)(layer)
+    layer = layers.LSTM(10, stateful=True)(layer)
+    # layer = layers.LSTM(10, return_sequences=False, stateful=True)(layer)
+    layer = layers.Dense(1, activation='linear')(layer)
 
     model = RecurrentModel(inputs=input, outputs=layer)
     model.compile(optimizer='adam', loss='mse')
 
-    model.fit(x_train, y_train, batch_size=2)
-    print model.predict(x_val, batch_size=2)
-    print model.forecast(x_val, y_val)
+    model.fit(x_train, y_train, epochs=200, batch_size=1)
+    pred = model.predict(x_val, batch_size=1)
+    fcast = model.forecast(x_val, y_val, batch_size=1)
+
+    from keras.utils.vis_utils import plot_model
+
+    plot_model(model)
+    model.summary()
+
+    plt.plot(y_val.values)
+    plt.plot(pred)
+    plt.show()
+
+    plt.plot(y_val.values)
+    plt.plot(fcast)
+    plt.show()
 
 
 def one_one():
@@ -225,12 +246,12 @@ def many_many():
     from src.utils import data_utils
     from keras import layers
 
-    x, y = data_utils.get_data_in_shape('EA', (['CPI', 'GDP'], ['CPI', 'GDP']), 1)
+    x, y = data_utils.get_data_in_shape('EA', (['CPI', 'GDP'], ['CPI', 'GDP']), 6)
     x_train, x_val, x_test, = data_utils.train_val_test_split(x, 12, 12)
     y_train, y_val, y_test = data_utils.train_val_test_split(y, 12, 12)
 
-    input1 = Input(shape=(1,))
-    input2 = Input(shape=(1,))
+    input1 = Input(shape=(6,))
+    input2 = Input(shape=(6,))
 
     layer = layers.concatenate([input1, input2])
     layer1 = Dense(1)(layer)
@@ -255,5 +276,5 @@ def main1():
 if __name__ == '__main__':
     # one_one()
     # many_one()
-    # many_many()
-    main()
+    many_many()
+    # main()

@@ -10,8 +10,8 @@ def get_name_from_data_params(data_params):
     name += 'many' if len(data_params['vars'][1]) > 1 else 'one'
     name += ']_['
     name += 'many' if len(data_params['vars'][1]) > 1 else 'one'
-    name += ']_'
-    name += str(data_params['lags'])
+    name += ']'
+    # name += str(data_params['lags'])
     return name
 
 
