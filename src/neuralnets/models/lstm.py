@@ -16,8 +16,9 @@ def lstm(num_inputs, num_outputs, input_size, neurons):
     input = Input(batch_shape=(1, 1,))
 
     layer = Reshape((1, 1))(input)
-    for i in neurons:
-        layer = LSTM(i, input_shape=(), stateful=True)(layer)
+    for i, n in enumerate(neurons):
+        seq = i != (len(neurons)-1)
+        layer = LSTM(n, stateful=True, return_sequences=seq)(layer)
     layer = Dense(1, activation='linear')(layer)
 
     model = RecurrentModel(inputs=input, outputs=layer)

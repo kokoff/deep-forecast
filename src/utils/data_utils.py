@@ -141,7 +141,7 @@ def get_data_formatted(country, var_dict, x_lag, y_lag, val_size, test_size):
     return x_train, y_train, x_val, y_val, x_test, y_test
 
 
-def get_data_in_shape(country, vars, lags=1):
+def get_data_in_shape(country, vars, lags=1, lags2=1):
     '''
     Formats model input and target data and returns a test and training sets
     :param country: EA or US
@@ -152,7 +152,7 @@ def get_data_in_shape(country, vars, lags=1):
     '''
     data = get_data_dict(drop_na=True)
     data = data[country]
-    X, Y = get_xy_data(data, lags)
+    X, Y = get_xy_data(data, lags, lags2=lags2)
 
     x = X.reindex(labels=vars[0], axis='columns', level=0, copy=True)
     y = Y.reindex(labels=vars[1], axis='columns', level=0, copy=True)

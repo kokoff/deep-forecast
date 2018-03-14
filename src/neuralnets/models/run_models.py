@@ -27,6 +27,8 @@ def main(args):
 
     params['batch_size'] = 1
     params['input_size'] = 1
+    # params['neurons'] = choice([3, 10])
+    # params['epochs'] = 35
 
     searcher = HyperSearch(solver='pso', num_particles=5, num_generations=5, output_dir='mlp_experiments', cv_splits=4,
                            eval_runs=2)

@@ -23,13 +23,13 @@ def create_input_layers(num_inputs, input_size):
         return inputs, layer
 
 
-def create_output_layers(num_outputs, prev_layers):
+def create_output_layers(num_outputs, output_size, prev_layers):
     if num_outputs == 1:
-        return Dense(1, activation=linear)(prev_layers)
+        return Dense(output_size, activation=linear)(prev_layers)
     else:
         outputs = []
         for i in range(num_outputs):
-            outputs.append(Dense(1, activation=linear)(prev_layers))
+            outputs.append(Dense(output_size, activation=linear)(prev_layers))
         return outputs
 
 
@@ -111,7 +111,7 @@ class ForecastModel(Model):
             output = super(ForecastModel, self).predict(list(input), batch_size, verbose, steps)
             output = np.reshape(output, (y_vars, 1, y_lags))
 
-            # output = y_true_matrix[:, i:i + 1]
+            output = y_true_matrix[:, i:i + 1]
             y_matrix[:, i:i + 1] = output
 
             # print list(input)
@@ -222,6 +222,30 @@ def one_one():
     print model.forecast(x_val, y_val)
 
 
+def m_m_m():
+    from src.utils import data_utils
+    from keras import layers
+
+    x, y = data_utils.get_data_in_shape('EA', (['CPI', 'GDP'], ['CPI', 'GDP']), 2, 2)
+    x_train, x_val, x_test, = data_utils.train_val_test_split(x, 12, 12)
+    y_train, y_val, y_test = data_utils.train_val_test_split(y, 12, 12)
+
+    input1 = Input(shape=(2,))
+    input2 = Input(shape=(2,))
+    conc = layers.concatenate([input1, input2])
+
+    layer = Dense(2)(conc)
+    layer1 = Dense(2)(conc)
+
+    model = ForecastModel(inputs=[input1, input2], outputs=[layer, layer1])
+    model.compile(optimizer='adam', loss='mse')
+
+    print y_val
+    fcast = model.forecast(x_val, y_val)
+    print fcast
+    print pd.DataFrame(list(fcast), index=y_val.index, columns=y_val.columns)
+
+
 def many_one():
     from src.utils import data_utils
     from keras import layers
@@ -276,5 +300,6 @@ def main1():
 if __name__ == '__main__':
     # one_one()
     # many_one()
-    many_many()
+    # many_many()
     # main()
+    m_m_m()

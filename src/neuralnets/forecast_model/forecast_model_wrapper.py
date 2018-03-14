@@ -300,6 +300,7 @@ def main():
     data_params['country'] = 'EA'
     data_params['vars'] = (['CPI', 'GDP'], ['CPI', 'GDP'])
     data_params['lags'] = 6
+    data_params['lags2'] = 2
 
     wrapper = ForecastRegressor(model, data_params, params)
     # print wrapper.evaluate_prediction('train')
