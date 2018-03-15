@@ -61,6 +61,11 @@ class ForecastModel(Model):
             self.y_lags = int(self.output.shape[1])
             self.y_vars = 1
 
+        if self.y_vars > self.x_vars:
+            raise ValueError('Input variables need to be more than output variables.')
+        if self.y_lags > self.x_lags:
+            raise ValueError('Input lags need to be more than output lags.')
+
     def fit(self, x=None, y=None, batch_size=None, epochs=1, verbose=0, callbacks=None, validation_split=0.,
             validation_data=None, shuffle=False, class_weight=None, sample_weight=None, initial_epoch=0,
             steps_per_epoch=None, validation_steps=None, **kwargs):
@@ -94,9 +99,6 @@ class ForecastModel(Model):
         return super(ForecastModel, self).evaluate(x, y, batch_size, verbose, sample_weight, steps)
 
     def forecast(self, x, y, batch_size=None, verbose=0, steps=None):
-        x_labels = x.columns.levels[0].tolist()
-        y_labels = y.columns.levels[0].tolist()
-
         x = split_data(x, self.x_vars)
         y = split_data(y, self.y_vars)
 
@@ -107,7 +109,12 @@ class ForecastModel(Model):
         y_matrix = np.zeros((self.y_vars, data_len, self.y_lags))
 
         input = x_matrix[:, 0:1]
-        var_indexes = [x_labels.index(i) for i in y_labels if i in x_labels]
+
+        var_indexes = []
+        for i in range(self.y_vars):
+            for j in range(self.x_vars):
+                if np.all(x_matrix[j, self.y_lags:, 0] == y_true_matrix[i, :-self.y_lags, 0]):
+                    var_indexes.append(j)
 
         for i in range(data_len):
             if i > 0:
@@ -258,17 +265,26 @@ def many_one():
     from src.utils import data_utils
     from keras import layers
 
-    x, y = data_utils.get_data_in_shape('EA', (['CPI', 'GDP'], ['CPI']), 2, 2)
+    data_params1 = {}
+    data_params1['country'] = 'EA'
+    data_params1['vars'] = (['CPI', 'GDP', 'UR'], ['CPI', 'GDP', 'UR'])
+    data_params1['lags'] = 5
+    data_params1['lags2'] = 2
+
+    xlags = data_params1['lags']
+    ylags = data_params1['lags2']
+    xvars = len(data_params1['vars'][0])
+    yvars = len(data_params1['vars'][1])
+
+    x, y = data_utils.get_data_in_shape(**data_params1)
     x_train, x_val, x_test, = data_utils.train_val_test_split(x, 12, 12)
     y_train, y_val, y_test = data_utils.train_val_test_split(y, 12, 12)
 
-    input1 = Input(shape=(2,))
-    input2 = Input(shape=(2,))
+    inputs, layer = create_input_layers(xvars, xlags)
 
-    layer = layers.concatenate([input1, input2])
-    layer = Dense(2)(layer)
+    outputs = create_output_layers(yvars, ylags, layer)
 
-    model = ForecastModel(inputs=[input1, input2], outputs=layer)
+    model = ForecastModel(inputs=inputs, outputs=outputs)
     model.compile(optimizer='adam', loss='mse')
 
     print 'many one'
@@ -311,9 +327,24 @@ def main1():
     # print pd.concat([x, y], axis=1)
 
 
+def valid_indexes(x, y):
+    x_vars = x.shape[1]
+    y_vars = y.shape[1]
+    print x_vars, y_vars
+
+
 if __name__ == '__main__':
-    one_one()
+    # x_lags = 2
+    # y_lags = 2
+    # x, y = data_utils.get_data_in_shape('EA', (['CPI', 'GDP'], ['CPI']), x_lags, y_lags)
+    #
+    # x = split_data(x, 2)
+    # y = split_data(y, 1
+
+    # valid_indexes(x.values, y.values)
+
+    # one_one()
     many_one()
-    many_many()
+    # many_many()
     # main()
     # m_m_m()
