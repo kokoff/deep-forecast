@@ -33,12 +33,9 @@ class ForecastRegressor(BaseWrapper):
 
         self.x = None
         self.y = None
-        self.x_train = None
-        self.x_val = None
-        self.x_test = None
-        self.y_train = None
-        self.y_val = None
-        self.y_test = None
+        self.train = None
+        self.val = None
+        self.test = None
 
         self.transformer = DifferenceTransformer()
 
@@ -56,7 +53,7 @@ class ForecastRegressor(BaseWrapper):
         self.x_lags = data_params['x_lags']
         self.y_lags = data_params['y_lags']
 
-        self.is_multioutput = self.y_vars > 1
+        self.is_multioutput = len(self.y_vars) > 1
         self.is_data_set = True
         self.is_fitted = False
 
@@ -68,8 +65,12 @@ class ForecastRegressor(BaseWrapper):
             self.x, self.y = self.transformer.fit(self.x, self.y)
 
         # split into train/val/test sets
-        self.x_train, self.x_val, self.x_test, = data_utils.train_val_test_split(self.x, 12, 12)
-        self.y_train, self.y_val, self.y_test = data_utils.train_val_test_split(self.y, 12, 12)
+        self.train = np.index_exp[:-24]
+        self.val = np.index_exp[-24:-12]
+        self.test = np.index_exp[-12:]
+
+        # self.x_train, self.x_val, self.x_test, = data_utils.train_val_test_split(self.x, 12, 12)
+        # self.y_train, self.y_val, self.y_test = data_utils.train_val_test_split(self.y, 12, 12)
 
     def get_data_params(self):
         return self.data_params
@@ -99,11 +100,11 @@ class ForecastRegressor(BaseWrapper):
 
     def _get_data_fold(self, fold):
         if fold == 'train':
-            return self.x_train, self.y_train
+            return self.x.iloc[self.train], self.y.iloc[self.train]
         elif fold == 'val':
-            return self.x_val, self.y_val
+            return self.x.iloc[self.val], self.y.iloc[self.val]
         elif fold == 'test':
-            return self.x_test, self.y_test
+            return self.x.iloc[self.test], self.y.iloc[self.test]
         else:
             raise ValueError('Set must be train, val or test')
 
@@ -125,21 +126,21 @@ class ForecastRegressor(BaseWrapper):
         # filter kwargs for predict
         kwargs = self.filter_sk_params(ForecastModel.predict, kwargs)
 
-        # # difference
-        # if self.difference:
-        #     x, y = self.transformer.transform(x, y)
+        # difference
+        if self.difference:
+            x, y = self.transformer.transform(x, y)
 
         # predict
         y_pred = self.model.predict(x, **kwargs)
 
-        # # inverse difference
-        # if self.difference:
-        #     y_pred = self.transformer.inverse_transform(y_pred, y, recursive=False)
+        y_pred = lag_average(y_pred, self.y_lags)
+        y = lag_average(y, self.y_lags)
 
-        # # average output lags if multiple
-        # if self.get_output_lags() > 1:
-        #     y_pred = lag_average(y_pred, self.get_output_lags())
-        #     y_pred = y_pred.T
+        # inverse difference
+        if self.difference:
+            y_pred = self.transformer.inverse_transform(y_pred, y, recursive=False)
+
+
 
         return y_pred
 
@@ -150,49 +151,53 @@ class ForecastRegressor(BaseWrapper):
 
         kwargs = self.filter_sk_params(ForecastModel.forecast, kwargs)
 
-        # if self.difference:
-        #     x, y = self.transformer.transform(x, y)
+        if self.difference:
+            x, y = self.transformer.transform(x, y)
 
         y_fcast = self.model.forecast(x, y, **kwargs)
 
-        # if self.difference:
-        #     y_fcast = self.transformer.inverse_transform(y_fcast, y, recursive=True)
+        y_fcast = lag_average(y_fcast, self.y_lags)
+        y = lag_average(y, self.y_lags)
 
-        # # average output lags if multiple
-        # if self.get_output_lags() > 1:
-        #     y_fcast = lag_average(y_fcast, self.get_output_lags())
-        #     y_fcast = y_fcast.T
+
+        if self.difference:
+            y_fcast = self.transformer.inverse_transform(y_fcast, y, recursive=True)
 
         return y_fcast
 
     def _loss_function(self, y, y_pred):
-        loss = K.eval(self.model.loss_functions[0](y.T, y_pred))
+
+        # reshape inputs for loss fn
+        y = lag_average(y, self.y_lags)
+        y = np.squeeze(y).T
+        y_pred = np.squeeze(y_pred).T
+
+        # eval loss function
+        loss_fn = self.model.loss_functions[0]
+        loss = K.eval(loss_fn(y, y_pred))
+
+        # calculate total loss if multioutput model
         if self.is_multioutput:
-            sm = np.sum(loss)
-            loss = [sm] + list(loss)
+            total_loss = np.sum(loss)
+            loss = [total_loss] + list(loss)
 
         return loss
 
     def _evaluate_prediction(self, x, y, **kwargs):
-        # average lags if multi lag output
-        # if self.get_output_lags() > 1:
-        #     y = lag_average(y, self.get_output_lags())
-
         y_pred = self._predict(x, y, **kwargs)
 
         loss = self._loss_function(y, y_pred)
         return loss
 
     def _evaluate_forecast(self, x, y, **kwargs):
-        # if self.get_output_lags() > 1:
-        #     y = lag_average(y, self.get_output_lags())
 
         y_pred = self._forecast(x, y, **kwargs)
         loss = self._loss_function(y, y_pred)
         return loss
 
     def fit(self, **kwargs):
-        return self._fit(self.x_train, self.y_train, **kwargs)
+        x, y = self._get_data_fold('train')
+        return self._fit(x, y, **kwargs)
 
     def predict(self, fold, **kwargs):
         x, y = self._get_data_fold(fold)
@@ -406,10 +411,11 @@ def main():
     data_params3['y_lags'] = 2
 
     for data_params in [data_params1, data_params2, data_params3]:
-        wrapper = ForecastRegressor(model, data_params, params)
+        wrapper = ForecastRegressor(model, data_params, params, difference=True)
         wrapper.set_params(**params)
         print wrapper.predict('val').shape
         print wrapper.forecast('val').shape
+        print wrapper.evaluate_prediction('val')
 
 
 if __name__ == '__main__':

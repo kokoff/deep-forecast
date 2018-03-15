@@ -48,10 +48,10 @@ class DifferenceTransformer(object):
     def inverse_transform(self, y, y_true, recursive=False):
         if recursive:
             constant = self.y.reindex(y_true.index).iloc[0].values
-            y_trans = np.cumsum(y, axis=-1).T + constant
+            y_trans = np.cumsum(y, axis=1) + constant
             y_trans = y_trans.T
         else:
-            y_trans = y + self.y.reindex(y_true.index).values.T
+            y_trans = y + self.y.reindex(y_true.index)
 
         return y_trans
 
