@@ -268,8 +268,8 @@ def many_one():
     data_params1 = {}
     data_params1['country'] = 'EA'
     data_params1['vars'] = (['CPI', 'GDP', 'UR'], ['CPI', 'GDP', 'UR'])
-    data_params1['lags'] = 5
-    data_params1['lags2'] = 2
+    data_params1['x_lags'] = 5
+    data_params1['y_lags'] = 2
 
     xlags = data_params1['lags']
     ylags = data_params1['lags2']
@@ -277,6 +277,7 @@ def many_one():
     yvars = len(data_params1['vars'][1])
 
     x, y = data_utils.get_data_in_shape(**data_params1)
+
     x_train, x_val, x_test, = data_utils.train_val_test_split(x, 12, 12)
     y_train, y_val, y_test = data_utils.train_val_test_split(y, 12, 12)
 

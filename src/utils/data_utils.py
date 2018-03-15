@@ -104,25 +104,25 @@ def remove_na(data):
     return data.dropna(axis=0, how='any', inplace=True)
 
 
-def get_xy_data(data, lags=1, lags2=1):
+def get_xy_data(data, x_lags=1, y_lags=1):
     # Transform X with approapriate lag values
-    index = [(i, 'x' + str(j)) for i in data.columns for j in range(lags)]
+    index = [(i, 'x' + str(j)) for i in data.columns for j in range(x_lags)]
     index = pd.MultiIndex.from_tuples(index, names=['variable', 'lag'])
     x = pd.DataFrame(np.zeros((len(data), len(index))), index=data.index, columns=index, dtype='float64')
-    for i in range(lags):
-        x[[(j, 'x' + str(i)) for j in data.columns]] = data.shift(i + lags2)
+    for i in range(x_lags):
+        x[[(j, 'x' + str(i)) for j in data.columns]] = data.shift(i + y_lags)
 
-    x = x.tail(-lags - lags2 + 1)
+    x = x.tail(-x_lags - y_lags + 1)
 
     # Transform Y with approapriate lag values
-    index = [(i, 'y' + str(j)) for i in data.columns for j in range(lags2)]
+    index = [(i, 'y' + str(j)) for i in data.columns for j in range(y_lags)]
     index = pd.MultiIndex.from_tuples(index, names=['variable', 'lag'])
     y = pd.DataFrame(np.zeros((len(data), len(index))), index=data.index, columns=index, dtype='float64')
 
-    for i in range(lags2):
+    for i in range(y_lags):
         y[[(j, 'y' + str(i)) for j in data.columns]] = data.shift(i)
 
-    y = y.tail(-lags - lags2 + 1)
+    y = y.tail(-x_lags - y_lags + 1)
 
     return x, y
 
@@ -141,18 +141,18 @@ def get_data_formatted(country, var_dict, x_lag, y_lag, val_size, test_size):
     return x_train, y_train, x_val, y_val, x_test, y_test
 
 
-def get_data_in_shape(country, vars, lags=1, lags2=1):
+def get_data_in_shape(country, vars, x_lags=1, y_lags=1):
     '''
     Formats model input and target data and returns a test and training sets
     :param country: EA or US
     :param vars: ([inputs],[outputs]) tuple of input vars list and output vars list
-    :param lags: (x lags,y lags) tuple of ints
+    :param x_lags: (x lags,y lags) tuple of ints
     :param split: test set size
     :return: x_train, y_train, x_test, y_test
     '''
     data = get_data_dict(drop_na=True)
     data = data[country]
-    X, Y = get_xy_data(data, lags, lags2=lags2)
+    X, Y = get_xy_data(data, x_lags, y_lags=y_lags)
 
     x = X.reindex(labels=vars[0], axis='columns', level=0, copy=True)
     y = Y.reindex(labels=vars[1], axis='columns', level=0, copy=True)
