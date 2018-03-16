@@ -91,6 +91,7 @@ class ForecastModel(Model):
         y = super(ForecastModel, self).predict(x, batch_size, verbose, steps)
 
         y = np.reshape(y, (self.y_vars, -1, self.y_lags))
+        y = np.concatenate(list(y), axis=1)
         return np.array(y)
 
     def evaluate(self, x=None, y=None, batch_size=None, verbose=0, sample_weight=None, steps=None):
@@ -132,6 +133,7 @@ class ForecastModel(Model):
             # print list(input)
             # print list(x_matrix[:, i:i + 1])
 
+        y_matrix = np.concatenate(list(y_matrix), axis=1)
         return y_matrix
 
     def evaluate_forecast(self, x, y, batch_size=None, verbose=0, steps=None):
@@ -271,8 +273,8 @@ def many_one():
     data_params1['x_lags'] = 5
     data_params1['y_lags'] = 2
 
-    xlags = data_params1['lags']
-    ylags = data_params1['lags2']
+    xlags = data_params1['x_lags']
+    ylags = data_params1['y_lags']
     xvars = len(data_params1['vars'][0])
     yvars = len(data_params1['vars'][1])
 
@@ -334,6 +336,51 @@ def valid_indexes(x, y):
     print x_vars, y_vars
 
 
+def lag(data, lags, offset=0):
+    cols = data.shape[-1]
+
+    # check if pandas
+    if isinstance(data, pd.DataFrame):
+        matrix = data.values
+    else:
+        matrix = data
+
+    # repeat each column
+    matrix = np.repeat(matrix, lags, axis=1)
+
+    # lag repeated columns
+    for i in range(matrix.shape[1]):
+        matrix[:, [i]] = np.roll(matrix[:, [i]], (i / cols), axis=0)
+
+    # shift by lagged values
+    matrix = matrix[lags - 1:]
+
+    # shift by offset
+    if offset > 0:
+        matrix = matrix[offset - 1:]
+    elif offset < 0:
+        matrix = matrix[:offset + 1]
+
+    return matrix
+
+
+def lag_xy(x, y, x_lags, y_lags, dataframe=False):
+    x_lagged = lag(x, x_lags, -y_lags)
+    y_lagged = lag(y, y_lags, x_lags)
+
+    if dataframe:
+        columns = pd.MultiIndex.from_product((x.columns, ['x' + str(i) for i in range(x_lags)]))
+        index = x.index[x_lags - 1: -y_lags + 1]
+        x_lagged = pd.DataFrame(x_lagged, index=index, columns=columns)
+
+        columns = pd.MultiIndex.from_product((y.columns, ['y' + str(i) for i in range(y_lags)]))
+        index = y.index[y_lags - 1 + x_lags - 1:]
+        y_lagged = pd.DataFrame(y_lagged, index=index, columns=columns)
+
+    return x_lagged, y_lagged
+
+
+
 if __name__ == '__main__':
     # x_lags = 2
     # y_lags = 2
@@ -344,8 +391,8 @@ if __name__ == '__main__':
 
     # valid_indexes(x.values, y.values)
 
-    # one_one()
+    one_one()
     many_one()
-    # many_many()
+    many_many()
     # main()
     # m_m_m()
