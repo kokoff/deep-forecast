@@ -56,37 +56,81 @@ class DifferenceTransformer(object):
         return y_trans
 
 
+def difference(data):
+    if isinstance(data, pd.DataFrame):
+        return data.diff().dropna()
+    else:
+        return np.diff(data, axis=0)
+
+
+def inverse_difference(data, true_data, recursive=False):
+    # convert to np array
+    if isinstance(data, pd.DataFrame):
+        data_matrix = data.values
+    else:
+        data_matrix = data
+
+    if isinstance(true_data, pd.DataFrame):
+        true_data_matrix = true_data.values
+    else:
+        true_data_matrix = true_data
+
+    # calculate levels
+    if not recursive:
+        new_data = data_matrix + true_data_matrix
+    else:
+        new_data = np.cumsum(data_matrix, axis=0) + true_data_matrix[0]
+
+    # convert back to dataframe
+    if isinstance(data, pd.DataFrame):
+        new_data = pd.DataFrame(new_data, index=data.index, columns=data.columns)
+
+    return new_data
+
+
 def main():
     data_params = OrderedDict()
     data_params['country'] = 'EA'
-    data_params['vars'] = (['CPI', 'GDP'], ['CPI', 'GDP'])
-    data_params['lags'] = (1, 1)
+    data_params['vars'] = (['CPI'], ['CPI', 'GDP'])
+    data_params['x_lags'] = 1
+    data_params['y_lags'] = 2
 
     tr = DifferenceTransformer()
 
     x, y = data_utils.get_data_in_shape(**data_params)
-    x, y = tr.fit(x, y)
-    x_train, x_val, x_test = data_utils.train_val_test_split(x, 12, 12)
-    y_train, y_val, y_test = data_utils.train_val_test_split(y, 12, 12)
+
+    print y
+    # print difference(x)
+    print y.values.shape
+    diff_y = difference(y)
+    inv_diff = inverse_difference(diff_y, y.iloc[:-1], True)
+    print inv_diff
+
+    print inv_diff == y.iloc[1:]
 
 
-    curr_x = x_val
-    cuur_y = y_val
-    x_trans, y_trans = tr.transform(curr_x, cuur_y)
-    y_orig = tr.inverse_transform(y_trans.values, cuur_y)
-
-    print np.concatenate([cuur_y, y_orig], axis=1)
-    print y_orig
-
-    # print pd.concat([x_train, y_train], axis=1)
-    # print pd.concat([x_trans, y_trans], axis=1)
-
-    # plt.plot(y_train.values, 'r+', label='a')
-    # print y_trans
-    # inv_tr = tr.inverse_transform(y_trans.values, y_train)
-    # plt.plot(inv_tr, 'b--', label='b')
-    # plt.legend()
-    # plt.show()
+    # x, y = tr.fit(x, y)
+    # x_train, x_val, x_test = data_utils.train_val_test_split(x, 12, 12)
+    # y_train, y_val, y_test = data_utils.train_val_test_split(y, 12, 12)
+    #
+    #
+    # curr_x = x_val
+    # cuur_y = y_val
+    # x_trans, y_trans = tr.transform(curr_x, cuur_y)
+    # y_orig = tr.inverse_transform(y_trans.values, cuur_y)
+    #
+    # print np.concatenate([cuur_y, y_orig], axis=1)
+    # print y_orig
+    #
+    # # print pd.concat([x_train, y_train], axis=1)
+    # # print pd.concat([x_trans, y_trans], axis=1)
+    #
+    # # plt.plot(y_train.values, 'r+', label='a')
+    # # print y_trans
+    # # inv_tr = tr.inverse_transform(y_trans.values, y_train)
+    # # plt.plot(inv_tr, 'b--', label='b')
+    # # plt.legend()
+    # # plt.show()
 
 
 if __name__ == '__main__':

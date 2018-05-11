@@ -10,7 +10,7 @@ from sklearn.model_selection import PredefinedSplit, TimeSeriesSplit
 
 from src.neuralnets.forecast_model.forecast_models import ForecastModel
 from src.utils import data_utils
-from preprocessing import DifferenceTransformer
+from preprocessing import DifferenceTransformer, difference, inverse_difference
 from scipy.ndimage import shift
 
 
@@ -62,15 +62,16 @@ class ForecastRegressor(BaseWrapper):
 
         # difference data
         if self.difference:
-            self.x, self.y = self.transformer.fit(self.x, self.y)
+            self.x_levels = self.x
+            self.y_levels = self.y
+            self.x = difference(self.x)
+            self.y = difference(self.y)
 
         # split into train/val/test sets
-        self.train = np.index_exp[:-24]
-        self.val = np.index_exp[-24:-12]
-        self.test = np.index_exp[-12:]
-
-        # self.x_train, self.x_val, self.x_test, = data_utils.train_val_test_split(self.x, 12, 12)
-        # self.y_train, self.y_val, self.y_test = data_utils.train_val_test_split(self.y, 12, 12)
+        data_len = len(self.x)
+        self.train = np.arange(0, data_len - 24)
+        self.val = np.arange(data_len - 24, data_len - 12)
+        self.test = np.arange(data_len - 12, data_len)
 
     def get_data_params(self):
         return self.data_params
@@ -100,75 +101,64 @@ class ForecastRegressor(BaseWrapper):
 
     def _get_data_fold(self, fold):
         if fold == 'train':
-            return self.x.iloc[self.train], self.y.iloc[self.train]
+            return self.train
         elif fold == 'val':
-            return self.x.iloc[self.val], self.y.iloc[self.val]
+            return self.val
         elif fold == 'test':
-            return self.x.iloc[self.test], self.y.iloc[self.test]
+            return self.test
         else:
-            raise ValueError('Set must be train, val or test')
+            return fold
 
-    def _fit(self, x, y, **kwargs):
+    def _fit(self, fold, **kwargs):
         self.check_data_params()
         self.is_fitted = True
 
-        # if self.difference:
-        #     x, y = self.transformer.transform(x, y)
+        if self.difference:
+            x = difference(self.x).iloc[fold]
+            y = difference(self.y).iloc[fold]
+        else:
+            x = self.x.iloc[fold]
+            y = self.y.iloc[fold]
 
         return super(ForecastRegressor, self).fit(x, y, **kwargs)
 
-    def _predict(self, x, y, **kwargs):
+    def _predict(self, fold, recursive=False, **kwargs):
         # check params are set and fit if not fitted
         self.check_data_params()
         if not self.is_fitted:
             self.fit()
 
+        if self.difference:
+            x_levels = self.x.iloc[fold-1]
+            y_levels = self.y.iloc[fold-1]
+            x = difference(self.x).iloc[fold]
+            y = difference(self.y).iloc[fold]
+        else:
+            x = self.x.iloc[fold]
+            y = self.y.iloc[fold]
+
         # filter kwargs for predict
         kwargs = self.filter_sk_params(ForecastModel.predict, kwargs)
 
-        # difference
-        if self.difference:
-            x, y = self.transformer.transform(x, y)
-
         # predict
-        y_pred = self.model.predict(x, **kwargs)
+        if not recursive:
+            y_pred = self.model.predict(x, **kwargs)
+        else:
+            y_pred = self.model.forecast(x, y)
 
         y_pred = lag_average(y_pred, self.y_lags)
-        y = lag_average(y, self.y_lags)
+        y_levels = lag_average(y_levels, self.y_lags)
 
         # inverse difference
         if self.difference:
-            y_pred = self.transformer.inverse_transform(y_pred, y, recursive=False)
-
-
+            inverse_difference(y_pred, y_levels, recursive=recursive)
 
         return y_pred
-
-    def _forecast(self, x, y, **kwargs):
-        self.check_data_params()
-        if not self.is_fitted:
-            self.fit()
-
-        kwargs = self.filter_sk_params(ForecastModel.forecast, kwargs)
-
-        if self.difference:
-            x, y = self.transformer.transform(x, y)
-
-        y_fcast = self.model.forecast(x, y, **kwargs)
-
-        y_fcast = lag_average(y_fcast, self.y_lags)
-        y = lag_average(y, self.y_lags)
-
-
-        if self.difference:
-            y_fcast = self.transformer.inverse_transform(y_fcast, y, recursive=True)
-
-        return y_fcast
 
     def _loss_function(self, y, y_pred):
 
         # reshape inputs for loss fn
-        y = lag_average(y, self.y_lags)
+        # y = lag_average(y, self.y_lags)
         y = np.squeeze(y).T
         y_pred = np.squeeze(y_pred).T
 
@@ -183,44 +173,28 @@ class ForecastRegressor(BaseWrapper):
 
         return loss
 
-    def _evaluate_prediction(self, x, y, **kwargs):
-        y_pred = self._predict(x, y, **kwargs)
+    def _evaluate_prediction(self, fold, recursive=False, **kwargs):
+        y_pred = self._predict(fold, recursive=recursive, **kwargs)
+        y = self.y.iloc[self._get_data_fold(fold)]
+        y = lag_average(y, self.y_lags)
 
-        loss = self._loss_function(y, y_pred)
-        return loss
-
-    def _evaluate_forecast(self, x, y, **kwargs):
-
-        y_pred = self._forecast(x, y, **kwargs)
         loss = self._loss_function(y, y_pred)
         return loss
 
     def fit(self, **kwargs):
-        x, y = self._get_data_fold('train')
-        return self._fit(x, y, **kwargs)
+        fold = self._get_data_fold('train')
+        return self._fit(fold, **kwargs)
 
-    def predict(self, fold, **kwargs):
-        x, y = self._get_data_fold(fold)
-        return self._predict(x, y, **kwargs)
+    def predict(self, fold, recursive=False, **kwargs):
+        fold = self._get_data_fold(fold)
+        return self._predict(fold, recursive=recursive, **kwargs)
 
-    def forecast(self, fold, **kwargs):
-        x, y = self._get_data_fold(fold)
-        return self._forecast(x, y, **kwargs)
-
-    def evaluate_prediction(self, fold, refit=False, **kwargs):
+    def evaluate_prediction(self, fold, recursive=False, refit=False, **kwargs):
         if refit:
             self.fit()
 
-        x, y = self._get_data_fold(fold)
-        loss = self._evaluate_prediction(x, y, **kwargs)
-        return loss
-
-    def evaluate_forecast(self, fold, refit=False, **kwargs):
-        if refit:
-            self.fit()
-
-        x, y = self._get_data_fold(fold)
-        loss = self._evaluate_forecast(x, y, **kwargs)
+        fold = self._get_data_fold(fold)
+        loss = self._evaluate_prediction(fold, recursive, **kwargs)
         return loss
 
     def validate(self, cv_splits, num_runs):
@@ -413,9 +387,12 @@ def main():
     for data_params in [data_params1, data_params2, data_params3]:
         wrapper = ForecastRegressor(model, data_params, params, difference=True)
         wrapper.set_params(**params)
-        print wrapper.predict('val').shape
-        print wrapper.forecast('val').shape
-        print wrapper.evaluate_prediction('val')
+        print wrapper.predict('val')
+        # print wrapper.predict('val', recursive=True).shape
+        # print wrapper.evaluate_prediction('val')
+        # print wrapper.evaluate_prediction('val', recursive=True)
+        # print wrapper.forecast('val').shape
+        # print wrapper.evaluate_prediction('val')
 
 
 if __name__ == '__main__':
