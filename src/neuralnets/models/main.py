@@ -56,5 +56,5 @@ def lstm_experiments():
 
 
 if __name__ == '__main__':
-    # lstm_experiments()
+    lstm_experiments()
     mlp_experiments()
