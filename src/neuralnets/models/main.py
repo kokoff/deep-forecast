@@ -35,7 +35,7 @@ def kill_others():
 
 def mlp_experiments(diff=True):
     countries = ['EA', 'US']
-    vars = one_one_in + many_one + many_many
+    vars = many_many + many_one + one_one_in
 
     for i, j in product(countries, vars):
         args = ['python', '-m', 'scoop', 'run_models.py', '-m', 'mlp', '-c', i, '--in', ' '.join(j[0]), '--out',
