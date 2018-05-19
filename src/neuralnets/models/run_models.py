@@ -27,7 +27,7 @@ def lstm_experiment(args):
     params['batch_size'] = 1
     params['input_size'] = 1
 
-    output_dir = 'lstm_experiments'
+    output_dir = 'lstm_experiments' if not args['diff'] else 'lstm_experiments_diff'
     searcher = HyperSearch(solver='pso', num_particles=5, num_generations=5, difference=args['diff'], output_dir=output_dir, cv_splits=5,
                            eval_runs=10)
 
@@ -48,7 +48,7 @@ def mlp_experiment(args):
     params['batch_size'] = var(1, 10, int)
     params['input_size'] = var(4, 10, int)
 
-    output_dir = 'mlp_experiments'
+    output_dir = 'mlp_experiments' if not args['diff'] else 'mlp_experiments_diff'
     searcher = HyperSearch(solver='pso', num_particles=5, num_generations=5, difference=args['diff'], output_dir=output_dir, cv_splits=5,
                            eval_runs=10)
 
@@ -67,7 +67,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     args = vars(args)
     print args
-    # args = {'model': 'mlp', 'country': 'EA', 'vars': 'one_one', 'lags': 1, 'in': ['CPI'], 'out': ['CPI']}
+    # args = {'model': 'mlp', 'country': 'EA', 'vars': 'one_one', 'lags': 1, 'in': ['CPI'], 'out': ['CPI'], 'diff': True}
 
     if args['model'] == 'lstm':
         print 'LSTM experiment'

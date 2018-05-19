@@ -131,10 +131,7 @@ class HyperSearch:
         self.cv_splits = cv_splits
         self.eval_runs = eval_runs
         self.difference = difference
-        if difference:
-            self.output_dir = output_dir + '_diff'
-        else:
-            self.output_dir = output_dir
+        self.output_dir = output_dir
 
     def hyper_data_search(self, build_fn, data_params_dict, params):
         data_params = ParameterGrid(data_params_dict)
