@@ -49,7 +49,7 @@ def mlp_experiment(args):
     params['input_size'] = var(4, 10, int)
 
     output_dir = 'mlp_experiments' if not args['diff'] else 'mlp_experiments_diff'
-    searcher = HyperSearch(solver='pso', num_particles=5, num_generations=5, difference=args['diff'], output_dir=output_dir, cv_splits=5,
+    searcher = HyperSearch(solver='pso', num_particles=10, num_generations=10, difference=args['diff'], output_dir=output_dir, cv_splits=5,
                            eval_runs=10)
 
     searcher.hyper_data_search(mlp, data_params, params)
@@ -67,7 +67,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     args = vars(args)
     print args
-    # args = {'model': 'mlp', 'country': 'EA', 'vars': 'one_one', 'lags': 1, 'in': ['CPI'], 'out': ['CPI'], 'diff': True}
+    # args = {'model': 'mlp', 'country': 'EA', 'vars': 'one_one', 'lags': 1, 'in': VARIABLES, 'out': ['CPI'], 'diff': True}
 
     if args['model'] == 'lstm':
         print 'LSTM experiment'
