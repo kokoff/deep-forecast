@@ -4,6 +4,7 @@ from src.utils.data_utils import VARIABLES
 import psutil
 import os
 import sys
+import argparse
 
 one_one_in = [([i], [i]) for i in VARIABLES]
 many_one = [(VARIABLES, [i]) for i in VARIABLES]
@@ -64,7 +65,22 @@ def lstm_experiments(diff=True):
 
 
 if __name__ == '__main__':
-    lstm_experiments(diff=True)
-    mlp_experiments(diff=True)
-    lstm_experiments(diff=False)
-    mlp_experiments(diff=False)
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('-m', '--model', choices=['mlp', 'lstm', 'all'], required=True)
+    parser.add_argument('-d', '--diff', choices=['yes', 'no', 'both'], required = True)
+    args = parser.parse_args()
+    args = vars(args)
+    print args
+
+    if args['diff'] == 'both' or args['diff'] == 'yes':
+        if args['model'] == 'all' or args['model'] == 'lstm':
+            lstm_experiments(diff=True)
+        if args['model'] == 'all' or args['model'] == 'mlp':
+            mlp_experiments(diff=True)
+
+    if args['diff'] == 'both' or args['diff'] == 'no':
+        if args['model'] == 'all' or args['model'] == 'lstm':
+            lstm_experiments(diff=False)
+        if args['model'] == 'all' or args['model'] == 'mlp':
+            mlp_experiments(diff=False)
