@@ -32,29 +32,39 @@ def kill_others():
             proc.kill()
 
 
-def mlp_experiments():
+def mlp_experiments(diff=True):
     countries = ['EA', 'US']
     vars = one_one_in + many_one + many_many
 
     for i, j in product(countries, vars):
         args = ['python', '-m', 'scoop', 'run_models.py', '-m', 'mlp', '-c', i, '--in', ' '.join(j[0]), '--out',
-                ' '.join(j[1]), '-d']
+                ' '.join(j[1])]
+
+        if diff:
+            args.append('-d')
+
         run_command(args)
         kill_others()
 
 
-def lstm_experiments():
+def lstm_experiments(diff=True):
     countries = ['EA', 'US']
     vars = one_one_in
 
     for i, j in product(countries, vars):
         print i, j
         args = ['python', '-m', 'scoop', 'run_models.py', '-m', 'lstm', '-c', i, '--in', ' '.join(j[0]), '--out',
-                ' '.join(j[1]), '-d']
+                ' '.join(j[1])]
+
+        if diff:
+            args.append('-d')
+
         run_command(args)
         kill_others()
 
 
 if __name__ == '__main__':
-    lstm_experiments()
-    mlp_experiments()
+    lstm_experiments(diff=True)
+    mlp_experiments(diff=True)
+    lstm_experiments(diff=False)
+    mlp_experiments(diff=False)
