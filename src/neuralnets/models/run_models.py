@@ -22,13 +22,13 @@ def lstm_experiment(args):
     params['neurons'] = choice([var(1, 15, int)],
                                [var(1, 15, int), var(1, 15, int)],
                                [var(1, 15, int), var(1, 15, int), var(1, 15, int)])
-    params['dropout'] = var(0.0, 0.5, float)
+    params['dropout'] = var(0.0, 0.3, float)
     params['epochs'] = var(10, 50, int)
     params['batch_size'] = 1
     params['input_size'] = 1
 
     output_dir = 'lstm_experiments'
-    searcher = HyperSearch(solver='pso', num_particles=5, num_generations=5, output_dir=output_dir, cv_splits=5,
+    searcher = HyperSearch(solver='pso', num_particles=5, num_generations=5, difference=args['diff'], output_dir=output_dir, cv_splits=5,
                            eval_runs=10)
 
     searcher.hyper_data_search(lstm, data_params, params)
@@ -43,13 +43,13 @@ def mlp_experiment(args):
     params = OrderedDict()
     params['neurons'] = choice([var(1, 15, int)],
                                [var(1, 15, int), var(1, 15, int)])
-    params['dropout'] = var(0.0, 0.5, float)
+    params['dropout'] = var(0.0, 0.3, float)
     params['epochs'] = var(10, 150, int)
     params['batch_size'] = var(1, 10, int)
     params['input_size'] = var(4, 10, int)
 
     output_dir = 'mlp_experiments'
-    searcher = HyperSearch(solver='pso', num_particles=5, num_generations=5, output_dir=output_dir, cv_splits=5,
+    searcher = HyperSearch(solver='pso', num_particles=5, num_generations=5, difference=args['diff'], output_dir=output_dir, cv_splits=5,
                            eval_runs=10)
 
     searcher.hyper_data_search(mlp, data_params, params)
@@ -63,6 +63,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--country', choices=['EA', 'US'])
     parser.add_argument('-i', '--in', nargs='*')
     parser.add_argument('-o', '--out', nargs='*')
+    parser.add_argument('-d', '--diff', action='store_true')
     args = parser.parse_args()
     args = vars(args)
     print args

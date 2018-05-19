@@ -117,7 +117,7 @@ def experiment_dir(data_param):
 
 
 class HyperSearch:
-    def __init__(self, solver, cv_splits=5, validation_runs=2, eval_runs=10, output_dir='experiments', **solver_kwargs):
+    def __init__(self, solver, cv_splits=5, validation_runs=2, eval_runs=10, difference=True, output_dir='experiments', **solver_kwargs):
         if solver == 'pso':
             self.solver = PSOptimizer(**solver_kwargs)
         elif solver == 'gso':
@@ -129,8 +129,12 @@ class HyperSearch:
 
         self.runs = validation_runs
         self.cv_splits = cv_splits
-        self.output_dir = output_dir
         self.eval_runs = eval_runs
+        self.difference = difference
+        if difference:
+            self.output_dir = output_dir + '_diff'
+        else:
+            self.output_dir = output_dir
 
     def hyper_data_search(self, build_fn, data_params_dict, params):
         data_params = ParameterGrid(data_params_dict)
@@ -143,7 +147,7 @@ class HyperSearch:
 
     def hyper_search(self, build_fn, data_param, params):
 
-        model = ForecastRegressor(build_fn, data_param, params)
+        model = ForecastRegressor(build_fn, data_param, params, self.difference)
         runner = Runner(model, self.cv_splits, self.runs)
 
         res = self.solver.optimize(runner.run, params)

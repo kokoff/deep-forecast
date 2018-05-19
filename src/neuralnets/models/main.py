@@ -38,7 +38,7 @@ def mlp_experiments():
 
     for i, j in product(countries, vars):
         args = ['python', '-m', 'scoop', 'run_models.py', '-m', 'mlp', '-c', i, '--in', ' '.join(j[0]), '--out',
-                ' '.join(j[1])]
+                ' '.join(j[1]), '-d']
         run_command(args)
         kill_others()
 
@@ -50,7 +50,7 @@ def lstm_experiments():
     for i, j in product(countries, vars):
         print i, j
         args = ['python', '-m', 'scoop', 'run_models.py', '-m', 'lstm', '-c', i, '--in', ' '.join(j[0]), '--out',
-                ' '.join(j[1])]
+                ' '.join(j[1]), '-d']
         run_command(args)
         kill_others()
 

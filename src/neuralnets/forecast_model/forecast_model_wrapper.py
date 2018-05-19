@@ -12,17 +12,20 @@ from src.neuralnets.forecast_model.forecast_models import ForecastModel
 from src.utils import data_utils
 from preprocessing import DifferenceTransformer
 
+
 def clear_session(dumy):
     K.clear_session()
 
+
 class ForecastRegressor(BaseWrapper):
-    def __init__(self, build_fn, data_params=None, params=None):
+    def __init__(self, build_fn, data_params=None, params=None, difference=True):
         self.data_params = None
         self.variables = None
 
         self.is_data_set = False
         self.is_fitted = False
         self.is_multioutput = None
+        self.difference = difference
 
         self.x = None
         self.y = None
@@ -42,7 +45,9 @@ class ForecastRegressor(BaseWrapper):
 
     def set_data_params(self, **data_params):
         self.x, self.y = data_utils.get_data_in_shape(**data_params)
-        self.x, self.y = self.transformer.fit(self.x, self.y)
+
+        if self.difference:
+            self.x, self.y = self.transformer.fit(self.x, self.y)
 
         self.x_train, self.x_val, self.x_test, = data_utils.train_val_test_split(self.x, 12, 12)
         self.y_train, self.y_val, self.y_test = data_utils.train_val_test_split(self.y, 12, 12)
@@ -62,7 +67,7 @@ class ForecastRegressor(BaseWrapper):
 
     def set_params(self, **params):
         K.clear_session()
-        map(clear_session, [10]*10)
+        map(clear_session, [10] * 10)
         self.check_data_params()
         data_params = self.data_params
         data_params['lags'] = params['input_size']
@@ -86,7 +91,10 @@ class ForecastRegressor(BaseWrapper):
     def _fit(self, x, y, **kwargs):
         self.check_data_params()
         self.is_fitted = True
-        x, y = self.transformer.transform(x, y)
+
+        if self.difference:
+            x, y = self.transformer.transform(x, y)
+
         return super(ForecastRegressor, self).fit(x, y, **kwargs)
 
     def _predict(self, x, y, **kwargs):
@@ -96,9 +104,14 @@ class ForecastRegressor(BaseWrapper):
 
         kwargs = self.filter_sk_params(ForecastModel.predict, kwargs)
 
-        x, y = self.transformer.transform(x, y)
+        if self.difference:
+            x, y = self.transformer.transform(x, y)
+
         y_pred = np.squeeze(self.model.predict(x, **kwargs))
-        y_pred = self.transformer.inverse_transform(y_pred, y, recursive=False)
+
+        if self.difference:
+            y_pred = self.transformer.inverse_transform(y_pred, y, recursive=False)
+
         return y_pred
 
     def _forecast(self, x, y, **kwargs):
@@ -108,9 +121,14 @@ class ForecastRegressor(BaseWrapper):
 
         kwargs = self.filter_sk_params(ForecastModel.forecast, kwargs)
 
-        x, y = self.transformer.transform(x, y)
+        if self.difference:
+            x, y = self.transformer.transform(x, y)
+
         y_fcast = np.squeeze(self.model.forecast(x, y, **kwargs))
-        y_fcast = self.transformer.inverse_transform(y_fcast, y, recursive=True)
+
+        if self.difference:
+            y_fcast = self.transformer.inverse_transform(y_fcast, y, recursive=True)
+
         return y_fcast
 
     def _loss_function(self, y, y_pred):
