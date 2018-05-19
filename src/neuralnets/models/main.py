@@ -38,8 +38,7 @@ def mlp_experiments(diff=True):
     vars = many_many + many_one + one_one_in
 
     for i, j in product(countries, vars):
-        args = ['python', '-m', 'scoop', 'run_models.py', '-m', 'mlp', '-c', i, '--in', ' '.join(j[0]), '--out',
-                ' '.join(j[1])]
+        args = ['python', '-m', 'scoop', 'run_models.py', '-m', 'mlp', '-c', i, '--in'] + j[0] + ['--out'] + j[1]
 
         if diff:
             args.append('-d')
@@ -54,8 +53,7 @@ def lstm_experiments(diff=True):
 
     for i, j in product(countries, vars):
         print i, j
-        args = ['python', '-m', 'scoop', 'run_models.py', '-m', 'lstm', '-c', i, '--in', ' '.join(j[0]), '--out',
-                ' '.join(j[1])]
+        args = ['python', '-m', 'scoop', 'run_models.py', '-m', 'lstm', '-c', i, '--in'] + j[0] + ['--out'] + j[1]
 
         if diff:
             args.append('-d')
@@ -68,7 +66,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     parser.add_argument('-m', '--model', choices=['mlp', 'lstm', 'all'], required=True)
-    parser.add_argument('-d', '--diff', choices=['yes', 'no', 'both'], required = True)
+    parser.add_argument('-d', '--diff', choices=['yes', 'no', 'both'], required=True)
     args = parser.parse_args()
     args = vars(args)
     print args
