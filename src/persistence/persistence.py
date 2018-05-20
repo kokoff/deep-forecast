@@ -56,7 +56,7 @@ def evaluate_persistance(series, country, variable, output_dir):
     if not os.path.exists(dir_path):
         os.mkdir(dir_path)
 
-    pred_path = os.path.join(dir_path, 'predictions.csv')
+    pred_path = os.path.join(dir_path, 'prediction.csv')
     performance_path = os.path.join(dir_path, 'performance.csv')
 
     pred = persistence_prediction(series)
@@ -68,7 +68,7 @@ def evaluate_persistance(series, country, variable, output_dir):
 
 
 def main():
-    output_dir = os.path.join(EXPERIMENTS_DIR, 'persistence')
+    output_dir = 'persistence'
 
     for country, variable in product(data_utils.COUNTRIES, data_utils.VARIABLES):
         series = data_utils.get_data_dict()[country][[variable]]
