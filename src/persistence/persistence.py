@@ -1,13 +1,16 @@
-import pandas as pd
-import numpy as np
-from sklearn.metrics import mean_squared_error as mse
-from src.utils import data_utils
-from matplotlib import pyplot as plt
-import seaborn as sns
 import os
 from collections import OrderedDict
 from itertools import product
+
+import pandas as pd
+import seaborn as sns
+from matplotlib import pyplot as plt
+from sklearn.metrics import mean_squared_error as mse
+
 from src.utils import EXPERIMENTS_DIR
+from src.utils import data_utils
+
+PERSISTENCE_DIR = os.path.join(EXPERIMENTS_DIR, 'persistence')
 
 sns.set()
 
@@ -68,7 +71,10 @@ def evaluate_persistance(series, country, variable, output_dir):
 
 
 def main():
-    output_dir = 'persistence'
+    if not os.path.exists(PERSISTENCE_DIR):
+        os.mkdir(PERSISTENCE_DIR)
+
+    output_dir = PERSISTENCE_DIR
 
     for country, variable in product(data_utils.COUNTRIES, data_utils.VARIABLES):
         series = data_utils.get_data_dict()[country][[variable]]

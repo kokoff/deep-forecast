@@ -1,9 +1,11 @@
-import pandas as pd
-from matplotlib import pyplot as plt
-import seaborn as sns
 import os
 from io import StringIO
+
+import pandas as pd
+import seaborn as sns
+from matplotlib import pyplot as plt
 from rpy2 import robjects
+
 from src.utils import EXPERIMENTS_DIR
 
 r = robjects.r
@@ -55,6 +57,9 @@ def plot_results(arima_dir):
 
 
 def main():
+    if not os.path.exists(ARIMA_DIR):
+        os.mkdir(ARIMA_DIR)
+
     robjects.globalenv["output_dir"] = ARIMA_DIR
     robjects.r.source("arima.R")
     plot_results(ARIMA_DIR)

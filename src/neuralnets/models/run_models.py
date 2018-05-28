@@ -4,13 +4,14 @@ warnings.filterwarnings("ignore")
 
 from mlp import mlp
 from lstm import lstm
+import os
 
 from collections import OrderedDict
-from src.utils.data_utils import VARIABLES, COUNTRIES
 import argparse
 
 from src.neuralnets.hypersearch import HyperSearch, var, choice
 from src.neuralnets.hypersearch.results.visualisation import produce_plots
+from src.utils import EXPERIMENTS_DIR
 
 
 def lstm_experiment(args):
@@ -28,7 +29,9 @@ def lstm_experiment(args):
     params['input_size'] = 1
 
     output_dir = 'lstm_experiments' if not args['diff'] else 'lstm_experiments_diff'
-    searcher = HyperSearch(solver='pso', num_particles=5, num_generations=5, difference=args['diff'], output_dir=output_dir, cv_splits=5,
+    output_dir = os.path.join(EXPERIMENTS_DIR, output_dir)
+    searcher = HyperSearch(solver='pso', num_particles=5, num_generations=5, difference=args['diff'],
+                           output_dir=output_dir, cv_splits=5,
                            eval_runs=10)
 
     searcher.hyper_data_search(lstm, data_params, params)
@@ -51,7 +54,9 @@ def mlp_experiment(args):
     params['input_size'] = var(4, 10, int)
 
     output_dir = 'mlp_experiments' if not args['diff'] else 'mlp_experiments_diff'
-    searcher = HyperSearch(solver='pso', num_particles=10, num_generations=10, difference=args['diff'], output_dir=output_dir, cv_splits=5,
+    output_dir = os.path.join(EXPERIMENTS_DIR, output_dir)
+    searcher = HyperSearch(solver='pso', num_particles=10, num_generations=10, difference=args['diff'],
+                           output_dir=output_dir, cv_splits=5,
                            eval_runs=10)
 
     searcher.hyper_data_search(mlp, data_params, params)
