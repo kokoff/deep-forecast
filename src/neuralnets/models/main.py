@@ -1,12 +1,18 @@
+import os
+import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.realpath(__file__), '..', '..', '..', '..')))
+
 import subprocess
 from itertools import product, chain
 from src.utils.data_utils import VARIABLES
 import psutil
 import os
-import sys
 import argparse
 
-one_one_in = [([i], [i]) for i in VARIABLES]
+RUN_SCRIPT = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'run_models.py'))
+
+one_one = [([i], [i]) for i in VARIABLES]
 many_one = [(VARIABLES, [i]) for i in VARIABLES]
 many_many = [(VARIABLES, VARIABLES)]
 
@@ -38,7 +44,7 @@ def mlp_experiments(diff, vars):
     # vars = one_one_in + many_one + many_many
 
     for i, j in product(countries, vars):
-        args = ['python', '-m', 'scoop', 'run_models.py', '-m', 'mlp', '-c', i, '--in'] + j[0] + ['--out'] + j[1]
+        args = ['python', '-m', 'scoop', RUN_SCRIPT, '-m', 'mlp', '-c', i, '--in'] + j[0] + ['--out'] + j[1]
 
         if diff:
             args.append('-d')
@@ -49,11 +55,11 @@ def mlp_experiments(diff, vars):
 
 def lstm_experiments(diff):
     countries = ['EA', 'US']
-    vars = one_one_in
+    vars = one_one
 
     for i, j in product(countries, vars):
         print i, j
-        args = ['python', '-m', 'scoop', 'run_models.py', '-m', 'lstm', '-c', i, '--in'] + j[0] + ['--out'] + j[1]
+        args = ['python', '-m', 'scoop', RUN_SCRIPT, '-m', 'lstm', '-c', i, '--in'] + j[0] + ['--out'] + j[1]
 
         if diff:
             args.append('-d')
@@ -64,7 +70,7 @@ def lstm_experiments(diff):
 
 MODELS = {'mlp': [mlp_experiments], 'lstm': [lstm_experiments], 'all': [lstm_experiments, mlp_experiments]}
 DIFFS = {'no': [False], 'yes': [True], 'both': [True, False]}
-SETS = {'one_to_one': one_one_in, 'many_to_one': many_one, 'many_to_many': many_many}
+SETS = {'one_to_one': one_one, 'many_to_one': many_one, 'many_to_many': many_many}
 
 
 def run_experiments(args):

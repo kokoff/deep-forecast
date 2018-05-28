@@ -1,4 +1,8 @@
 import os
+import sys
+
+sys.path.append(os.path.abspath(os.path.join(os.path.realpath(__file__), '..', '..', '..')))
+
 from io import StringIO
 
 import pandas as pd
@@ -13,6 +17,7 @@ r = robjects.r
 sns.set()
 
 ARIMA_DIR = os.path.join(EXPERIMENTS_DIR, 'arima')
+ARIMA_SCRIPT = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'arima.R'))
 
 
 def read_predictions(file_path):
@@ -61,7 +66,7 @@ def main():
         os.mkdir(ARIMA_DIR)
 
     robjects.globalenv["output_dir"] = ARIMA_DIR
-    robjects.r.source("arima.R")
+    robjects.r.source(ARIMA_SCRIPT)
     plot_results(ARIMA_DIR)
 
 
