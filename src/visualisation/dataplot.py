@@ -11,7 +11,6 @@ from statsmodels.graphics.tsaplots import quarter_plot
 from pandas.plotting import lag_plot
 from statsmodels.tsa.stattools import adfuller, kpss
 
-
 from src.utils import data_utils
 
 sns.set()
@@ -218,13 +217,33 @@ class DataPlotter:
         self.plot_matrix()
 
 
+def stationarity_tests():
+    data = data_utils.get_data_dict()
+
+    index = ['_'.join([i, j]) for i in data_utils.COUNTRIES for j in data_utils.VARIABLES]
+    columns = ['ADF stat', 'ADF p-val', 'KPSS stat', 'KPSS p-val']
+    df = pd.DataFrame(index=index, columns=columns)
+    for country in data_utils.COUNTRIES:
+        for var in data_utils.VARIABLES:
+            index = '_'.join([country, var])
+
+            adf_res = adfuller(data[country][var])[:2]
+            kpss_res = kpss(data[country][var])[:2]
+
+            df.loc[index, :] = adf_res + kpss_res
+
+    df.to_csv('stationary_tests.csv')
+
+
 # TODO Implement cross correlation matrix for each variable with different lags of other variables
 
 if __name__ == '__main__':
-    series = data_utils.get_ea_data()
-    # plotter = SeriesPlotter(series, label='EA CPI')
-    # plotter.plot_all()
-    # plot_lag(series, 'EA CPI')
-    # plt.show()
-    plotter = DataPlotter(series, 'EA')
+    stationarity_tests()
+
+    ea = data_utils.get_ea_data()
+    plotter = DataPlotter(ea, 'EA', 'EA')
+    plotter.plot_all()
+
+    us = data_utils.get_ea_data()
+    plotter = DataPlotter(us, 'US', 'US')
     plotter.plot_all()
