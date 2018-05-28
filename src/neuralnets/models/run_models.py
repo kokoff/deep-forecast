@@ -35,7 +35,7 @@ def lstm_experiment(args):
 
     output_dir = 'lstm_experiments' if not args['diff'] else 'lstm_experiments_diff'
     output_dir = os.path.join(EXPERIMENTS_DIR, output_dir)
-    searcher = HyperSearch(solver='pso', num_particles=5, num_generations=5, difference=args['diff'],
+    searcher = HyperSearch(solver='rso', num_runs=25, difference=args['diff'],
                            output_dir=output_dir, cv_splits=5,
                            eval_runs=10)
 
@@ -60,7 +60,7 @@ def mlp_experiment(args):
 
     output_dir = 'mlp_experiments' if not args['diff'] else 'mlp_experiments_diff'
     output_dir = os.path.join(EXPERIMENTS_DIR, output_dir)
-    searcher = HyperSearch(solver='pso', num_particles=10, num_generations=10, difference=args['diff'],
+    searcher = HyperSearch(solver='rso', num_runs=100, difference=args['diff'],
                            output_dir=output_dir, cv_splits=5,
                            eval_runs=10)
 
