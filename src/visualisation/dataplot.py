@@ -18,42 +18,48 @@ sns.set()
 
 def plot(series, label=''):
     series.plot()
-    plt.title(label + ' Plot')
+    # plt.title(label + ' Plot')
+    plt.title('')
     plt.xlabel('Time')
     plt.ylabel(label)
 
 
 def plot_acf(series, label=''):
     _plot_acf(series)
-    plt.title(label + ' ACF Plot')
+    # plt.title(label + ' ACF Plot')
+    plt.title('')
     plt.xlabel('Lag')
     plt.ylabel('Autocorrelation')
 
 
 def plot_pacf(series, label=''):
     _plot_pacf(series)
-    plt.title(label + ' PACF Plot')
+    # plt.title(label + ' PACF Plot')
+    plt.title('')
     plt.xlabel('Lag')
     plt.ylabel('Partial Autocorrelation')
 
 
 def plot_dist(series, label=''):
     sns.distplot(series)
-    plt.title(label + ' Distribution Plot')
+    # plt.title(label + ' Distribution Plot')
+    plt.title('')
     plt.xlabel('Value')
     plt.ylabel('Frequency')
 
 
 def plot_quarter(series, label=''):
     quarter_plot(series)
-    plt.title(label + ' Seasonal Subseries Plot')
+    # plt.title(label + ' Seasonal Subseries Plot')
+    plt.title('')
     plt.xlabel('Quarter')
     plt.ylabel(label)
 
 
 def plot_lag(series, label=''):
     lag_plot(series)
-    plt.title(label + ' Lag Plot')
+    # plt.title(label + ' Lag Plot')
+    plt.title('')
     plt.xlabel(label + ' (t)')
     plt.ylabel(label + ' (t+1)')
 
@@ -83,7 +89,7 @@ class SeriesPlotter:
             plt.show()
         else:
             plot_path = os.path.join(self.output, self.file_name + '_plot.pdf')
-            plt.savefig(plot_path)
+            plt.savefig(plot_path, bbox_inches='tight')
             plt.close()
 
     def plot_acf(self):
@@ -92,7 +98,7 @@ class SeriesPlotter:
             plt.show()
         else:
             plot_path = os.path.join(self.output, self.file_name + '_acf.pdf')
-            plt.savefig(plot_path)
+            plt.savefig(plot_path, bbox_inches='tight')
             plt.close()
 
     def plot_pacf(self):
@@ -101,7 +107,7 @@ class SeriesPlotter:
             plt.show()
         else:
             plot_path = os.path.join(self.output, self.file_name + '_pacf.pdf')
-            plt.savefig(plot_path)
+            plt.savefig(plot_path, bbox_inches='tight')
             plt.close()
 
     def plot_dist(self):
@@ -110,7 +116,7 @@ class SeriesPlotter:
             plt.show()
         else:
             plot_path = os.path.join(self.output, self.file_name + '_dist.pdf')
-            plt.savefig(plot_path)
+            plt.savefig(plot_path, bbox_inches='tight')
             plt.close()
 
     def plot_quarter(self):
@@ -119,7 +125,7 @@ class SeriesPlotter:
             plt.show()
         else:
             plot_path = os.path.join(self.output, self.file_name + '_quarter.pdf')
-            plt.savefig(plot_path)
+            plt.savefig(plot_path, bbox_inches='tight')
             plt.close()
 
     def stationary_test(self):
@@ -217,7 +223,7 @@ class DataPlotter:
         self.plot_matrix()
 
 
-def stationarity_tests():
+def stationarity_tests(output):
     data = data_utils.get_data_dict()
 
     index = ['_'.join([i, j]) for i in data_utils.COUNTRIES for j in data_utils.VARIABLES]
@@ -232,18 +238,20 @@ def stationarity_tests():
 
             df.loc[index, :] = adf_res + kpss_res
 
-    df.to_csv('stationary_tests.csv')
+    df.to_csv(os.path.join(output, 'stationary_tests.csv'))
 
 
 # TODO Implement cross correlation matrix for each variable with different lags of other variables
 
 if __name__ == '__main__':
-    stationarity_tests()
+    output = 'data-analysis'
 
     ea = data_utils.get_ea_data()
-    plotter = DataPlotter(ea, 'EA', 'EA')
+    plotter = DataPlotter(ea, 'EA', output)
     plotter.plot_all()
 
-    us = data_utils.get_ea_data()
-    plotter = DataPlotter(us, 'US', 'US')
+    us = data_utils.get_us_data()
+    plotter = DataPlotter(us, 'US', output)
     plotter.plot_all()
+
+    stationarity_tests(output)

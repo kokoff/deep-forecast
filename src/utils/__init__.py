@@ -1,2 +1,1 @@
 from experiments_utils import EXPERIMENTS_DIR
-from experiments_utils import get_table
