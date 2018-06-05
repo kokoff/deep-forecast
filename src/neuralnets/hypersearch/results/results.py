@@ -7,7 +7,7 @@ from warnings import warn
 def get_name_from_data_params(data_params):
     name = ''
     name += data_params['country'] + '_['
-    name += 'many' if len(data_params['vars'][1]) > 1 else 'one'
+    name += 'many' if len(data_params['vars'][0]) > 1 else 'one'
     name += ']_['
     name += 'many' if len(data_params['vars'][1]) > 1 else 'one'
     name += ']'

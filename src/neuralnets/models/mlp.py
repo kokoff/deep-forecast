@@ -1,17 +1,20 @@
 from collections import OrderedDict
 from src.utils.data_utils import VARIABLES, COUNTRIES
 
-from keras.layers import Dense
+from keras.layers import Dense, Dropout
 
 from src.neuralnets.forecast_model.forecast_models import ForecastModel, create_input_layers, create_output_layers
 from src.neuralnets.hypersearch import HyperSearch, var, choice
 
 
-def mlp(num_inputs, num_outputs, input_size, neurons):
+def mlp(num_inputs, num_outputs, input_size, neurons, dropout):
     input, layer = create_input_layers(num_inputs, input_size)
 
     for i in neurons:
         layer = Dense(i, activation='relu')(layer)
+        if dropout > 0:
+            layer = Dropout(dropout)(layer)
+
     output = create_output_layers(num_outputs, layer)
 
     model = ForecastModel(inputs=input, outputs=output)
